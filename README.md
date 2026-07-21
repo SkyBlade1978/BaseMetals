@@ -3,6 +3,12 @@
 [![Versions](http://cf.way2muchnoise.eu/versions/base-metals.svg)](https://www.curseforge.com/minecraft/mc-mods/base-metals)
 [![Build Status](https://ci.mcmoddev.com/job/Base%20Metals/job/Base%20Metals%201.12/badge/icon)](https://ci.mcmoddev.com/job/Base%20Metals/job/Base%20Metals%201.12/)
 
+> **Minecraft 1.18.2 port scaffold:** this branch starts from the complete
+> `master-1.12` history with the Forge `1.18.2-40.3.0` MDK build scaffold.
+> The retained 1.12 implementation is reference material and is not yet a
+> runnable 1.18 release. The target port will use OreSpawn 4 as its required,
+> single ore-generation engine.
+
 ## Base Metals Mod
 
 This mod adds historically commonly used metals to Minecraft, specifically Silver, Copper, Tin, Lead, Zinc, Mercury, and Nickel. You will also find a number of metal alloys in this mod and a new tool: the Crack Hammer.

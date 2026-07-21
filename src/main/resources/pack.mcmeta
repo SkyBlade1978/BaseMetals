@@ -1,6 +1,8 @@
 {
-  "pack":{
-    "pack_format":3,
-    "description":"Base Metals"
-  }
+    "pack": {
+        "description": "${mod_id} resources",
+        "pack_format": 9,
+        "forge:resource_pack_format": 8,
+        "forge:data_pack_format": 9
+    }
 }

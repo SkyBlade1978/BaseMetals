@@ -32,3 +32,9 @@ libs/*
 
 .DS_Store
 bugreport.md
+
+# local coding-agent context
+/AGENTS.md
+/agent-notes/
+/.codex/
+/CLAUDE.md
