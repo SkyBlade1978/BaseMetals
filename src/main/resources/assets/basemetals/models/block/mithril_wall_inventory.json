@@ -1,6 +1,6 @@
 {
     "parent": "block/wall_inventory",
     "textures": {
-        "wall": "basemetals:blocks/mithril_block"
+        "wall": "basemetals:block/mithril_block"
     }
 }

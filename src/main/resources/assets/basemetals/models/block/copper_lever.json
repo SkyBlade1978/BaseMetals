@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/copper_block",
-        "base": "basemetals:blocks/copper_block",
-        "lever": "blocks/lever"
+        "particle": "basemetals:block/copper_block",
+        "base": "basemetals:block/copper_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

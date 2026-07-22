@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/coldiron_shard"
+        "layer0": "basemetals:item/coldiron_shard"
     }
 }

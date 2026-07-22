@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/mithril"
+    }
+  },
+  "result": {
+    "item": "basemetals:mithril_door",
+    "count": 3
+  }
+}

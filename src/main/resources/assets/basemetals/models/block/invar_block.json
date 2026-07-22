@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "basemetals:blocks/invar_block"
+        "all": "basemetals:block/invar_block"
     }
 }

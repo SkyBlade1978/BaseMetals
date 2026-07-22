@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:ingots/starsteel"
+    }
+  ],
+  "result": {
+    "item": "basemetals:starsteel_button"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/bismuth"
+    },
+    "X": {
+      "tag": "forge:ingots/bismuth"
+    }
+  },
+  "result": {
+    "item": "basemetals:bismuth_lever"
+  }
+}

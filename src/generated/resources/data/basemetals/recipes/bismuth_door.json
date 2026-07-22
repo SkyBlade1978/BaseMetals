@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/bismuth"
+    }
+  },
+  "result": {
+    "item": "basemetals:bismuth_door",
+    "count": 3
+  }
+}

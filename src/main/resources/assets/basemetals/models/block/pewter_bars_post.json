@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/pewter_bars",
-        "bars": "basemetals:blocks/pewter_bars"
+        "particle": "basemetals:block/pewter_bars",
+        "bars": "basemetals:block/pewter_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

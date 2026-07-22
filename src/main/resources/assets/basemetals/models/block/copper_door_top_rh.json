@@ -1,7 +1,7 @@
 {
     "parent": "block/door_top_rh",
     "textures": {
-        "bottom": "basemetals:blocks/copper_door_lower",
-        "top": "basemetals:blocks/copper_door_upper"
+        "bottom": "basemetals:block/copper_door_lower",
+        "top": "basemetals:block/copper_door_upper"
     }
 }

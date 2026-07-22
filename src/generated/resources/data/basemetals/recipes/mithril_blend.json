@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/silver"
+    },
+    {
+      "tag": "forge:dusts/silver"
+    },
+    {
+      "tag": "forge:dusts/coldiron"
+    },
+    {
+      "tag": "forge:ingots/mercury"
+    }
+  ],
+  "result": {
+    "item": "basemetals:mithril_blend",
+    "count": 3
+  }
+}

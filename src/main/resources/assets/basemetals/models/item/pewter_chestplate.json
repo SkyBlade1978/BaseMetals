@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/pewter_chestplate"
+        "layer0": "basemetals:item/pewter_chestplate"
     }
 }

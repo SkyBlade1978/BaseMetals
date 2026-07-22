@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/diamond"
+    },
+    "X": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "item": "basemetals:diamond_gear"
+  }
+}

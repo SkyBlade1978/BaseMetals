@@ -1,6 +1,6 @@
 {
-    "parent": "block/trapdoor_bottom",
+    "parent": "minecraft:block/template_orientable_trapdoor_bottom",
     "textures": {
-        "texture": "basemetals:blocks/quartz_trapdoor"
+        "texture": "basemetals:block/quartz_trapdoor"
     }
 }

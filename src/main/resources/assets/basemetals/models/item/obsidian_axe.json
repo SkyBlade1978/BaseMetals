@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/obsidian_axe"
+        "layer0": "basemetals:item/obsidian_axe"
     }
 }

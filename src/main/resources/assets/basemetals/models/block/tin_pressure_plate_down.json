@@ -1,6 +1,6 @@
 {
     "parent": "block/pressure_plate_down",
     "textures": {
-        "texture": "basemetals:blocks/tin_block"
+        "texture": "basemetals:block/tin_block"
     }
 }

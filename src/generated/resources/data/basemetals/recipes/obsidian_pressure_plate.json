@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/obsidian"
+    }
+  },
+  "result": {
+    "item": "basemetals:obsidian_pressure_plate"
+  }
+}

@@ -1,12 +1,12 @@
 {
     "parent": "block/cube",
     "textures": {
-        "particle": "basemetals:blocks/starsteel0",
-        "down": "basemetals:blocks/starsteel0",
-        "up": "basemetals:blocks/starsteel1",
-        "north": "basemetals:blocks/starsteel2",
-        "east": "basemetals:blocks/starsteel3",
-        "south": "basemetals:blocks/starsteel4",
-        "west": "basemetals:blocks/starsteel5"
+        "particle": "basemetals:block/starsteel0",
+        "down": "basemetals:block/starsteel0",
+        "up": "basemetals:block/starsteel1",
+        "north": "basemetals:block/starsteel2",
+        "east": "basemetals:block/starsteel3",
+        "south": "basemetals:block/starsteel4",
+        "west": "basemetals:block/starsteel5"
     }
 }

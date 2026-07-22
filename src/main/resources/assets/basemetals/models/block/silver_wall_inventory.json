@@ -1,6 +1,6 @@
 {
     "parent": "block/wall_inventory",
     "textures": {
-        "wall": "basemetals:blocks/silver_block"
+        "wall": "basemetals:block/silver_block"
     }
 }

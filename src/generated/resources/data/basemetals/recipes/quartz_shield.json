@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XWX",
+    "XXX",
+    " X "
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:planks"
+    },
+    "X": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "item": "basemetals:quartz_shield"
+  }
+}

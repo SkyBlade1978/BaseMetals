@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/tin"
+    },
+    "X": {
+      "tag": "forge:ingots/tin"
+    }
+  },
+  "result": {
+    "item": "basemetals:tin_gear"
+  }
+}

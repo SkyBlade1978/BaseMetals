@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  X",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "X": {
+      "tag": "forge:ingots/electrum"
+    }
+  },
+  "result": {
+    "item": "basemetals:electrum_horse_armor"
+  }
+}

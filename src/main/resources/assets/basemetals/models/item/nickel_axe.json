@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/nickel_axe"
+        "layer0": "basemetals:item/nickel_axe"
     }
 }

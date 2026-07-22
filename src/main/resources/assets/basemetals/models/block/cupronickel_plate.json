@@ -1,8 +1,8 @@
 {
     "parent": "basemetals:block/plate",
     "textures": {
-        "top": "basemetals:blocks/cupronickel_plate",
-        "side": "basemetals:blocks/cupronickel_plate",
-        "bottom": "basemetals:blocks/cupronickel_plate"
+        "top": "basemetals:block/cupronickel_plate",
+        "side": "basemetals:block/cupronickel_plate",
+        "bottom": "basemetals:block/cupronickel_plate"
     }
 }

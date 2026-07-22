@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/tin_shovel"
+        "layer0": "basemetals:item/tin_shovel"
     }
 }

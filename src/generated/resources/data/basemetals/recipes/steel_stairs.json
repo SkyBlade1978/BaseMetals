@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/steel"
+    }
+  },
+  "result": {
+    "item": "basemetals:steel_stairs",
+    "count": 4
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "basemetals:adamantine_block"
+    }
+  ],
+  "result": {
+    "item": "basemetals:adamantine_ingot",
+    "count": 9
+  }
+}

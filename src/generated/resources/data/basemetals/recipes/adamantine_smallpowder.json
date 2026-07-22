@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/adamantine"
+    }
+  ],
+  "result": {
+    "item": "basemetals:adamantine_smallpowder",
+    "count": 9
+  }
+}

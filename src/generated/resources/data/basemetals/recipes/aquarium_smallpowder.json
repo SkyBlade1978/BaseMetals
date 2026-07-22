@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/aquarium"
+    }
+  ],
+  "result": {
+    "item": "basemetals:aquarium_smallpowder",
+    "count": 9
+  }
+}

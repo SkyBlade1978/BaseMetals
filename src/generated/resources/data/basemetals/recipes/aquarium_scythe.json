@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX ",
+    "  X",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "X": {
+      "tag": "forge:ingots/aquarium"
+    }
+  },
+  "result": {
+    "item": "basemetals:aquarium_scythe"
+  }
+}

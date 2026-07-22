@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/silver_bars",
-        "bars": "basemetals:blocks/silver_bars"
+        "particle": "basemetals:block/silver_bars",
+        "bars": "basemetals:block/silver_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

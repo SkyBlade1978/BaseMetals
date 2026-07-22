@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/mithril_block"
+    "shield": "basemetals:block/mithril_block"
   },
     "overrides": [
         {

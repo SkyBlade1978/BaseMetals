@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/aquarium_block"
+    "shield": "basemetals:block/aquarium_block"
     }
 }

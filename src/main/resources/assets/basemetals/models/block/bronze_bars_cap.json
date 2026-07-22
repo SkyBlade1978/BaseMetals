@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/bronze_bars",
-        "bars": "basemetals:blocks/bronze_bars",
-        "edge": "basemetals:blocks/bronze_bars"
+        "particle": "basemetals:block/bronze_bars",
+        "bars": "basemetals:block/bronze_bars",
+        "edge": "basemetals:block/bronze_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 8 ],

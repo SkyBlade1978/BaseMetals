@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:ingots/zinc"
+    }
+  ],
+  "result": {
+    "item": "basemetals:zinc_button"
+  }
+}

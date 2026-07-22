@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/zinc_bars",
-        "bars": "basemetals:blocks/zinc_bars",
-        "edge": "basemetals:blocks/zinc_bars"
+        "particle": "basemetals:block/zinc_bars",
+        "bars": "basemetals:block/zinc_bars",
+        "edge": "basemetals:block/zinc_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 0 ],

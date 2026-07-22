@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/silver"
+    }
+  },
+  "result": {
+    "item": "basemetals:silver_slab",
+    "count": 6
+  }
+}

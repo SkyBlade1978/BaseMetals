@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRR",
+    " SR",
+    "R G"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:gears/invar"
+    },
+    "R": {
+      "tag": "forge:rods/invar"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "basemetals:invar_crossbow"
+  }
+}

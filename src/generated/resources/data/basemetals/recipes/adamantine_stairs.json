@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/adamantine"
+    }
+  },
+  "result": {
+    "item": "basemetals:adamantine_stairs",
+    "count": 4
+  }
+}

@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/adamantine_shovel"
+        "layer0": "basemetals:item/adamantine_shovel"
     }
 }

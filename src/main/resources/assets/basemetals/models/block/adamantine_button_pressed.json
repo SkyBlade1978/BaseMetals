@@ -1,6 +1,6 @@
 {
     "parent": "block/button_pressed",
     "textures": {
-        "texture": "basemetals:blocks/adamantine_block"
+        "texture": "basemetals:block/adamantine_block"
     }
 }

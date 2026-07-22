@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/zinc_crackhammer"
+        "layer0": "basemetals:item/zinc_crackhammer"
     }
 }

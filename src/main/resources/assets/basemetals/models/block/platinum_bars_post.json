@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/platinum_bars",
-        "bars": "basemetals:blocks/platinum_bars"
+        "particle": "basemetals:block/platinum_bars",
+        "bars": "basemetals:block/platinum_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

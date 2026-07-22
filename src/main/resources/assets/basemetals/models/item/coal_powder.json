@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/carbon_powder"
+        "layer0": "basemetals:item/carbon_powder"
     }
 }

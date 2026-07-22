@@ -1,8 +1,8 @@
 {
     "parent": "basemetals:block/plate",
     "textures": {
-        "top": "basemetals:blocks/nickel_plate",
-        "side": "basemetals:blocks/nickel_plate",
-        "bottom": "basemetals:blocks/nickel_plate"
+        "top": "basemetals:block/nickel_plate",
+        "side": "basemetals:block/nickel_plate",
+        "bottom": "basemetals:block/nickel_plate"
     }
 }

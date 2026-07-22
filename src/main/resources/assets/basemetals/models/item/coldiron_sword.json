@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/coldiron_sword"
+        "layer0": "basemetals:item/coldiron_sword"
     }
 }

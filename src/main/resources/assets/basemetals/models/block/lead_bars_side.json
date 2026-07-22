@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/lead_bars",
-        "bars": "basemetals:blocks/lead_bars",
-        "edge": "basemetals:blocks/lead_bars"
+        "particle": "basemetals:block/lead_bars",
+        "bars": "basemetals:block/lead_bars",
+        "edge": "basemetals:block/lead_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 0 ],

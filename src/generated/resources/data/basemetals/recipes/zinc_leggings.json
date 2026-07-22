@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX",
+    "X X",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/zinc"
+    }
+  },
+  "result": {
+    "item": "basemetals:zinc_leggings"
+  }
+}

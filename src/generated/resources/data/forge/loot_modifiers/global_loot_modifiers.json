@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "entries": [
+    "basemetals:abandoned_mineshaft",
+    "basemetals:desert_pyramid",
+    "basemetals:end_city_treasure",
+    "basemetals:jungle_temple",
+    "basemetals:nether_bridge",
+    "basemetals:simple_dungeon",
+    "basemetals:spawn_bonus_chest",
+    "basemetals:stronghold_corridor",
+    "basemetals:stronghold_crossing",
+    "basemetals:village_armorer",
+    "basemetals:village_toolsmith",
+    "basemetals:village_weaponsmith"
+  ]
+}

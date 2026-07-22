@@ -1,7 +1,7 @@
 {
     "parent": "block/door_top",
     "textures": {
-        "bottom": "basemetals:blocks/lead_door_lower",
-        "top": "basemetals:blocks/lead_door_upper"
+        "bottom": "basemetals:block/lead_door_lower",
+        "top": "basemetals:block/lead_door_upper"
     }
 }

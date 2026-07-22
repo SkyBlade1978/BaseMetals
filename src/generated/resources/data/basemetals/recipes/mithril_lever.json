@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/mithril"
+    },
+    "X": {
+      "tag": "forge:ingots/mithril"
+    }
+  },
+  "result": {
+    "item": "basemetals:mithril_lever"
+  }
+}

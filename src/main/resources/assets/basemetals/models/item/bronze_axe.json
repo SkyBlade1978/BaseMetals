@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/bronze_axe"
+        "layer0": "basemetals:item/bronze_axe"
     }
 }

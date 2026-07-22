@@ -1,6 +1,6 @@
 {
     "parent": "block/wall_inventory",
     "textures": {
-        "wall": "basemetals:blocks/coldiron_block"
+        "wall": "basemetals:block/coldiron_block"
     }
 }

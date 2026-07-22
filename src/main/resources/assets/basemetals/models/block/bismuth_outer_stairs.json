@@ -1,8 +1,8 @@
 {
     "parent": "block/outer_stairs",
     "textures": {
-        "bottom": "basemetals:blocks/bismuth_block",
-        "top": "basemetals:blocks/bismuth_block",
-        "side": "basemetals:blocks/bismuth_block"
+        "bottom": "basemetals:block/bismuth_block",
+        "top": "basemetals:block/bismuth_block",
+        "side": "basemetals:block/bismuth_block"
     }
 }

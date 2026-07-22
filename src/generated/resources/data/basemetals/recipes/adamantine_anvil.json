@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BBB",
+    " B ",
+    "III"
+  ],
+  "key": {
+    "B": {
+      "tag": "forge:storage_blocks/adamantine"
+    },
+    "I": {
+      "tag": "forge:ingots/adamantine"
+    }
+  },
+  "result": {
+    "item": "basemetals:adamantine_anvil"
+  }
+}

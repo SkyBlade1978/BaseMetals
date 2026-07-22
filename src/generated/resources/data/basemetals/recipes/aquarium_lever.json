@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/aquarium"
+    },
+    "X": {
+      "tag": "forge:ingots/aquarium"
+    }
+  },
+  "result": {
+    "item": "basemetals:aquarium_lever"
+  }
+}

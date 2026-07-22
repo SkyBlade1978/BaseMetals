@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "minecraft:blocks/emerald_block",
-        "base": "minecraft:blocks/emerald_block",
-        "lever": "blocks/lever"
+        "particle": "minecraft:block/emerald_block",
+        "base": "minecraft:block/emerald_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

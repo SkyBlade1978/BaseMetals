@@ -1,6 +1,6 @@
 {
     "parent": "block/button_pressed",
     "textures": {
-        "texture": "basemetals:blocks/invar_block"
+        "texture": "basemetals:block/invar_block"
     }
 }

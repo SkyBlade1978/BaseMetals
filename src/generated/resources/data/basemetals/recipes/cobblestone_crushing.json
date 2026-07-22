@@ -1,0 +1,9 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:cobblestone"
+  },
+  "result": {
+    "item": "minecraft:gravel"
+  }
+}

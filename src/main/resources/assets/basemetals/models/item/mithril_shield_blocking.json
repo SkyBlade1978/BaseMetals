@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/mithril_block"
+    "shield": "basemetals:block/mithril_block"
     }
 }

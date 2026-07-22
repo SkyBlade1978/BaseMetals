@@ -1,0 +1,51 @@
+{
+  "parent": "basemetals:this_is_new",
+  "display": {
+    "icon": {
+      "item": "basemetals:coldiron_sword"
+    },
+    "title": {
+      "translate": "advancements.basemetals.demon_slayer.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.demon_slayer.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:coldiron_helmet"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:coldiron_chestplate"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:coldiron_leggings"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:coldiron_boots"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:coldiron_sword"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

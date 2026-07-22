@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/brass"
+    }
+  },
+  "result": {
+    "item": "basemetals:brass_door",
+    "count": 3
+  }
+}

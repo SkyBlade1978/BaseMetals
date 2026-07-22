@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    " S",
+    " S"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "X": {
+      "tag": "forge:ingots/electrum"
+    }
+  },
+  "result": {
+    "item": "basemetals:electrum_hoe"
+  }
+}

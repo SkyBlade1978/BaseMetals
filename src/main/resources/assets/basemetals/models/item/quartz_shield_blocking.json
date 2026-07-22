@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "minecraft:blocks/quartz_block_side"
+    "shield": "minecraft:block/quartz_block_side"
     }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/coldiron_crushed_purified"
+        "layer0": "basemetals:item/coldiron_crushed_purified"
     }
 }

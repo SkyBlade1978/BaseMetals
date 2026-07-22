@@ -1,6 +1,6 @@
 {
     "parent": "block/button_inventory",
     "textures": {
-        "texture": "basemetals:blocks/bronze_block"
+        "texture": "basemetals:block/bronze_block"
     }
 }

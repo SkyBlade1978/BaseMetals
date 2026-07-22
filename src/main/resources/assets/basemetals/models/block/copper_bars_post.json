@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/copper_bars",
-        "bars": "basemetals:blocks/copper_bars"
+        "particle": "basemetals:block/copper_bars",
+        "bars": "basemetals:block/copper_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:blends/aquarium"
+    }
+  ],
+  "result": {
+    "item": "basemetals:aquarium_smallblend",
+    "count": 9
+  }
+}

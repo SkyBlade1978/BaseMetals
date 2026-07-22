@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "basemetals:blocks/platinum_block"
+        "all": "basemetals:block/platinum_block"
     }
 }

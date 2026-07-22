@@ -1,7 +1,7 @@
 {
     "parent": "item/bow",
     "textures": {
-        "layer0": "basemetals:items/adamantine_crossbow_standby"
+        "layer0": "basemetals:item/adamantine_crossbow_standby"
     },
     "overrides": [
         {

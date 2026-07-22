@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "basemetals:block/electrum_pressure_plate_up"
+    },
+    "powered=true": {
+      "model": "basemetals:block/electrum_pressure_plate_down"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:add_table",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/spawn_bonus_chest"
+    }
+  ],
+  "table": "basemetals:chests/inject/spawn_bonus_chest"
+}

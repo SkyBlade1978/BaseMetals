@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/bismuth_bars",
-        "bars": "basemetals:blocks/bismuth_bars",
-        "edge": "basemetals:blocks/bismuth_bars"
+        "particle": "basemetals:block/bismuth_bars",
+        "bars": "basemetals:block/bismuth_bars",
+        "edge": "basemetals:block/bismuth_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 0 ],

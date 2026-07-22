@@ -1,7 +1,7 @@
 {
     "parent": "item/bow",
     "textures": {
-        "layer0": "basemetals:items/cupronickel_bow_standby"
+        "layer0": "basemetals:item/cupronickel_bow_standby"
     },
     "overrides": [
         {

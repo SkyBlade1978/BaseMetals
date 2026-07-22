@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/cupronickel_bars",
-        "bars": "basemetals:blocks/cupronickel_bars",
-        "edge": "basemetals:blocks/cupronickel_bars"
+        "particle": "basemetals:block/cupronickel_bars",
+        "bars": "basemetals:block/cupronickel_bars",
+        "edge": "basemetals:block/cupronickel_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

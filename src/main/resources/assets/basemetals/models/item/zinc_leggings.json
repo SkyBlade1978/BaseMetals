@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/zinc_leggings"
+        "layer0": "basemetals:item/zinc_leggings"
     }
 }

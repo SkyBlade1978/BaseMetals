@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/quartz_bars",
-        "bars": "basemetals:blocks/quartz_bars"
+        "particle": "basemetals:block/quartz_bars",
+        "bars": "basemetals:block/quartz_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

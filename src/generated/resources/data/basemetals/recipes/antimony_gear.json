@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/antimony"
+    },
+    "X": {
+      "tag": "forge:ingots/antimony"
+    }
+  },
+  "result": {
+    "item": "basemetals:antimony_gear"
+  }
+}

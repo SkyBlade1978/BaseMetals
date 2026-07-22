@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/coldiron_block",
-        "base": "basemetals:blocks/coldiron_block",
-        "lever": "blocks/lever"
+        "particle": "basemetals:block/coldiron_block",
+        "base": "basemetals:block/coldiron_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

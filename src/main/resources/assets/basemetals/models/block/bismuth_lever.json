@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/bismuth_block",
-        "base": "basemetals:blocks/bismuth_block",
-        "lever": "blocks/lever"
+        "particle": "basemetals:block/bismuth_block",
+        "base": "basemetals:block/bismuth_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/gold"
+    }
+  ],
+  "result": {
+    "item": "basemetals:gold_smallpowder",
+    "count": 9
+  }
+}

@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/electrum_bars",
-        "bars": "basemetals:blocks/electrum_bars",
-        "edge": "basemetals:blocks/electrum_bars"
+        "particle": "basemetals:block/electrum_bars",
+        "bars": "basemetals:block/electrum_bars",
+        "edge": "basemetals:block/electrum_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

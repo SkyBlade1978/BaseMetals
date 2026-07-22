@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/cupronickel_hoe"
+        "layer0": "basemetals:item/cupronickel_hoe"
     }
 }

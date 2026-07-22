@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/coldiron"
+    }
+  },
+  "result": {
+    "item": "basemetals:coldiron_slab",
+    "count": 6
+  }
+}

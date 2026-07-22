@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/gold"
+    },
+    "X": {
+      "tag": "forge:ingots/gold"
+    }
+  },
+  "result": {
+    "item": "basemetals:gold_gear"
+  }
+}

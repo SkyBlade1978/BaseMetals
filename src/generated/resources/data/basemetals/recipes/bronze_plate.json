@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/bronze"
+    }
+  },
+  "result": {
+    "item": "basemetals:bronze_plate"
+  }
+}

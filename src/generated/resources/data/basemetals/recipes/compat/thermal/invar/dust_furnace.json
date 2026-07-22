@@ -1,0 +1,18 @@
+{
+  "type": "thermal:furnace",
+  "energy": 2000,
+  "ingredient": {
+    "tag": "forge:dusts/invar"
+  },
+  "result": [
+    {
+      "item": "basemetals:invar_ingot"
+    }
+  ],
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "thermal_expansion"
+    }
+  ]
+}

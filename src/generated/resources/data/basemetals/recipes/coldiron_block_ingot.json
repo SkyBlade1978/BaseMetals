@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "basemetals:coldiron_block"
+    }
+  ],
+  "result": {
+    "item": "basemetals:coldiron_ingot",
+    "count": 9
+  }
+}

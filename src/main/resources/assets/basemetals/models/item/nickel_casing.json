@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/nickel_casing"
+        "layer0": "basemetals:item/nickel_casing"
     }
 }

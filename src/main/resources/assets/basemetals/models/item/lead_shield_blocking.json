@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/lead_block"
+    "shield": "basemetals:block/lead_block"
     }
 }

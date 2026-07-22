@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/starsteel_shovel"
+        "layer0": "basemetals:item/starsteel_shovel"
     }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/copper_axe"
+        "layer0": "basemetals:item/copper_axe"
     }
 }

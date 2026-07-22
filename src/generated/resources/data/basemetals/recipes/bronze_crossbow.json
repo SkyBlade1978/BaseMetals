@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRR",
+    " SR",
+    "R G"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:gears/bronze"
+    },
+    "R": {
+      "tag": "forge:rods/bronze"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "basemetals:bronze_crossbow"
+  }
+}

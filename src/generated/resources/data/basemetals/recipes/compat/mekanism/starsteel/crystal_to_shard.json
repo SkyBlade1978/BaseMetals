@@ -1,0 +1,21 @@
+{
+  "type": "mekanism:injecting",
+  "itemInput": {
+    "ingredient": {
+      "tag": "forge:crystals/starsteel"
+    }
+  },
+  "chemicalInput": {
+    "amount": 1,
+    "gas": "mekanism:hydrogen_chloride"
+  },
+  "output": {
+    "item": "basemetals:starsteel_shard"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ]
+}

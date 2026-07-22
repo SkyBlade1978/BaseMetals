@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:blends/cupronickel"
+    }
+  ],
+  "result": {
+    "item": "basemetals:cupronickel_smallblend",
+    "count": 9
+  }
+}

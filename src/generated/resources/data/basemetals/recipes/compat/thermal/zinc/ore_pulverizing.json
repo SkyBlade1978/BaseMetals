@@ -1,0 +1,19 @@
+{
+  "type": "thermal:pulverizer",
+  "energy": 4000,
+  "ingredient": {
+    "tag": "forge:ores/zinc"
+  },
+  "result": [
+    {
+      "item": "basemetals:zinc_powder",
+      "count": 2
+    }
+  ],
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "thermal_expansion"
+    }
+  ]
+}

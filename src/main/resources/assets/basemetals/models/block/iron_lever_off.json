@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "minecraft:blocks/iron_block",
-        "base": "minecraft:blocks/iron_block",
-        "lever": "blocks/lever"
+        "particle": "minecraft:block/iron_block",
+        "base": "minecraft:block/iron_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

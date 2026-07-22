@@ -1,8 +1,0 @@
-{
-    "parent": "basemetals:block/plate",
-    "textures": {
-        "top": "basemetals:blocks/starsteel5",
-        "side": "basemetals:blocks/starsteel5",
-        "bottom": "basemetals:blocks/starsteel5"
-    }
-}

@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:blocks/nickel_bars"
+        "layer0": "basemetals:block/nickel_bars"
     }
 }

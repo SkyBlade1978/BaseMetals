@@ -1,0 +1,31 @@
+{
+  "parent": "basemetals:this_is_new",
+  "display": {
+    "icon": {
+      "item": "basemetals:starsteel_boots"
+    },
+    "title": {
+      "translate": "advancements.basemetals.moon_boots.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.moon_boots.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:starsteel_boots"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

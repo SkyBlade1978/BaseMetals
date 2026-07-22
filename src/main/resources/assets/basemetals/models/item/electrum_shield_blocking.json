@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/electrum_block"
+    "shield": "basemetals:block/electrum_block"
     }
 }

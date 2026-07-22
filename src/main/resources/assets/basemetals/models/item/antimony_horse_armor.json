@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/antimony_horse_armor"
+        "layer0": "basemetals:item/antimony_horse_armor"
     }
 }

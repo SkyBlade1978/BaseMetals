@@ -1,7 +1,7 @@
 {
     "parent": "block/door_top_rh",
     "textures": {
-        "bottom": "basemetals:blocks/pewter_door_lower",
-        "top": "basemetals:blocks/pewter_door_upper"
+        "bottom": "basemetals:block/pewter_door_lower",
+        "top": "basemetals:block/pewter_door_upper"
     }
 }

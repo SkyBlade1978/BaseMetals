@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRR",
+    " SR",
+    "R G"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:gears/coldiron"
+    },
+    "R": {
+      "tag": "forge:rods/coldiron"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "basemetals:coldiron_crossbow"
+  }
+}

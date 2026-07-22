@@ -1,0 +1,20 @@
+{
+  "type": "tconstruct:casting_table",
+  "cooling_time": 90,
+  "cast": {
+    "tag": "tconstruct:casts/multi_use/gear"
+  },
+  "fluid": {
+    "tag": "forge:molten_nickel",
+    "amount": 360
+  },
+  "result": {
+    "item": "basemetals:nickel_gear"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ]
+}

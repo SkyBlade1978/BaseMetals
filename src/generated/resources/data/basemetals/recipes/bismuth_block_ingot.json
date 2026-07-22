@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "basemetals:bismuth_block"
+    }
+  ],
+  "result": {
+    "item": "basemetals:bismuth_ingot",
+    "count": 9
+  }
+}

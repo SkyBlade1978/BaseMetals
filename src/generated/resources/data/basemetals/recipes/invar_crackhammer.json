@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "S",
+    "S"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "X": {
+      "tag": "forge:storage_blocks/invar"
+    }
+  },
+  "result": {
+    "item": "basemetals:invar_crackhammer"
+  }
+}

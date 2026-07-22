@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/coldiron_block"
+    "shield": "basemetals:block/coldiron_block"
   },
     "overrides": [
         {

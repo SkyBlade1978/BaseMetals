@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  X",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "X": {
+      "item": "basemetals:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "basemetals:copper_horse_armor"
+  }
+}

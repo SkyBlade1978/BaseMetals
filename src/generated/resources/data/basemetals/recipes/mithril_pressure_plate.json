@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/mithril"
+    }
+  },
+  "result": {
+    "item": "basemetals:mithril_pressure_plate"
+  }
+}

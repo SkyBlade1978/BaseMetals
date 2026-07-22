@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/antimony_bars",
-        "bars": "basemetals:blocks/antimony_bars",
-        "edge": "basemetals:blocks/antimony_bars"
+        "particle": "basemetals:block/antimony_bars",
+        "bars": "basemetals:block/antimony_bars",
+        "edge": "basemetals:block/antimony_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 0 ],

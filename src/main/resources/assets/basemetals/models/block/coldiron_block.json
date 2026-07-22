@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "basemetals:blocks/coldiron_block"
+        "all": "basemetals:block/coldiron_block"
     }
 }

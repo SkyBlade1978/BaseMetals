@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/diamond"
+    }
+  ],
+  "result": {
+    "item": "basemetals:diamond_smallpowder",
+    "count": 9
+  }
+}

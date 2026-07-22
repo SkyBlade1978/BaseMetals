@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XWX",
+    "XXX",
+    " X "
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:planks"
+    },
+    "X": {
+      "tag": "forge:ingots/electrum"
+    }
+  },
+  "result": {
+    "item": "basemetals:electrum_shield"
+  }
+}

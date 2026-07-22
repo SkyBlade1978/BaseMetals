@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/adamantine_bars",
-        "bars": "basemetals:blocks/adamantine_bars",
-        "edge": "basemetals:blocks/adamantine_bars"
+        "particle": "basemetals:block/adamantine_bars",
+        "bars": "basemetals:block/adamantine_bars",
+        "edge": "basemetals:block/adamantine_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 8 ],

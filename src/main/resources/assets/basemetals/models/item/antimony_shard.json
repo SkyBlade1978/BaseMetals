@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/antimony_shard"
+        "layer0": "basemetals:item/antimony_shard"
     }
 }

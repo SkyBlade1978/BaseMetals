@@ -1,0 +1,21 @@
+{
+  "type": "tconstruct:casting_table",
+  "cooling_time": 45,
+  "cast": {
+    "tag": "tconstruct:casts/single_use/ingot"
+  },
+  "cast_consumed": true,
+  "fluid": {
+    "tag": "forge:molten_bismuth",
+    "amount": 90
+  },
+  "result": {
+    "item": "basemetals:bismuth_ingot"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ]
+}

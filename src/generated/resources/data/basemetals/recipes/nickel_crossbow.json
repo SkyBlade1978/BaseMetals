@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRR",
+    " SR",
+    "R G"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:gears/nickel"
+    },
+    "R": {
+      "tag": "forge:rods/nickel"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "basemetals:nickel_crossbow"
+  }
+}

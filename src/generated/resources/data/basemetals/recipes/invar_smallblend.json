@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:blends/invar"
+    }
+  ],
+  "result": {
+    "item": "basemetals:invar_smallblend",
+    "count": 9
+  }
+}

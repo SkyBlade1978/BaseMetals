@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:ingots/cupronickel"
+    }
+  ],
+  "result": {
+    "item": "basemetals:cupronickel_nugget",
+    "count": 9
+  }
+}

@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/adamantine_block",
-        "base": "basemetals:blocks/adamantine_block",
-        "lever": "blocks/lever"
+        "particle": "basemetals:block/adamantine_block",
+        "base": "basemetals:block/adamantine_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

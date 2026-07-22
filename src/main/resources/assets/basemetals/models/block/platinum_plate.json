@@ -1,8 +1,8 @@
 {
     "parent": "basemetals:block/plate",
     "textures": {
-        "top": "basemetals:blocks/platinum_plate",
-        "side": "basemetals:blocks/platinum_plate",
-        "bottom": "basemetals:blocks/platinum_plate"
+        "top": "basemetals:block/platinum_plate",
+        "side": "basemetals:block/platinum_plate",
+        "bottom": "basemetals:block/platinum_plate"
     }
 }

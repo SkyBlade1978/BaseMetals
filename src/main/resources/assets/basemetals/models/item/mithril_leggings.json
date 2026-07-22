@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/mithril_leggings"
+        "layer0": "basemetals:item/mithril_leggings"
     }
 }

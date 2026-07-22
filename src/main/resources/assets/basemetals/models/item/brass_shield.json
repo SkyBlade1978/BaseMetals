@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/brass_block"
+    "shield": "basemetals:block/brass_block"
   },
     "overrides": [
         {

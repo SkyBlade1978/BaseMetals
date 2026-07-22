@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/quartz"
+    },
+    "X": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "item": "basemetals:quartz_lever"
+  }
+}

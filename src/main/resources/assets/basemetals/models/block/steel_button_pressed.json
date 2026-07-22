@@ -1,6 +1,6 @@
 {
     "parent": "block/button_pressed",
     "textures": {
-        "texture": "basemetals:blocks/steel_block"
+        "texture": "basemetals:block/steel_block"
     }
 }

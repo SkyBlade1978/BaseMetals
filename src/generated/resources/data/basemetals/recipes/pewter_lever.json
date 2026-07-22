@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/pewter"
+    },
+    "X": {
+      "tag": "forge:ingots/pewter"
+    }
+  },
+  "result": {
+    "item": "basemetals:pewter_lever"
+  }
+}

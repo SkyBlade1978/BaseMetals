@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/brass_bars",
-        "bars": "basemetals:blocks/brass_bars"
+        "particle": "basemetals:block/brass_bars",
+        "bars": "basemetals:block/brass_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

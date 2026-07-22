@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/nickel_hoe"
+        "layer0": "basemetals:item/nickel_hoe"
     }
 }

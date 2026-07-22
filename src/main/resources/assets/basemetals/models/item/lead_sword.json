@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/lead_sword"
+        "layer0": "basemetals:item/lead_sword"
     }
 }

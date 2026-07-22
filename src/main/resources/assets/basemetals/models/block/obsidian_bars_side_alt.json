@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/obsidian_bars",
-        "bars": "basemetals:blocks/obsidian_bars",
-        "edge": "basemetals:blocks/obsidian_bars"
+        "particle": "basemetals:block/obsidian_bars",
+        "bars": "basemetals:block/obsidian_bars",
+        "edge": "basemetals:block/obsidian_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 8 ],

@@ -1,6 +1,6 @@
 {
     "parent": "block/pressure_plate_up",
     "textures": {
-        "texture": "basemetals:blocks/lead_block"
+        "texture": "basemetals:block/lead_block"
     }
 }

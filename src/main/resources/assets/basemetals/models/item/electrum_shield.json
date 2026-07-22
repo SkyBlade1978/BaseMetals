@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/electrum_block"
+    "shield": "basemetals:block/electrum_block"
   },
     "overrides": [
         {

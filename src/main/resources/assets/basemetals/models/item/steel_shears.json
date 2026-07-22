@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/steel_shears"
+        "layer0": "basemetals:item/steel_shears"
     }
 }

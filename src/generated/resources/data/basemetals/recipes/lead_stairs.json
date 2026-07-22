@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/lead"
+    }
+  },
+  "result": {
+    "item": "basemetals:lead_stairs",
+    "count": 4
+  }
+}

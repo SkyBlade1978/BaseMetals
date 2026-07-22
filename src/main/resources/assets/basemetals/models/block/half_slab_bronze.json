@@ -1,8 +1,8 @@
 {
-    "parent": "block/half_slab",
+    "parent": "minecraft:block/slab",
     "textures": {
-        "bottom": "basemetals:blocks/bronze_block",
-        "top": "basemetals:blocks/bronze_block",
-        "side": "basemetals:blocks/bronze_block"
+        "bottom": "basemetals:block/bronze_block",
+        "top": "basemetals:block/bronze_block",
+        "side": "basemetals:block/bronze_block"
     }
 }

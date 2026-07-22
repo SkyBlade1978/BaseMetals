@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "minecraft:blocks/gold_block",
-        "base": "minecraft:blocks/gold_block",
-        "lever": "blocks/lever"
+        "particle": "minecraft:block/gold_block",
+        "base": "minecraft:block/gold_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

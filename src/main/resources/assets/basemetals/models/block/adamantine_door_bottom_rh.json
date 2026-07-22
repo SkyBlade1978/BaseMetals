@@ -1,7 +1,7 @@
 {
     "parent": "block/door_bottom_rh",
     "textures": {
-        "bottom": "basemetals:blocks/adamantine_door_lower",
-        "top": "basemetals:blocks/adamantine_door_upper"
+        "bottom": "basemetals:block/adamantine_door_lower",
+        "top": "basemetals:block/adamantine_door_upper"
     }
 }

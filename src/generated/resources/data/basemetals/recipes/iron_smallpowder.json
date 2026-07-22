@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/iron"
+    }
+  ],
+  "result": {
+    "item": "basemetals:iron_smallpowder",
+    "count": 9
+  }
+}

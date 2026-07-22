@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    " S",
+    " S"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "X": {
+      "tag": "forge:ingots/adamantine"
+    }
+  },
+  "result": {
+    "item": "basemetals:adamantine_hoe"
+  }
+}

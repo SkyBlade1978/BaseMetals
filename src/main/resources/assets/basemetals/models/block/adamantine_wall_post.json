@@ -1,6 +1,6 @@
 {
-    "parent": "block/wall_post",
+    "parent": "minecraft:block/template_wall_post",
     "textures": {
-        "wall": "basemetals:blocks/adamantine_block"
+        "wall": "basemetals:block/adamantine_block"
     }
 }

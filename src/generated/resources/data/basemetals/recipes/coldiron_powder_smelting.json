@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:dusts/coldiron"
+  },
+  "result": "basemetals:coldiron_ingot",
+  "experience": 0.7,
+  "cookingtime": 200
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/starsteel"
+    },
+    "X": {
+      "tag": "forge:ingots/starsteel"
+    }
+  },
+  "result": {
+    "item": "basemetals:starsteel_lever"
+  }
+}

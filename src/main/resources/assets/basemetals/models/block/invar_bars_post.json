@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/invar_bars",
-        "bars": "basemetals:blocks/invar_bars"
+        "particle": "basemetals:block/invar_bars",
+        "bars": "basemetals:block/invar_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/tin_bars",
-        "bars": "basemetals:blocks/tin_bars",
-        "edge": "basemetals:blocks/tin_bars"
+        "particle": "basemetals:block/tin_bars",
+        "bars": "basemetals:block/tin_bars",
+        "edge": "basemetals:block/tin_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 0 ],

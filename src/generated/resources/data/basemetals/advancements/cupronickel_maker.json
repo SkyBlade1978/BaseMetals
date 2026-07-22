@@ -1,0 +1,31 @@
+{
+  "parent": "basemetals:metallurgy",
+  "display": {
+    "icon": {
+      "item": "basemetals:cupronickel_blend"
+    },
+    "title": {
+      "translate": "advancements.basemetals.cupronickel_maker.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.cupronickel_maker.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:cupronickel_blend"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/platinum_block"
+    "shield": "basemetals:block/platinum_block"
   },
     "overrides": [
         {

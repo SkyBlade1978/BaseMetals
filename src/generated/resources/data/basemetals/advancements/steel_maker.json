@@ -1,0 +1,31 @@
+{
+  "parent": "basemetals:metallurgy",
+  "display": {
+    "icon": {
+      "item": "basemetals:steel_blend"
+    },
+    "title": {
+      "translate": "advancements.basemetals.steel_maker.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.steel_maker.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:steel_blend"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

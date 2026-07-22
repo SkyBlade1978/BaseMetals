@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  X",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "X": {
+      "tag": "forge:ingots/mithril"
+    }
+  },
+  "result": {
+    "item": "basemetals:mithril_horse_armor"
+  }
+}

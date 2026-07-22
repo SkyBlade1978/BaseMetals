@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N",
+    "R",
+    "F"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "N": {
+      "tag": "forge:nuggets/adamantine"
+    },
+    "R": {
+      "tag": "forge:rods/adamantine"
+    }
+  },
+  "result": {
+    "item": "basemetals:adamantine_arrow",
+    "count": 4
+  }
+}

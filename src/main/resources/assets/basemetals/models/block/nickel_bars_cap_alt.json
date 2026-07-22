@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/nickel_bars",
-        "bars": "basemetals:blocks/nickel_bars",
-        "edge": "basemetals:blocks/nickel_bars"
+        "particle": "basemetals:block/nickel_bars",
+        "bars": "basemetals:block/nickel_bars",
+        "edge": "basemetals:block/nickel_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

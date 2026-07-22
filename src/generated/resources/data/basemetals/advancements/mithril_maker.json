@@ -1,0 +1,31 @@
+{
+  "parent": "basemetals:metallurgy",
+  "display": {
+    "icon": {
+      "item": "basemetals:mithril_blend"
+    },
+    "title": {
+      "translate": "advancements.basemetals.mithril_maker.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.mithril_maker.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:mithril_blend"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

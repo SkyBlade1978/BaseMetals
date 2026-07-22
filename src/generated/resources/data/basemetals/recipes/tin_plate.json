@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/tin"
+    }
+  },
+  "result": {
+    "item": "basemetals:tin_plate"
+  }
+}

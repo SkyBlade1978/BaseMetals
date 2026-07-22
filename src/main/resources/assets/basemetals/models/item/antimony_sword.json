@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/antimony_sword"
+        "layer0": "basemetals:item/antimony_sword"
     }
 }

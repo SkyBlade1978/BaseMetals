@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N",
+    "R",
+    "F"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "N": {
+      "tag": "forge:nuggets/mithril"
+    },
+    "R": {
+      "tag": "forge:rods/mithril"
+    }
+  },
+  "result": {
+    "item": "basemetals:mithril_arrow",
+    "count": 4
+  }
+}

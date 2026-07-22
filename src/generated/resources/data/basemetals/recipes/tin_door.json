@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/tin"
+    }
+  },
+  "result": {
+    "item": "basemetals:tin_door",
+    "count": 3
+  }
+}

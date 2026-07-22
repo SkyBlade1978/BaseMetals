@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/pewter"
+    }
+  ],
+  "result": {
+    "item": "basemetals:pewter_smallpowder",
+    "count": 9
+  }
+}

@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:blocks/electrum_bars"
+        "layer0": "basemetals:block/electrum_bars"
     }
 }

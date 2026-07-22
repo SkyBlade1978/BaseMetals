@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/quartz"
+    }
+  ],
+  "result": {
+    "item": "basemetals:quartz_smallpowder",
+    "count": 9
+  }
+}

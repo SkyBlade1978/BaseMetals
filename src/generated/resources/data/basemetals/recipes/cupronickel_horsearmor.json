@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  X",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "X": {
+      "tag": "forge:ingots/cupronickel"
+    }
+  },
+  "result": {
+    "item": "basemetals:cupronickel_horse_armor"
+  }
+}

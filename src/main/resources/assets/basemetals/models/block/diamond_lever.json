@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "minecraft:blocks/diamond_block",
-        "base": "minecraft:blocks/diamond_block",
-        "lever": "blocks/lever"
+        "particle": "minecraft:block/diamond_block",
+        "base": "minecraft:block/diamond_block",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

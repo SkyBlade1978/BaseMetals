@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/zinc_axe"
+        "layer0": "basemetals:item/zinc_axe"
     }
 }

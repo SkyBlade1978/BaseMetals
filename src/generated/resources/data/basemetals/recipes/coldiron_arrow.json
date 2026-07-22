@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N",
+    "R",
+    "F"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "N": {
+      "tag": "forge:nuggets/coldiron"
+    },
+    "R": {
+      "tag": "forge:rods/coldiron"
+    }
+  },
+  "result": {
+    "item": "basemetals:coldiron_arrow",
+    "count": 4
+  }
+}

@@ -1,7 +1,7 @@
 {
     "parent": "block/door_bottom",
     "textures": {
-        "bottom": "basemetals:blocks/invar_door_lower",
-        "top": "basemetals:blocks/invar_door_upper"
+        "bottom": "basemetals:block/invar_door_lower",
+        "top": "basemetals:block/invar_door_upper"
     }
 }

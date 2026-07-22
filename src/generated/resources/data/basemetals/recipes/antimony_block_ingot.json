@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "basemetals:antimony_block"
+    }
+  ],
+  "result": {
+    "item": "basemetals:antimony_ingot",
+    "count": 9
+  }
+}

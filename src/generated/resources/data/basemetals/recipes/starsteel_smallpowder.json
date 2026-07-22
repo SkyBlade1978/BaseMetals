@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/starsteel"
+    }
+  ],
+  "result": {
+    "item": "basemetals:starsteel_smallpowder",
+    "count": 9
+  }
+}

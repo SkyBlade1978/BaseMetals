@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "powered=false": { "model": "basemetals:aquarium_pressure_plate_up" },
-        "powered=true": { "model": "basemetals:aquarium_pressure_plate_down" }
-    }
-}

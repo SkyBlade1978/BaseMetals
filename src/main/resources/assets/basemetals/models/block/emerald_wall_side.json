@@ -1,6 +1,6 @@
 {
-    "parent": "block/wall_side",
+    "parent": "minecraft:block/template_wall_side",
     "textures": {
-        "wall": "minecraft:blocks/emerald_block"
+        "wall": "minecraft:block/emerald_block"
     }
 }

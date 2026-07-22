@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "S",
+    "S"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "X": {
+      "tag": "forge:storage_blocks/starsteel"
+    }
+  },
+  "result": {
+    "item": "basemetals:starsteel_crackhammer"
+  }
+}

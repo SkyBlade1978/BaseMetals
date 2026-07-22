@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "minecraft:blocks/obsidian",
-        "base": "minecraft:blocks/obsidian",
-        "lever": "blocks/lever"
+        "particle": "minecraft:block/obsidian",
+        "base": "minecraft:block/obsidian",
+        "lever": "minecraft:block/lever"
     },
     "elements": [
         {   "from": [ 5, 0, 4 ],

@@ -19,6 +19,33 @@ java {
     withJavadocJar()
 }
 
+// Validation-only client code is kept out of the published mod.  ForgeGradle
+// adds this source set to the client run only when the integrated-world smoke
+// is explicitly requested.
+sourceSets {
+    integratedSmoke {
+        java.srcDir 'src/integratedSmoke/java'
+        resources.setSrcDirs([])
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    upgradeSmoke {
+        java.srcDir 'src/upgradeSmoke/java'
+        resources.setSrcDirs([])
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integratedSmokeImplementation.extendsFrom implementation
+    integratedSmokeCompileOnly.extendsFrom compileOnly
+    integratedSmokeRuntimeOnly.extendsFrom runtimeOnly
+    upgradeSmokeImplementation.extendsFrom implementation
+    upgradeSmokeCompileOnly.extendsFrom compileOnly
+    upgradeSmokeRuntimeOnly.extendsFrom runtimeOnly
+}
+
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
@@ -81,6 +108,32 @@ minecraft {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
 
+            if (providers.gradleProperty('orespawnBenchmarkMode').isPresent()) {
+                property 'orespawn.worldgenBenchmarkMode', providers.gradleProperty('orespawnBenchmarkMode').get()
+                property 'orespawn.worldgenBenchmarkRadius',
+                        providers.gradleProperty('orespawnBenchmarkRadius').getOrElse('8')
+                property 'orespawn.worldgenBenchmarkRepetitions',
+                        providers.gradleProperty('orespawnBenchmarkRepetitions').getOrElse('5')
+                property 'orespawn.worldgenBenchmarkVanillaOres',
+                        providers.gradleProperty('orespawnBenchmarkVanillaOres').getOrElse('false')
+                property 'orespawn.worldgenBenchmarkOreAudit',
+                        providers.gradleProperty('orespawnBenchmarkOreAudit').getOrElse('false')
+                property 'orespawn.worldgenBenchmarkBlockAudit',
+                        providers.gradleProperty('orespawnBenchmarkBlockAudit').getOrElse('')
+                property 'orespawn.worldgenBenchmarkCenterX',
+                        providers.gradleProperty('orespawnBenchmarkCenterX').getOrElse('1024')
+                property 'orespawn.worldgenBenchmarkCenterZ',
+                        providers.gradleProperty('orespawnBenchmarkCenterZ').getOrElse('1024')
+                property 'orespawn.worldgenBenchmarkCenterStep',
+                        providers.gradleProperty('orespawnBenchmarkCenterStep').getOrElse('64')
+                property 'orespawn.worldgenBenchmarkDimension',
+                        providers.gradleProperty('orespawnBenchmarkDimension').getOrElse('overworld')
+                property 'orespawn.worldgenBenchmarkStopServer', 'true'
+            }
+            if (providers.gradleProperty('worldgenJfrFile').isPresent()) {
+                jvmArg "-XX:StartFlightRecording=filename=${providers.gradleProperty('worldgenJfrFile').get()},settings=profile,dumponexit=true"
+            }
+
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -91,10 +144,31 @@ minecraft {
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
+            if (providers.gradleProperty('integratedWorldSmoke').isPresent()) {
+                property 'basemetals.integratedWorldSmoke', 'true'
+                property 'basemetals.integratedWorldSmokeName',
+                        providers.gradleProperty('integratedWorldSmokeName').getOrElse('basemetals-integrated-smoke')
+                mods {
+                    "${mod_id}" {
+                        source sourceSets.integratedSmoke
+                    }
+                }
+            }
         }
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
+            if (providers.gradleProperty('upgradeWorldSmoke').isPresent()) {
+                workingDirectory project.file('run-upgrade')
+                property 'fml.doNotBackup', 'true'
+                property 'fml.queryResult', 'confirm'
+                property 'basemetals.upgradeWorldSmoke', 'true'
+                mods {
+                    "${mod_id}" {
+                        source sourceSets.upgradeSmoke
+                    }
+                }
+            }
             args '--nogui'
         }
 
@@ -116,16 +190,24 @@ minecraft {
 }
 
 // Include resources generated by data generators.
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude '.cache/**'
+}
 
 repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-    // flatDir {
-    //     dir 'libs'
-    // }
+    flatDir {
+        dir rootProject.file('../../../MinecraftMineralogy/OS118/OreSpawn/build/libs')
+    }
+    flatDir {
+        dir rootProject.file('../../benchmarks/external/EnderIO-1.18.2/build/libs')
+    }
+    maven { url 'https://modmaven.dev/' }
+    maven { url 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url 'https://maven.covers1624.net/' }
 }
 
 dependencies {
@@ -135,6 +217,42 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // Workspace development runtime only. OreSpawn remains an ordinary hard
+    // mod dependency in metadata and is never shaded into Base Metals.
+    def oreSpawnDevJar = rootProject.file('../../../MinecraftMineralogy/OS118/OreSpawn/build/libs/OreSpawn-1.18.2-4.0.1.jar')
+    if (oreSpawnDevJar.isFile()) {
+        // A module coordinate lets ForgeGradle remap the release JAR for userdev.
+        runtimeOnly fg.deobf('local:OreSpawn-1.18.2:4.0.1')
+    }
+
+    // API only: Mekanism remains optional at runtime. Its public slurry
+    // registry is required to provide the eight historical processing chains.
+    compileOnly 'mekanism:Mekanism:1.18.2-10.2.5.465:api'
+
+    // Opt-in runtime distributions for compatibility smoke tests. These are
+    // never packaged, required, or resolved by ordinary Base Metals builds.
+    def compatibilitySmokes = providers.gradleProperty('compatSmoke').getOrElse('')
+            .split(',').collect { it.trim().toLowerCase(Locale.ROOT) }.findAll { !it.isEmpty() }
+    if (compatibilitySmokes.contains('mekanism') || compatibilitySmokes.contains('all')) {
+        runtimeOnly fg.deobf('mekanism:Mekanism:1.18.2-10.2.5.465')
+    }
+    if (compatibilitySmokes.contains('tconstruct') || compatibilitySmokes.contains('all')) {
+        runtimeOnly fg.deobf('slimeknights.mantle:Mantle:1.18.2-1.9.55')
+        runtimeOnly fg.deobf('slimeknights.tconstruct:TConstruct:1.18.2-3.7.2.169')
+    }
+    if (compatibilitySmokes.contains('thermal') || compatibilitySmokes.contains('all')) {
+        runtimeOnly fg.deobf('com.teamcofh:cofh_core:1.18.2-9.2.3.47')
+        runtimeOnly fg.deobf('com.teamcofh:thermal_foundation:1.18.2-9.2.2.59')
+        runtimeOnly fg.deobf('com.teamcofh:thermal_expansion:1.18.2-9.2.2.24')
+    }
+    if (compatibilitySmokes.contains('enderio') || compatibilitySmokes.contains('all')) {
+        runtimeOnly fg.deobf('validation:EnderIO-base-1.18.2:6.0.0-alpha-a94a2cb')
+        runtimeOnly fg.deobf('validation:EnderIO-machines-1.18.2:6.0.0-alpha-a94a2cb')
+    }
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -210,11 +328,90 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+}
+
+def prepareCustomDimensionSmoke = tasks.register('prepareCustomDimensionSmoke', Sync) {
+    group = 'verification'
+    description = 'Installs the runtime-only custom-dimension datapack into the disposable smoke world.'
+    from layout.projectDirectory.dir('src/smoke/datapack')
+    into layout.projectDirectory.dir('run/smoke-custom-dimension/datapacks/basemetals-smoke')
+}
+
+tasks.matching { it.name == 'runServer' }.configureEach {
+    if (providers.gradleProperty('smokeCustomDimension').isPresent()) {
+        dependsOn prepareCustomDimensionSmoke
+    }
+}
+
+def generatedResourcesDir = layout.projectDirectory.dir('src/generated/resources')
+def generatedSnapshotFile = layout.buildDirectory.file('tmp/generated-data-before.json')
+def generatedFingerprint = {
+    fileTree(generatedResourcesDir).matching { exclude '.cache/**' }.files
+            .findAll { it.isFile() }
+            .sort { a, b -> a.absolutePath <=> b.absolutePath }
+            .collectEntries { File resource ->
+                String relative = generatedResourcesDir.asFile.toPath().relativize(resource.toPath())
+                        .toString().replace('\\', '/')
+                byte[] digest = java.security.MessageDigest.getInstance('SHA-256').digest(resource.bytes)
+                [(relative): digest.encodeHex().toString()]
+            }
+}
+
+def snapshotGeneratedData = tasks.register('snapshotGeneratedData') {
+    group = 'verification'
+    description = 'Snapshots generated resources before data generation.'
+    doLast {
+        File snapshot = generatedSnapshotFile.get().asFile
+        snapshot.parentFile.mkdirs()
+        snapshot.setText(groovy.json.JsonOutput.toJson(generatedFingerprint()), 'UTF-8')
+    }
+}
+
+tasks.matching { it.name == 'runData' }.configureEach {
+    mustRunAfter snapshotGeneratedData
+}
+
+def verifyGeneratedData = tasks.register('verifyGeneratedData') {
+    group = 'verification'
+    description = 'Fails when runData changes checked-in generated resources.'
+    dependsOn snapshotGeneratedData, 'runData'
+    doLast {
+        Map before = new groovy.json.JsonSlurper().parse(generatedSnapshotFile.get().asFile) as Map
+        Map after = generatedFingerprint()
+        if (before != after) {
+            Set<String> changed = new TreeSet<>(before.keySet() + after.keySet())
+            changed.removeIf { before[it] == after[it] }
+            throw new GradleException("Generated-resource drift detected after runData: ${changed.join(', ')}")
+        }
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn verifyGeneratedData
+}
+
+def prepareGameTestStructures = tasks.register('prepareGameTestStructures', Copy) {
+    group = 'verification'
+    description = 'Copies the tracked SNBT fixtures into the GameTest working directory.'
+    from layout.projectDirectory.dir('src/gametest/resources/gameteststructures')
+    into layout.projectDirectory.dir('run/gameteststructures')
+}
+
+tasks.matching { it.name == 'prepareRunGameTestServer' }.configureEach {
+    dependsOn prepareGameTestStructures
+}
+
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    dependsOn prepareGameTestStructures
+}
+
 // Keep generated Eclipse launch inputs on one physical Gradle cache. Mixing
 // Buildship's cache with a command-line cache duplicates named Java modules.
 def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
     group = 'IDE'
-    description = 'Aligns Eclipse project and Forge run classpaths with Buildship\'s Gradle home.'
+    description = 'Aligns Eclipse project, Buildship, and Forge run classpaths with the active Gradle home.'
 
     doLast {
         File classpathDir = layout.buildDirectory.dir('classpath').get().asFile
@@ -232,16 +429,14 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
         }
         String configuredGradleHome = buildship.getProperty('connection.gradle.user.home', '').trim()
         File eclipseProjectClasspath = file('.classpath')
-        File eclipseGradleHome = configuredGradleHome ? file(configuredGradleHome).canonicalFile : null
-        if (eclipseGradleHome == null && eclipseProjectClasspath.isFile()) {
-            def cacheMatcher = eclipseProjectClasspath.getText('UTF-8') =~
-                    /(?i)([A-Z]:[\\\/][^"<\r\n]*?[\\\/]caches)(?=[\\\/])/
-            if (cacheMatcher.find()) {
-                eclipseGradleHome = file(cacheMatcher.group(1)).canonicalFile.parentFile
+        File eclipseGradleHome = gradle.gradleUserHomeDir.canonicalFile
+        if (!configuredGradleHome || file(configuredGradleHome).canonicalFile != eclipseGradleHome) {
+            buildship.setProperty('eclipse.preferences.version', '1')
+            buildship.setProperty('connection.gradle.user.home', eclipseGradleHome.absolutePath)
+            buildshipPreferences.parentFile.mkdirs()
+            buildshipPreferences.withOutputStream {
+                buildship.store(it, 'Generated by syncEclipseRunClasspaths; keep Eclipse and command-line caches aligned.')
             }
-        }
-        if (eclipseGradleHome == null) {
-            eclipseGradleHome = gradle.gradleUserHomeDir.canonicalFile
         }
         File eclipseCache = new File(eclipseGradleHome, 'caches').canonicalFile
         File eclipseClasspathDir = file('.settings/basemetals-run-classpaths')
@@ -312,15 +507,12 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
                         .split(/\|/)
                         .findAll { !it.isEmpty() }
                 ['META-INF/mods.toml', 'pack.mcmeta'].each { String metadataFile ->
-                    if (exclusions.remove(metadataFile)) {
+                    if (!exclusions.contains(metadataFile)) {
+                        exclusions.add(metadataFile)
                         changedResourceExclusions = 1
                     }
                 }
-                if (exclusions.isEmpty()) {
-                    entry.attributes().remove('excluding')
-                } else {
-                    entry.attributes().put('excluding', exclusions.join('|'))
-                }
+                entry.attributes().put('excluding', exclusions.join('|'))
             }
             if (changedProjectClasspath || changedResourceExclusions) {
                 eclipseProjectClasspath.setText(groovy.xml.XmlUtil.serialize(parsedClasspath), 'UTF-8')
@@ -358,7 +550,27 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
                 }
             }
         }
-        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedLaunches} launches updated)")
+
+        // ForgeGradle's launch group otherwise starts copyEclipseResources and
+        // Minecraft concurrently. Base Metals expands placeholders in
+        // mods.toml, so the game must not scan bin/main until that copy exits.
+        int changedLaunchGroups = 0
+        fileTree(projectDir) {
+            include '*.launch'
+        }.files.each { File launchFile ->
+            String original = launchFile.getText('UTF-8')
+            if (!original.contains('prepareRun') || !original.contains('Slim')) {
+                return
+            }
+            String synced = original.replace(
+                    'key="org.eclipse.debug.core.launchGroup.0.action" value="NONE"',
+                    'key="org.eclipse.debug.core.launchGroup.0.action" value="WAIT_FOR_TERMINATION"')
+            if (original != synced) {
+                launchFile.setText(synced, 'UTF-8')
+                changedLaunchGroups++
+            }
+        }
+        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedLaunches} slim launches, ${changedLaunchGroups} sequential launch groups updated)")
     }
 }
 

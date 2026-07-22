@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "basemetals:blocks/zinc_block"
+        "all": "basemetals:block/zinc_block"
     }
 }

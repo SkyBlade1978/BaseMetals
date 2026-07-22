@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
     "textures": {
-        "layer0": "basemetals:items/steel_hoe"
+        "layer0": "basemetals:item/steel_hoe"
     }
 }

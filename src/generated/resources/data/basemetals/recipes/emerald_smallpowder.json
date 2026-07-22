@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/emerald"
+    }
+  ],
+  "result": {
+    "item": "basemetals:emerald_smallpowder",
+    "count": 9
+  }
+}

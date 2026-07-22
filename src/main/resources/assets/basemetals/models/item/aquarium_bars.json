@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:blocks/aquarium_bars"
+        "layer0": "basemetals:block/aquarium_bars"
     }
 }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/electrum"
+    },
+    "X": {
+      "tag": "forge:ingots/electrum"
+    }
+  },
+  "result": {
+    "item": "basemetals:electrum_lever"
+  }
+}

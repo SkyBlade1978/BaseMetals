@@ -1,7 +1,7 @@
 {
     "parent": "block/door_top_rh",
     "textures": {
-        "bottom": "basemetals:blocks/cupronickel_door_lower",
-        "top": "basemetals:blocks/cupronickel_door_upper"
+        "bottom": "basemetals:block/cupronickel_door_lower",
+        "top": "basemetals:block/cupronickel_door_upper"
     }
 }

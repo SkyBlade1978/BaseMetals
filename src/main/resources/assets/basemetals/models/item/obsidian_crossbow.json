@@ -1,7 +1,7 @@
 {
     "parent": "item/bow",
     "textures": {
-        "layer0": "basemetals:items/obsidian_crossbow_standby"
+        "layer0": "basemetals:item/obsidian_crossbow_standby"
     },
     "overrides": [
         {

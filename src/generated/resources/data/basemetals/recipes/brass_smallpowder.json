@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/brass"
+    }
+  ],
+  "result": {
+    "item": "basemetals:brass_smallpowder",
+    "count": 9
+  }
+}

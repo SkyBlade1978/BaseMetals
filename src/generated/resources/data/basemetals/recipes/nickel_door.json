@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:ingots/nickel"
+    }
+  },
+  "result": {
+    "item": "basemetals:nickel_door",
+    "count": 3
+  }
+}

@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/adamantine_block"
+    "shield": "basemetals:block/adamantine_block"
   },
     "overrides": [
         {

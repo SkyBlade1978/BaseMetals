@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "R",
+    "F"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "R": {
+      "tag": "forge:rods/diamond"
+    }
+  },
+  "result": {
+    "item": "basemetals:diamond_bolt",
+    "count": 4
+  }
+}

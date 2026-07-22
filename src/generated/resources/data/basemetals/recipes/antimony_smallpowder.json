@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/antimony"
+    }
+  ],
+  "result": {
+    "item": "basemetals:antimony_smallpowder",
+    "count": 9
+  }
+}

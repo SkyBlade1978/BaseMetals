@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/diamond_bars",
-        "bars": "basemetals:blocks/diamond_bars",
-        "edge": "basemetals:blocks/diamond_bars"
+        "particle": "basemetals:block/diamond_bars",
+        "bars": "basemetals:block/diamond_bars",
+        "edge": "basemetals:block/diamond_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 8 ],

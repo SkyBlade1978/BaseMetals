@@ -1,6 +1,6 @@
 {
     "parent": "block/button",
     "textures": {
-        "texture": "basemetals:blocks/pewter_block"
+        "texture": "basemetals:block/pewter_block"
     }
 }

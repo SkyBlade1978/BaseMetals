@@ -1,0 +1,51 @@
+{
+  "parent": "basemetals:mithril_maker",
+  "display": {
+    "icon": {
+      "item": "basemetals:mithril_sword"
+    },
+    "title": {
+      "translate": "advancements.basemetals.angel_of_death.title"
+    },
+    "description": {
+      "translate": "advancements.basemetals.angel_of_death.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "basemetals:mithril_helmet"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:mithril_chestplate"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:mithril_leggings"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:mithril_boots"
+            ]
+          },
+          {
+            "items": [
+              "basemetals:mithril_sword"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

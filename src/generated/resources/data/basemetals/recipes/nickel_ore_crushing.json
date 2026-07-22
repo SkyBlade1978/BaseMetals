@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:ores/nickel"
+  },
+  "result": {
+    "item": "basemetals:nickel_powder",
+    "count": 2
+  }
+}

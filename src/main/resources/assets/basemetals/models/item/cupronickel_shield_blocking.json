@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/cupronickel_block"
+    "shield": "basemetals:block/cupronickel_block"
     }
 }

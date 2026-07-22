@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/obsidian"
+    },
+    "X": {
+      "tag": "forge:ingots/obsidian"
+    }
+  },
+  "result": {
+    "item": "basemetals:obsidian_lever"
+  }
+}

@@ -1,6 +1,6 @@
 {
     "parent": "basemetals:item/electrum_crossbow",
     "textures": {
-        "layer0": "basemetals:items/electrum_crossbow_pulling_1"
+        "layer0": "basemetals:item/electrum_crossbow_pulling_1"
     }
 }

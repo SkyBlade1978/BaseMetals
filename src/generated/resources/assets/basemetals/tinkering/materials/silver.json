@@ -1,0 +1,8 @@
+{
+  "color": "FFFFFF",
+  "skipUniqueTexture": true,
+  "luminosity": 0,
+  "fallbacks": [
+    "metal"
+  ]
+}

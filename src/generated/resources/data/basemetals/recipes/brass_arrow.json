@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N",
+    "R",
+    "F"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "N": {
+      "tag": "forge:nuggets/brass"
+    },
+    "R": {
+      "tag": "forge:rods/brass"
+    }
+  },
+  "result": {
+    "item": "basemetals:brass_arrow",
+    "count": 4
+  }
+}

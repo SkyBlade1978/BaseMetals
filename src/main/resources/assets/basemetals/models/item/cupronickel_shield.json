@@ -1,7 +1,7 @@
 {
   "parent": "basemetals:item/shield",
   "textures": {
-    "shield": "basemetals:blocks/cupronickel_block"
+    "shield": "basemetals:block/cupronickel_block"
   },
     "overrides": [
         {

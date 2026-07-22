@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/aquarium_bars",
-        "bars": "basemetals:blocks/aquarium_bars"
+        "particle": "basemetals:block/aquarium_bars",
+        "bars": "basemetals:block/aquarium_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

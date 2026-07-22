@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/platinum"
+    },
+    "X": {
+      "tag": "forge:ingots/platinum"
+    }
+  },
+  "result": {
+    "item": "basemetals:platinum_gear"
+  }
+}

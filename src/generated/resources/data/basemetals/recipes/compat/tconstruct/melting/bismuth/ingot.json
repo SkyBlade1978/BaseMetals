@@ -1,0 +1,18 @@
+{
+  "type": "tconstruct:melting",
+  "temperature": 769,
+  "time": 45,
+  "ingredient": {
+    "tag": "forge:ingots/bismuth"
+  },
+  "result": {
+    "fluid": "basemetals:bismuth",
+    "amount": 90
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
     "parent": "item/bow",
     "textures": {
-        "layer0": "basemetals:items/tin_bow_standby"
+        "layer0": "basemetals:item/tin_bow_standby"
     },
     "overrides": [
         {

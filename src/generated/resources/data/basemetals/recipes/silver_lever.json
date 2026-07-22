@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R",
+    "X"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/silver"
+    },
+    "X": {
+      "tag": "forge:ingots/silver"
+    }
+  },
+  "result": {
+    "item": "basemetals:silver_lever"
+  }
+}

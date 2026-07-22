@@ -1,6 +1,6 @@
 {
   "parent": "basemetals:item/shield_blocking",
   "textures": {
-    "shield": "basemetals:blocks/silver_block"
+    "shield": "basemetals:block/silver_block"
     }
 }

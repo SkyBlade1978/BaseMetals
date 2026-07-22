@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XRX",
+    " X "
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:rods/bronze"
+    },
+    "X": {
+      "tag": "forge:ingots/bronze"
+    }
+  },
+  "result": {
+    "item": "basemetals:bronze_gear"
+  }
+}

@@ -1,6 +1,6 @@
 {
-    "parent": "block/wall_side",
+    "parent": "minecraft:block/template_wall_side",
     "textures": {
-        "wall": "basemetals:blocks/nickel_block"
+        "wall": "basemetals:block/nickel_block"
     }
 }

@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "basemetals:blocks/coldiron_bars",
-        "bars": "basemetals:blocks/coldiron_bars",
-        "edge": "basemetals:blocks/coldiron_bars"
+        "particle": "basemetals:block/coldiron_bars",
+        "bars": "basemetals:block/coldiron_bars",
+        "edge": "basemetals:block/coldiron_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 8 ],

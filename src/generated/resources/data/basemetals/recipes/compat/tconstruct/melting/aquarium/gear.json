@@ -1,0 +1,18 @@
+{
+  "type": "tconstruct:melting",
+  "temperature": 769,
+  "time": 90,
+  "ingredient": {
+    "tag": "forge:gears/aquarium"
+  },
+  "result": {
+    "fluid": "basemetals:aquarium",
+    "amount": 360
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ]
+}

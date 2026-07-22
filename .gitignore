@@ -6,6 +6,8 @@ bin
 .metadata
 .classpath
 .project
+/.eclipse/
+/.factorypath
 
 # idea
 out
@@ -21,20 +23,32 @@ build
 # other
 eclipse
 run
+run-data
+run-upgrade
+logs
 classes
+/mcmodsrepo/
+/run.*
+/*.log
+/*.jfr
+/*.hprof
 
 /README.txt
 /forge-*-changelog.txt
 
-secret.json
-libs/*
+/secret.json
+/libs/*
 !/libs/README.txt
 
 .DS_Store
-bugreport.md
+Thumbs.db
+Desktop.ini
+/bugreport.md
 
-# local coding-agent context
+# machine-specific agent context (public project notes belong under /docs)
 /AGENTS.md
 /agent-notes/
+/.agents/
 /.codex/
 /CLAUDE.md
+/.claude/

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XWX",
+    "XXX",
+    " X "
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:planks"
+    },
+    "X": {
+      "item": "basemetals:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "basemetals:copper_shield"
+  }
+}

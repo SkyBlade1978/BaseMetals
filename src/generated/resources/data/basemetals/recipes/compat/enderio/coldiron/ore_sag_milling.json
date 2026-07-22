@@ -1,0 +1,19 @@
+{
+  "type": "enderio_machines:sagmilling",
+  "energy": 2400,
+  "input": {
+    "tag": "forge:ores/coldiron"
+  },
+  "outputs": [
+    {
+      "item": "basemetals:coldiron_powder",
+      "count": 2
+    }
+  ],
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "enderio_machines"
+    }
+  ]
+}

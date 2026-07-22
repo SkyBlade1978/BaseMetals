@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  X",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "X": {
+      "tag": "forge:ingots/nickel"
+    }
+  },
+  "result": {
+    "item": "basemetals:nickel_horse_armor"
+  }
+}

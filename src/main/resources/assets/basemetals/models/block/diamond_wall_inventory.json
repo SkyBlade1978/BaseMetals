@@ -1,6 +1,6 @@
 {
     "parent": "block/wall_inventory",
     "textures": {
-        "wall": "minecraft:blocks/diamond_block"
+        "wall": "minecraft:block/diamond_block"
     }
 }

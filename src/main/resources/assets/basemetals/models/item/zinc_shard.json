@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "basemetals:items/zinc_shard"
+        "layer0": "basemetals:item/zinc_shard"
     }
 }

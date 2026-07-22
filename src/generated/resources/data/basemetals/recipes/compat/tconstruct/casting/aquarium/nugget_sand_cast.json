@@ -1,0 +1,21 @@
+{
+  "type": "tconstruct:casting_table",
+  "cooling_time": 16,
+  "cast": {
+    "tag": "tconstruct:casts/single_use/nugget"
+  },
+  "cast_consumed": true,
+  "fluid": {
+    "tag": "forge:molten_aquarium",
+    "amount": 10
+  },
+  "result": {
+    "item": "basemetals:aquarium_nugget"
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ]
+}
