@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:mithril_rod"
+    "item": "basemetals:mithril_rod",
+    "count": 4
   }
 }

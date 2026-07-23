@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "item": "minecraft:bone_block"
+  },
+  "result": {
+    "item": "minecraft:bone_meal",
+    "count": 9
+  }
+}

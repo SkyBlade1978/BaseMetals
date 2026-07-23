@@ -10,10 +10,11 @@
       "tag": "forge:rods/quartz"
     },
     "X": {
-      "item": "minecraft:quartz"
+      "tag": "forge:gems/quartz"
     }
   },
   "result": {
-    "item": "basemetals:quartz_gear"
+    "item": "basemetals:quartz_gear",
+    "count": 4
   }
 }

@@ -20,7 +20,7 @@ public final class MaterialArmor implements ArmorMaterial {
     public MaterialArmor(MaterialDefinition material) {
         this.material = material;
         this.repair = () -> Ingredient.of(ItemTags.create(
-                new ResourceLocation("forge", "ingots/" + material.name())));
+                new ResourceLocation(material.repairIngredientTag())));
     }
 
     public MaterialDefinition material() { return material; }
@@ -32,6 +32,6 @@ public final class MaterialArmor implements ArmorMaterial {
     @Override public SoundEvent getEquipSound() { return SoundEvents.ARMOR_EQUIP_IRON; }
     @Override public Ingredient getRepairIngredient() { return repair.get(); }
     @Override public String getName() { return "basemetals:" + material.name(); }
-    @Override public float getToughness() { return Math.max(0.0F, material.toolLevel() - 2.0F); }
+    @Override public float getToughness() { return material.armorToughness(); }
     @Override public float getKnockbackResistance() { return 0.0F; }
 }

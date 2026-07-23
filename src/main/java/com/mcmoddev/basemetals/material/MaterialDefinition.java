@@ -83,12 +83,49 @@ public record MaterialDefinition(
         return Math.round((float) (2.5D * hardness)) / 10.0F;
     }
 
+    public float axeAttackDamage() {
+        return 4.0F + (2.0F * baseAttackDamage());
+    }
+
+    public float axeAttackSpeed() {
+        return -3.5F + Math.min(0.5F, 0.05F * (float) strength);
+    }
+
+    public float crackhammerAttackDamage() {
+        return 5.0F + (2.0F * baseAttackDamage());
+    }
+
+    public float crackhammerDestroySpeed() {
+        return Math.max(1.0F, 0.5F * toolEfficiency());
+    }
+
+    public int crackhammerDurability() {
+        return Math.max(1, (int) (0.75D * toolDurability()));
+    }
+
+    public int shieldDurability() {
+        return Math.max(1, (int) (168.0D * strength));
+    }
+
+    public String repairIngredientTag() {
+        return switch (name) {
+            case "diamond", "emerald", "quartz" -> "forge:gems/" + name;
+            case "stone" -> "forge:stone";
+            case "wood" -> "minecraft:planks";
+            default -> "forge:ingots/" + name;
+        };
+    }
+
     public int enchantability() {
         return Math.max(0, (int) (2.5D * magic));
     }
 
     public int armorDurabilityFactor() {
         return Math.max(1, (int) (2.0D * strength));
+    }
+
+    public float armorToughness() {
+        return hardness > 10.0D ? (int) (hardness / 5.0D) : 0.0F;
     }
 
     public int armorProtection(EquipmentSlot slot) {

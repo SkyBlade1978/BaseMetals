@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:bismuth_gear"
+    "item": "basemetals:bismuth_gear",
+    "count": 4
   }
 }

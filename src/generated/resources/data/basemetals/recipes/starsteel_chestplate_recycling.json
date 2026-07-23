@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:starsteel_chestplate"
+  },
+  "result": {
+    "item": "basemetals:starsteel_ingot",
+    "count": 8
+  },
+  "experience": 1.2,
+  "cookingtime": 200
+}

@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:aquarium_gear"
+    "item": "basemetals:aquarium_gear",
+    "count": 4
   }
 }

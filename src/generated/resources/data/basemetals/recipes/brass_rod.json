@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:brass_rod"
+    "item": "basemetals:brass_rod",
+    "count": 4
   }
 }

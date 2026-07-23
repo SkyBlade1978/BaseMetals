@@ -1,10 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:quartz"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "X"
   ],
+  "key": {
+    "X": {
+      "tag": "forge:nuggets/quartz"
+    }
+  },
   "result": {
     "item": "basemetals:quartz_button"
   }

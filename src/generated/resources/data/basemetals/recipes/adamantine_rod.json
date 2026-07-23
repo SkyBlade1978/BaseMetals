@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:adamantine_rod"
+    "item": "basemetals:adamantine_rod",
+    "count": 4
   }
 }

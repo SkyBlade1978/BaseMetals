@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:gold_gear"
+    "item": "basemetals:gold_gear",
+    "count": 4
   }
 }

@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:zinc_plate"
+    "item": "basemetals:zinc_plate",
+    "count": 3
   }
 }

@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:gold_rod"
+    "item": "basemetals:gold_rod",
+    "count": 4
   }
 }

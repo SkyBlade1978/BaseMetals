@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:aquarium_plate"
+    "item": "basemetals:aquarium_plate",
+    "count": 3
   }
 }

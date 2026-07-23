@@ -31,13 +31,17 @@ public final class BaseMetalsTrades {
             int emeraldCost = Math.max(1, (int) (0.2F * value));
             int level = Math.max(1, Math.min(4, (int) (0.1F * value)));
             Item ingot = ModContent.item(material.name() + "_ingot").get();
-            event.getTrades().get(level).add(selling(ingot, emeraldCost));
+            event.getTrades().get(level).add(selling(ingot, 12, emeraldCost));
             if (event.getType() == VillagerProfession.ARMORER) {
-                addSales(event, level, emeraldCost, material, "helmet", "chestplate", "leggings", "boots");
+                addSales(event, level, emeraldCost + (int) (material.hardness() / 2.0D),
+                        material, "helmet", "chestplate", "leggings", "boots");
             } else if (event.getType() == VillagerProfession.TOOLSMITH) {
                 addSales(event, level, emeraldCost, material, "pickaxe", "axe", "shovel", "hoe", "crackhammer");
             } else if (event.getType() == VillagerProfession.WEAPONSMITH) {
-                addSales(event, level, emeraldCost, material, "sword", "bow", "crossbow");
+                addSales(event, level,
+                        emeraldCost + ((int) (material.baseAttackDamage() / 2.0F)) - 1,
+                        material, "sword");
+                addSales(event, level, emeraldCost, material, "bow", "crossbow");
             }
             if (material.magic() > 5.0D) {
                 addEnchantedSales(event, level, emeraldCost, material);
@@ -88,7 +92,7 @@ public final class BaseMetalsTrades {
     }
 
     private static ItemListing selling(Item item, int count, int emeralds) {
-        return (trader, random) -> new MerchantOffer(new ItemStack(Items.EMERALD, emeralds),
+        return (trader, random) -> new MerchantOffer(new ItemStack(Items.EMERALD, Math.max(1, emeralds)),
                 new ItemStack(item, count), 6, 5, 0.2F);
     }
 

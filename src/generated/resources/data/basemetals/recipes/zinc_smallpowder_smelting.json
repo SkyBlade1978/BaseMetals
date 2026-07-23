@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:tiny_dusts/zinc"
+  },
+  "result": "basemetals:zinc_nugget",
+  "experience": 0.01,
+  "cookingtime": 200
+}

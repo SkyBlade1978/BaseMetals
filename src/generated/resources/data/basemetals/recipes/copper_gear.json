@@ -10,10 +10,11 @@
       "tag": "forge:rods/copper"
     },
     "X": {
-      "item": "basemetals:copper_ingot"
+      "tag": "forge:ingots/copper"
     }
   },
   "result": {
-    "item": "basemetals:copper_gear"
+    "item": "basemetals:copper_gear",
+    "count": 4
   }
 }

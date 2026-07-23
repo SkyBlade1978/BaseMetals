@@ -10,22 +10,13 @@
     "description": {
       "translate": "advancements.basemetals.geologist.description"
     },
-    "frame": "goal",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:iron_crackhammer"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

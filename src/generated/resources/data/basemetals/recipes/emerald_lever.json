@@ -9,7 +9,7 @@
       "tag": "forge:rods/emerald"
     },
     "X": {
-      "item": "minecraft:emerald"
+      "tag": "forge:gems/emerald"
     }
   },
   "result": {

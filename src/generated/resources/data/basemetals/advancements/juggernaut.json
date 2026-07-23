@@ -1,5 +1,5 @@
 {
-  "parent": "basemetals:this_is_new",
+  "parent": "minecraft:story/enter_the_nether",
   "display": {
     "icon": {
       "item": "basemetals:adamantine_chestplate"
@@ -10,37 +10,13 @@
     "description": {
       "translate": "advancements.basemetals.juggernaut.description"
     },
-    "frame": "goal",
+    "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:adamantine_helmet"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:adamantine_chestplate"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:adamantine_leggings"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:adamantine_boots"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

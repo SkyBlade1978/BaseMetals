@@ -59,6 +59,22 @@ class MaterialCatalogueTest {
                     material.enchantability(), material.name());
             assertEquals(Math.max(1, (int) (2.0D * material.strength())),
                     material.armorDurabilityFactor(), material.name());
+            assertEquals(4.0F + (2.0F * material.baseAttackDamage()),
+                    material.axeAttackDamage(), material.name());
+            assertEquals(-3.5F + Math.min(0.5F, 0.05F * (float) material.strength()),
+                    material.axeAttackSpeed(), material.name());
+            assertEquals(5.0F + (2.0F * material.baseAttackDamage()),
+                    material.crackhammerAttackDamage(), material.name());
+            assertEquals(Math.max(1.0F, 0.5F * material.toolEfficiency()),
+                    material.crackhammerDestroySpeed(), material.name());
+            assertEquals(Math.max(1, (int) (0.75D * material.toolDurability())),
+                    material.crackhammerDurability(), material.name());
+            assertEquals(Math.max(1, (int) (168.0D * material.strength())),
+                    material.shieldDurability(), material.name());
+            assertEquals("forge:ingots/" + material.name(), material.repairIngredientTag(),
+                    material.name());
+            assertEquals(material.hardness() > 10.0D ? (float) (int) (material.hardness() / 5.0D) : 0.0F,
+                    material.armorToughness(), material.name());
             for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST,
                     EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
                 assertTrue(material.armorProtection(slot) >= 0 && material.armorProtection(slot) <= 30,
@@ -67,5 +83,7 @@ class MaterialCatalogueTest {
         }
         assertEquals(0.9F, MaterialCatalogue.get("brass").baseAttackDamage());
         assertEquals(2.0F, MaterialCatalogue.get("bronze").baseAttackDamage());
+        assertEquals(0.0F, MaterialCatalogue.get("starsteel").armorToughness());
+        assertEquals(2.0F, MaterialCatalogue.get("adamantine").armorToughness());
     }
 }

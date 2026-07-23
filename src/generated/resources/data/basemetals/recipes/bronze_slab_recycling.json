@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:bronze_slab"
+  },
+  "result": {
+    "item": "basemetals:bronze_nugget",
+    "count": 4
+  },
+  "experience": 0.05,
+  "cookingtime": 200
+}

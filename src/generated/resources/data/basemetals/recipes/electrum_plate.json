@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:electrum_plate"
+    "item": "basemetals:electrum_plate",
+    "count": 3
   }
 }

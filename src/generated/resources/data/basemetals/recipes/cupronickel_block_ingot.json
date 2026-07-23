@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "basemetals:cupronickel_block"
+      "tag": "forge:storage_blocks/cupronickel"
     }
   ],
   "result": {

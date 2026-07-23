@@ -29,6 +29,10 @@ public final class CrushingRecipe implements Recipe<Container> {
             .<RecipeType<CrushingRecipe>>register("crushing", CrushingRecipeType::new);
     public static final RegistryObject<RecipeSerializer<CrushingRecipe>> SERIALIZER = SERIALIZERS.register(
             "crushing", Serializer::new);
+    public static final RegistryObject<RecipeSerializer<LegacySmeltingRecipe>> LEGACY_SMELTING_SERIALIZER =
+            SERIALIZERS.register("legacy_smelting", LegacySmeltingRecipe.Serializer::new);
+    public static final RegistryObject<RecipeSerializer<PlateRepairRecipe>> PLATE_REPAIR_SERIALIZER =
+            SERIALIZERS.register("plate_repair", PlateRepairRecipe.Serializer::new);
 
     private final ResourceLocation id;
     private final Ingredient ingredient;

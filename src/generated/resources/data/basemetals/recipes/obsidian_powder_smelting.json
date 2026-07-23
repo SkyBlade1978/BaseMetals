@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:dusts/obsidian"
+  },
+  "result": "basemetals:obsidian_ingot",
+  "experience": 0.4,
+  "cookingtime": 200
+}

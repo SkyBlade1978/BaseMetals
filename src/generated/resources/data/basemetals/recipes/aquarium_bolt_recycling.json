@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:aquarium_bolt"
+  },
+  "result": {
+    "item": "basemetals:aquarium_nugget",
+    "count": 2
+  },
+  "experience": 0.17,
+  "cookingtime": 200
+}

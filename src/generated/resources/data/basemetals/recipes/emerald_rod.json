@@ -6,10 +6,11 @@
   ],
   "key": {
     "X": {
-      "item": "minecraft:emerald"
+      "tag": "forge:gems/emerald"
     }
   },
   "result": {
-    "item": "basemetals:emerald_rod"
+    "item": "basemetals:emerald_rod",
+    "count": 4
   }
 }

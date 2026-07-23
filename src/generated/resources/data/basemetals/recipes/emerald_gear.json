@@ -7,13 +7,14 @@
   ],
   "key": {
     "R": {
-      "tag": "forge:rods/emerald"
+      "tag": "forge:rods/iron"
     },
     "X": {
-      "item": "minecraft:emerald"
+      "tag": "forge:gems/emerald"
     }
   },
   "result": {
-    "item": "basemetals:emerald_gear"
+    "item": "basemetals:emerald_gear",
+    "count": 4
   }
 }

@@ -1,10 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:emerald"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "X"
   ],
+  "key": {
+    "X": {
+      "tag": "forge:nuggets/emerald"
+    }
+  },
   "result": {
     "item": "basemetals:emerald_button"
   }

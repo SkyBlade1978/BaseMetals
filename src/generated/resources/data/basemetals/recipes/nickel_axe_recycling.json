@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:nickel_axe"
+  },
+  "result": {
+    "item": "basemetals:nickel_ingot",
+    "count": 3
+  },
+  "experience": 0.7,
+  "cookingtime": 200
+}

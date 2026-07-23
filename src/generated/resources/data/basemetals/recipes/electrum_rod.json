@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:electrum_rod"
+    "item": "basemetals:electrum_rod",
+    "count": 4
   }
 }

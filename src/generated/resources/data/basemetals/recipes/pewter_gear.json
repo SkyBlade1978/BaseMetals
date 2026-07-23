@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:pewter_gear"
+    "item": "basemetals:pewter_gear",
+    "count": 4
   }
 }

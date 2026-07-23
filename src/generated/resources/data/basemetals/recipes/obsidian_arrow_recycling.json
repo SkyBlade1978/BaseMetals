@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:obsidian_arrow"
+  },
+  "result": {
+    "item": "basemetals:obsidian_nugget"
+  },
+  "experience": 0.04,
+  "cookingtime": 200
+}

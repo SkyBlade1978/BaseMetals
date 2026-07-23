@@ -1,4 +1,5 @@
 {
+  "parent": "minecraft:story/smelt_iron",
   "display": {
     "icon": {
       "item": "basemetals:copper_ingot"
@@ -14,17 +15,8 @@
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:copper_ingot"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

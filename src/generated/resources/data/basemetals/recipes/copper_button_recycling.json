@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:copper_button"
+  },
+  "result": {
+    "item": "basemetals:copper_nugget",
+    "count": 2
+  },
+  "experience": 0.06,
+  "cookingtime": 200
+}

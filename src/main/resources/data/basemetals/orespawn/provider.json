@@ -14,6 +14,7 @@
           "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
           "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
           "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
+          "host_blocks": ["minecraft:netherrack"],
           "host_tags": ["forge:netherrack"]
         }
       }
@@ -27,6 +28,7 @@
           "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
           "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
           "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
+          "host_blocks": ["minecraft:netherrack"],
           "host_tags": ["forge:netherrack"]
         }
       }
@@ -40,6 +42,7 @@
           "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
           "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
           "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
+          "host_blocks": ["minecraft:end_stone"],
           "host_tags": ["forge:end_stones"]
         }
       }

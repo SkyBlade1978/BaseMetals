@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:zinc_rod"
+    "item": "basemetals:zinc_rod",
+    "count": 4
   }
 }

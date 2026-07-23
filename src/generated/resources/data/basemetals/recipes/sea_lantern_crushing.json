@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "item": "minecraft:sea_lantern"
+  },
+  "result": {
+    "item": "minecraft:prismarine_crystals",
+    "count": 5
+  }
+}

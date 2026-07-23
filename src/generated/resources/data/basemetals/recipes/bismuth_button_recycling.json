@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:bismuth_button"
+  },
+  "result": {
+    "item": "basemetals:bismuth_nugget",
+    "count": 2
+  },
+  "experience": 0.01,
+  "cookingtime": 200
+}

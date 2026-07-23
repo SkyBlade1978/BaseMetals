@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:nickel_plate"
+    "item": "basemetals:nickel_plate",
+    "count": 3
   }
 }

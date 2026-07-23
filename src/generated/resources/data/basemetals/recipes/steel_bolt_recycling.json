@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:steel_bolt"
+  },
+  "result": {
+    "item": "basemetals:steel_nugget",
+    "count": 2
+  },
+  "experience": 0.02,
+  "cookingtime": 200
+}

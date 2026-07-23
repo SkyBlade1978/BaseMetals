@@ -1559,7 +1559,9 @@
     "basemetals:custom_bolt"
   ],
   "recipe_serializers": [
-    "basemetals:crushing"
+    "basemetals:crushing",
+    "basemetals:legacy_smelting",
+    "basemetals:plate_repair"
   ],
   "loot_modifier_serializers": [
     "basemetals:add_table"
@@ -1701,7 +1703,9 @@
     "basemetals:custom_bolt"
   ],
   "new_recipe_serializers": [
-    "basemetals:crushing"
+    "basemetals:crushing",
+    "basemetals:legacy_smelting",
+    "basemetals:plate_repair"
   ],
   "new_loot_modifier_serializers": [
     "basemetals:add_table"

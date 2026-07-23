@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:invar_plate"
+    "item": "basemetals:invar_plate",
+    "count": 3
   }
 }

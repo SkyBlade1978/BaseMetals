@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "XXX",
-    "XXX"
+    "XX",
+    "XX"
   ],
   "key": {
     "X": {
@@ -10,7 +10,6 @@
     }
   },
   "result": {
-    "item": "basemetals:bismuth_trapdoor",
-    "count": 2
+    "item": "basemetals:bismuth_trapdoor"
   }
 }

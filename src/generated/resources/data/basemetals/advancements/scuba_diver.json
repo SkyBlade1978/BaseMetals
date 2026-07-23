@@ -10,37 +10,13 @@
     "description": {
       "translate": "advancements.basemetals.scuba_diver.description"
     },
-    "frame": "goal",
+    "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:aquarium_helmet"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:aquarium_chestplate"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:aquarium_leggings"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:aquarium_boots"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

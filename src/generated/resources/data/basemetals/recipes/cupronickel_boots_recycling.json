@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:cupronickel_boots"
+  },
+  "result": {
+    "item": "basemetals:cupronickel_ingot",
+    "count": 4
+  },
+  "experience": 0.6,
+  "cookingtime": 200
+}

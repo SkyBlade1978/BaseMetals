@@ -1,10 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "tag": "forge:ingots/cupronickel"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "X"
   ],
+  "key": {
+    "X": {
+      "tag": "forge:nuggets/cupronickel"
+    }
+  },
   "result": {
     "item": "basemetals:cupronickel_button"
   }

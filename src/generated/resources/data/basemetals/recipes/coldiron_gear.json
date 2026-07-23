@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:coldiron_gear"
+    "item": "basemetals:coldiron_gear",
+    "count": 4
   }
 }

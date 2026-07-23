@@ -1,10 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "tag": "forge:ingots/obsidian"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "X"
   ],
+  "key": {
+    "X": {
+      "tag": "forge:nuggets/obsidian"
+    }
+  },
   "result": {
     "item": "basemetals:obsidian_button"
   }

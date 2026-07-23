@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:cupronickel_lever"
+  },
+  "result": {
+    "item": "basemetals:cupronickel_ingot"
+  },
+  "experience": 0.6,
+  "cookingtime": 200
+}

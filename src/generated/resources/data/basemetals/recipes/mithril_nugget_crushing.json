@@ -1,0 +1,9 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:nuggets/mithril"
+  },
+  "result": {
+    "item": "basemetals:mithril_smallpowder"
+  }
+}

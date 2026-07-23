@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:iron_button"
+  },
+  "result": {
+    "item": "minecraft:iron_nugget",
+    "count": 2
+  },
+  "experience": 0.05,
+  "cookingtime": 200
+}

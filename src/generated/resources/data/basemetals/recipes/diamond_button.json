@@ -1,10 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:diamond"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X",
+    "X"
   ],
+  "key": {
+    "X": {
+      "tag": "forge:nuggets/diamond"
+    }
+  },
   "result": {
     "item": "basemetals:diamond_button"
   }

@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:steel_plate"
+    "item": "basemetals:steel_plate",
+    "count": 3
   }
 }

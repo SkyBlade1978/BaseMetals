@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:bronze_leggings"
+  },
+  "result": {
+    "item": "basemetals:bronze_ingot",
+    "count": 7
+  },
+  "experience": 0.45,
+  "cookingtime": 200
+}

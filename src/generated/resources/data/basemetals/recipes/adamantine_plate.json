@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:adamantine_plate"
+    "item": "basemetals:adamantine_plate",
+    "count": 3
   }
 }

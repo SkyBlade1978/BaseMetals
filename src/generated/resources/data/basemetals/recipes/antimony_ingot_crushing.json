@@ -1,0 +1,9 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:ingots/antimony"
+  },
+  "result": {
+    "item": "basemetals:antimony_powder"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "parent": "basemetals:this_is_new",
+  "parent": "basemetals:geologist",
   "display": {
     "icon": {
       "item": "basemetals:bronze_blend"
@@ -10,22 +10,13 @@
     "description": {
       "translate": "advancements.basemetals.metallurgy.description"
     },
-    "frame": "goal",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:bronze_blend"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:emerald_leggings"
+  },
+  "result": {
+    "item": "minecraft:emerald",
+    "count": 7
+  },
+  "experience": 1.0,
+  "cookingtime": 200
+}

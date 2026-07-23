@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:diamond_door"
+  },
+  "result": {
+    "item": "minecraft:diamond",
+    "count": 2
+  },
+  "experience": 1.0,
+  "cookingtime": 200
+}

@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:platinum_crackhammer"
+  },
+  "result": {
+    "item": "basemetals:platinum_block"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

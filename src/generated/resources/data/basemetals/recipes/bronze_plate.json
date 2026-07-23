@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:bronze_plate"
+    "item": "basemetals:bronze_plate",
+    "count": 3
   }
 }

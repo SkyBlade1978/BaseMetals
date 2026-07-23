@@ -1,0 +1,7 @@
+{
+  "type": "basemetals:plate_repair",
+  "target": "basemetals:bronze_shield",
+  "plate": {
+    "tag": "forge:plates/bronze"
+  }
+}

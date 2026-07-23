@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:bismuth_plate"
+    "item": "basemetals:bismuth_plate",
+    "count": 3
   }
 }

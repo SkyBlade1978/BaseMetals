@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:iron_rod"
+  },
+  "result": {
+    "item": "minecraft:iron_nugget",
+    "count": 4
+  },
+  "experience": 0.05,
+  "cookingtime": 200
+}

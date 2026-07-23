@@ -6,10 +6,11 @@
   ],
   "key": {
     "X": {
-      "item": "basemetals:copper_ingot"
+      "tag": "forge:ingots/copper"
     }
   },
   "result": {
-    "item": "basemetals:copper_rod"
+    "item": "basemetals:copper_rod",
+    "count": 4
   }
 }

@@ -10,7 +10,7 @@
       "tag": "minecraft:planks"
     },
     "X": {
-      "item": "minecraft:emerald"
+      "tag": "forge:gems/emerald"
     }
   },
   "result": {

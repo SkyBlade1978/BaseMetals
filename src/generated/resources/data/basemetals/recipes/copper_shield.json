@@ -10,7 +10,7 @@
       "tag": "minecraft:planks"
     },
     "X": {
-      "item": "basemetals:copper_ingot"
+      "tag": "forge:ingots/copper"
     }
   },
   "result": {

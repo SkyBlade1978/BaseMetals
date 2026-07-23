@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:invar_crackhammer"
+  },
+  "result": {
+    "item": "basemetals:invar_block"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:brass_gear"
+    "item": "basemetals:brass_gear",
+    "count": 4
   }
 }

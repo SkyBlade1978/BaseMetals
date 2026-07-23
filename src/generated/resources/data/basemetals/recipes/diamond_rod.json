@@ -6,10 +6,11 @@
   ],
   "key": {
     "X": {
-      "item": "minecraft:diamond"
+      "tag": "forge:gems/diamond"
     }
   },
   "result": {
-    "item": "basemetals:diamond_rod"
+    "item": "basemetals:diamond_rod",
+    "count": 4
   }
 }

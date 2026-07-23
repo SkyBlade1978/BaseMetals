@@ -19,7 +19,7 @@ public final class MaterialTier implements Tier {
 
     public MaterialTier(MaterialDefinition material) {
         this.material = material;
-        TagKey<Item> tag = ItemTags.create(new ResourceLocation("forge", "ingots/" + material.name()));
+        TagKey<Item> tag = ItemTags.create(new ResourceLocation(material.repairIngredientTag()));
         this.repair = () -> Ingredient.of(tag);
     }
 

@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:electrum_rod"
+  },
+  "result": {
+    "item": "basemetals:electrum_nugget",
+    "count": 4
+  },
+  "experience": 0.11,
+  "cookingtime": 200
+}

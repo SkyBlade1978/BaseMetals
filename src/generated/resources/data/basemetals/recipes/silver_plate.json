@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:silver_plate"
+    "item": "basemetals:silver_plate",
+    "count": 3
   }
 }

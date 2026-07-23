@@ -532,6 +532,45 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
         }
 
         File eclipseLaunchDir = file('.eclipse/configurations')
+        int changedPrepareLaunches = 0
+        if (eclipseLaunchDir.isDirectory()) {
+            boolean windows = System.getProperty('os.name', '').toLowerCase(Locale.ROOT).contains('windows')
+            File gradleWrapper = file(windows ? 'gradlew.bat' : 'gradlew').canonicalFile
+            String launcher = windows
+                    ? (System.getenv('ComSpec') ?: new File(System.getenv('SystemRoot') ?: 'C:\\Windows',
+                            'System32\\cmd.exe').absolutePath)
+                    : '/bin/sh'
+            String arguments = windows
+                    ? "/d /s /c \"\\\"${gradleWrapper.absolutePath}\\\" copyEclipseResources --console plain\""
+                    : "-c \"'${gradleWrapper.absolutePath.replace("'", "'\\''")}' copyEclipseResources --console plain\""
+
+            fileTree(eclipseLaunchDir) {
+                include '*prepareRun*.launch'
+            }.files.each { File launchFile ->
+                StringWriter output = new StringWriter()
+                def xml = new groovy.xml.MarkupBuilder(output)
+                xml.mkp.xmlDeclaration(version: '1.0', encoding: 'UTF-8', standalone: 'no')
+                xml.launchConfiguration(type: 'org.eclipse.ui.externaltools.ProgramLaunchConfigurationType') {
+                    booleanAttribute(key: 'org.eclipse.debug.ui.ATTR_LAUNCH_IN_BACKGROUND', value: 'true')
+                    booleanAttribute(key: 'org.eclipse.ui.externaltools.ATTR_CAPTURE_OUTPUT', value: 'true')
+                    stringAttribute(key: 'org.eclipse.ui.externaltools.ATTR_LOCATION', value: launcher)
+                    booleanAttribute(key: 'org.eclipse.ui.externaltools.ATTR_SHOW_CONSOLE', value: 'true')
+                    stringAttribute(key: 'org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS', value: arguments)
+                    stringAttribute(key: 'org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY',
+                            value: projectDir.canonicalPath)
+                    mapAttribute(key: 'org.eclipse.debug.core.environmentVariables') {
+                        mapEntry(key: 'GRADLE_USER_HOME', value: eclipseGradleHome.absolutePath)
+                        mapEntry(key: 'JAVA_HOME', value: System.getProperty('java.home'))
+                    }
+                }
+                String replacement = output.toString() + System.lineSeparator()
+                if (launchFile.getText('UTF-8') != replacement) {
+                    launchFile.setText(replacement, 'UTF-8')
+                    changedPrepareLaunches++
+                }
+            }
+        }
+
         int changedLaunches = 0
         if (eclipseLaunchDir.isDirectory()) {
             fileTree(eclipseLaunchDir) {
@@ -570,7 +609,7 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
                 changedLaunchGroups++
             }
         }
-        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedLaunches} slim launches, ${changedLaunchGroups} sequential launch groups updated)")
+        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedPrepareLaunches} terminating prepare launches, ${changedLaunches} slim launches, ${changedLaunchGroups} sequential launch groups updated)")
     }
 }
 

@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:storage_blocks/coldiron"
+  },
+  "result": {
+    "item": "basemetals:coldiron_powder",
+    "count": 9
+  }
+}

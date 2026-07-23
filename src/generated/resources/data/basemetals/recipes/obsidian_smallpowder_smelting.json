@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:tiny_dusts/obsidian"
+  },
+  "result": "basemetals:obsidian_nugget",
+  "experience": 0.04,
+  "cookingtime": 200
+}

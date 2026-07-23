@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:iron_rod"
+    "item": "basemetals:iron_rod",
+    "count": 4
   }
 }

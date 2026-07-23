@@ -10,42 +10,13 @@
     "description": {
       "translate": "advancements.basemetals.angel_of_death.description"
     },
-    "frame": "goal",
+    "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "has_item": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "basemetals:mithril_helmet"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:mithril_chestplate"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:mithril_leggings"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:mithril_boots"
-            ]
-          },
-          {
-            "items": [
-              "basemetals:mithril_sword"
-            ]
-          }
-        ]
-      }
+    "event": {
+      "trigger": "minecraft:impossible"
     }
   }
 }

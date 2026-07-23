@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:electrum_lever"
+  },
+  "result": {
+    "item": "basemetals:electrum_ingot"
+  },
+  "experience": 1.0,
+  "cookingtime": 200
+}

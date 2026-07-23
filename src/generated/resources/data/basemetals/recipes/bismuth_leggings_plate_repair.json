@@ -1,0 +1,7 @@
+{
+  "type": "basemetals:plate_repair",
+  "target": "basemetals:bismuth_leggings",
+  "plate": {
+    "tag": "forge:plates/bismuth"
+  }
+}

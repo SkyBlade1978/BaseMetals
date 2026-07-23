@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:starsteel_slab"
+  },
+  "result": {
+    "item": "basemetals:starsteel_nugget",
+    "count": 4
+  },
+  "experience": 0.13,
+  "cookingtime": 200
+}

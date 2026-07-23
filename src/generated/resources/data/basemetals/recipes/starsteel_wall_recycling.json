@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:starsteel_wall"
+  },
+  "result": {
+    "item": "basemetals:starsteel_block"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:obsidian_slab"
+  },
+  "result": {
+    "item": "basemetals:obsidian_nugget",
+    "count": 4
+  },
+  "experience": 0.04,
+  "cookingtime": 200
+}

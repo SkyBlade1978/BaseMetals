@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:tiny_dusts/coldiron"
+  },
+  "result": "basemetals:coldiron_nugget",
+  "experience": 0.08,
+  "cookingtime": 200
+}

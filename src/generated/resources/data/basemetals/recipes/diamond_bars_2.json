@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "tag": "forge:rods/diamond"
+    }
+  },
+  "result": {
+    "item": "basemetals:diamond_bars",
+    "count": 4
+  }
+}

@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:coldiron_plate"
+    "item": "basemetals:coldiron_plate",
+    "count": 3
   }
 }

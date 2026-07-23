@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:tin_plate"
+    "item": "basemetals:tin_plate",
+    "count": 3
   }
 }

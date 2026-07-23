@@ -14,6 +14,7 @@
     }
   },
   "result": {
-    "item": "basemetals:iron_gear"
+    "item": "basemetals:iron_gear",
+    "count": 4
   }
 }

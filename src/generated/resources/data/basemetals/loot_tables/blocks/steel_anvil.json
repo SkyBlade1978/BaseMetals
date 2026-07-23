@@ -7,7 +7,15 @@
         {
           "type": "minecraft:item",
           "name": "basemetals:steel_anvil",
-          "functions": []
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "basemetals:steel_anvil",
+              "properties": [
+                "damage"
+              ]
+            }
+          ]
         }
       ],
       "conditions": [

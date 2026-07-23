@@ -9,7 +9,7 @@
       "tag": "forge:rods/copper"
     },
     "X": {
-      "item": "basemetals:copper_ingot"
+      "tag": "forge:ingots/copper"
     }
   },
   "result": {

@@ -166,7 +166,7 @@ public final class ModContent {
             case "slab" -> () -> new SlabBlock(metalProperties(material));
             case "lever" -> () -> new LeverBlock(metalProperties(material).noCollission());
             case "pressure_plate" -> () -> new PressurePlateBlock(
-                    PressurePlateBlock.Sensitivity.EVERYTHING, metalProperties(material));
+                    PressurePlateBlock.Sensitivity.MOBS, metalProperties(material));
             case "stairs" -> () -> new StairBlock(
                     () -> MATERIALS.containsKey(material.name())
                             ? MATERIALS.get(material.name()).blocks().get("block").get().defaultBlockState()
@@ -203,7 +203,7 @@ public final class ModContent {
         items.put("crossbow", registerItem(material.name() + "_crossbow", () -> new MaterialItems.Crossbow(material,
                 new Item.Properties().tab(ModTabs.COMBAT).durability(material.toolDurability()))));
         items.put("shield", registerItem(material.name() + "_shield", () -> new MaterialItems.Shield(material,
-                new Item.Properties().tab(ModTabs.COMBAT).durability(material.toolDurability()))));
+                new Item.Properties().tab(ModTabs.COMBAT).durability(material.shieldDurability()))));
         items.put("arrow", registerItem(material.name() + "_arrow", () -> new BaseMetalAmmoItem(material,
                 BaseMetalAmmoItem.Kind.ARROW, ModEntities.CUSTOM_ARROW::get,
                 new Item.Properties().tab(ModTabs.COMBAT))));
@@ -234,7 +234,11 @@ public final class ModContent {
 
     private static void registerVanillaBits() {
         Map<String, MaterialDefinition> vanilla = vanillaDefinitions();
-        registerBlock("charcoal_block", () -> new Block(BlockBehaviour.Properties.of(Material.STONE).strength(5.0F)), true);
+        RegistryObject<Block> charcoalBlock = registerBlock("charcoal_block",
+                () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
+                        .requiresCorrectToolForDrops().strength(5.0F)), false);
+        registerItem("charcoal_block", () -> new MaterialItems.BurnableBlock(
+                charcoalBlock.get(), 16000, new Item.Properties().tab(ModTabs.BLOCKS)));
         registerVanillaDecorative("diamond", vanilla.get("diamond"),
                 List.of("bars", "door", "trapdoor", "button", "slab", "lever", "pressure_plate", "stairs", "wall"));
         registerVanillaDecorative("emerald", vanilla.get("emerald"),
@@ -310,7 +314,7 @@ public final class ModContent {
                     new Item.Properties().tab(ModTabs.TOOLS).durability(material.toolDurability())));
         }
         registerItem(name + "_shield", () -> new MaterialItems.Shield(material,
-                new Item.Properties().tab(ModTabs.COMBAT).durability(material.toolDurability())));
+                new Item.Properties().tab(ModTabs.COMBAT).durability(material.shieldDurability())));
         // Preserve IDs which were added for vanilla materials by MMDLib. The
         // vanilla equipment itself remains the canonical tool/armor where present.
         if (name.equals("emerald") || name.equals("obsidian") || name.equals("quartz")) {
@@ -412,7 +416,16 @@ public final class ModContent {
 
     private static RegistryObject<Item> registerSimpleMaterialItem(String id, MaterialDefinition material,
             net.minecraft.world.item.CreativeModeTab tab) {
-        return registerItem(id, () -> new MaterialItems.Basic(material, new Item.Properties().tab(tab)));
+        return registerItem(id, () -> new MaterialItems.Basic(material, burnTime(id),
+                new Item.Properties().tab(tab)));
+    }
+
+    private static int burnTime(String id) {
+        if (id.equals("charcoal_block")) return 16000;
+        if (id.equals("wood_gear")) return 300;
+        if (id.endsWith("_powder")) return 1600;
+        if (id.endsWith("_nugget") || id.endsWith("_smallpowder")) return 200;
+        return -1;
     }
 
     private static RegistryObject<Item> registerItem(String id, Supplier<? extends Item> factory) {

@@ -7,7 +7,15 @@
         {
           "type": "minecraft:item",
           "name": "basemetals:adamantine_anvil",
-          "functions": []
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "basemetals:adamantine_anvil",
+              "properties": [
+                "damage"
+              ]
+            }
+          ]
         }
       ],
       "conditions": [

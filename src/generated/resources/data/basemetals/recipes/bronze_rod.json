@@ -10,6 +10,7 @@
     }
   },
   "result": {
-    "item": "basemetals:bronze_rod"
+    "item": "basemetals:bronze_rod",
+    "count": 4
   }
 }

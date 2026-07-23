@@ -9,6 +9,7 @@
     }
   },
   "result": {
-    "item": "basemetals:mithril_plate"
+    "item": "basemetals:mithril_plate",
+    "count": 3
   }
 }

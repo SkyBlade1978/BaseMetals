@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:silver_door"
+  },
+  "result": {
+    "item": "basemetals:silver_ingot",
+    "count": 2
+  },
+  "experience": 0.6,
+  "cookingtime": 200
+}

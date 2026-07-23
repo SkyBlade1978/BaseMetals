@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "basemetals:starsteel_block"
+      "tag": "forge:storage_blocks/starsteel"
     }
   ],
   "result": {

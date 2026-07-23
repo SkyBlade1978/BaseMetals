@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:storage_blocks/antimony"
+  },
+  "result": {
+    "item": "basemetals:antimony_powder",
+    "count": 9
+  }
+}

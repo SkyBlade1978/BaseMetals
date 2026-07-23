@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:iron_wall"
+  },
+  "result": {
+    "item": "minecraft:iron_block"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

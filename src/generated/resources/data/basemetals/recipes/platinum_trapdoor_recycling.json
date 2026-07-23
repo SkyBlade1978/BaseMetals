@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:platinum_trapdoor"
+  },
+  "result": {
+    "item": "basemetals:platinum_ingot",
+    "count": 4
+  },
+  "experience": 1.5,
+  "cookingtime": 200
+}

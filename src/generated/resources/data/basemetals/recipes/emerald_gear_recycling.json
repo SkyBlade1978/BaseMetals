@@ -1,0 +1,11 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:emerald_gear"
+  },
+  "result": {
+    "item": "minecraft:emerald"
+  },
+  "experience": 1.0,
+  "cookingtime": 200
+}

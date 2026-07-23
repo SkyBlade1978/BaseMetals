@@ -6,37 +6,68 @@ import java.util.Optional;
 import com.mcmoddev.basemetals.material.MaterialDefinition;
 import com.mcmoddev.basemetals.recipe.CrushingRecipe;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 
-public final class CrackhammerItem extends PickaxeItem implements MaterialBacked {
+public final class CrackhammerItem extends DiggerItem implements MaterialBacked {
     private final MaterialDefinition material;
 
     public CrackhammerItem(MaterialDefinition material, Properties properties) {
-        super(new MaterialTier(material), 1, -3.0F, properties);
+        super(5.0F + material.baseAttackDamage(), -3.5F, new MaterialTier(material),
+                BlockTags.MINEABLE_WITH_PICKAXE,
+                properties.durability(material.crackhammerDurability()));
         this.material = material;
     }
 
     @Override public MaterialDefinition baseMetalsMaterial() { return material; }
 
     @Override
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        return state.is(com.mcmoddev.basemetals.ModTags.CRACKHAMMER_CRUSHABLE)
+                && stack.isCorrectToolForDrops(state)
+                ? material.crackhammerDestroySpeed()
+                : 1.0F;
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ToolAction action) {
+        return ToolActions.DEFAULT_PICKAXE_ACTIONS.contains(action);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level,
+            List<net.minecraft.network.chat.Component> tooltip,
+            net.minecraft.world.item.TooltipFlag flag) {
+        MaterialItems.addToolTooltip(material, tooltip);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getLevel().isClientSide || context.getPlayer() == null) return InteractionResult.PASS;
-        AABB area = new AABB(context.getClickedPos().above()).inflate(0.75D);
+        if (context.getClickedFace() != Direction.UP || context.getLevel().isClientSide
+                || context.getPlayer() == null) {
+            return InteractionResult.PASS;
+        }
+        AABB area = new AABB(context.getClickedPos().above());
         List<ItemEntity> entities = context.getLevel().getEntitiesOfClass(ItemEntity.class, area,
                 entity -> entity.isAlive() && !entity.getItem().isEmpty());
-        boolean changed = false;
         for (ItemEntity entity : entities) {
             ItemStack input = entity.getItem();
             Optional<CrushingRecipe> recipe = context.getLevel().getRecipeManager().getRecipeFor(
                     CrushingRecipe.TYPE.get(), new SimpleContainer(input), context.getLevel());
-            if (recipe.isEmpty()) continue;
+            if (recipe.isEmpty() || !canCrushDroppedBlock(context.getItemInHand(), input)) continue;
             // Sneaking is the per-use full-stack control; ordinary use crushes
             // one item and never changes a persistent config contract.
             int requested = context.getPlayer().isShiftKeyDown() ? input.getCount() : 1;
@@ -46,16 +77,25 @@ public final class CrackhammerItem extends PickaxeItem implements MaterialBacked
                     : requested;
             int operations = Math.min(requested, durability);
             if (operations == 0) break;
-            ItemStack output = recipe.get().getResultItem();
+            ItemStack output = recipe.get().getResultItem().copy();
             input.shrink(operations);
             if (input.isEmpty()) entity.discard(); else entity.setItem(input);
             spawnOutputs(context.getLevel(), entity, output, operations);
             hammer.hurtAndBreak(operations, context.getPlayer(),
                     player -> player.broadcastBreakEvent(context.getHand()));
-            changed = true;
-            if (hammer.isEmpty()) break;
+            context.getLevel().playSound(null, context.getClickedPos(),
+                    net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.5F,
+                    0.5F + (context.getLevel().random.nextFloat() * 0.3F));
+            return InteractionResult.CONSUME;
         }
-        return changed ? InteractionResult.CONSUME : InteractionResult.PASS;
+        return InteractionResult.PASS;
+    }
+
+    private static boolean canCrushDroppedBlock(ItemStack hammer, ItemStack input) {
+        if (!(input.getItem() instanceof BlockItem blockItem)) return true;
+        BlockState state = blockItem.getBlock().defaultBlockState();
+        return !state.requiresCorrectToolForDrops() || hammer.isCorrectToolForDrops(state);
     }
 
     private static void spawnOutputs(Level level, ItemEntity source, ItemStack result, int operations) {

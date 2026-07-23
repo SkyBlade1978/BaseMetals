@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "tag": "forge:storage_blocks/aquarium"
+  },
+  "result": {
+    "item": "basemetals:aquarium_powder",
+    "count": 9
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "basemetals:legacy_smelting",
+  "ingredient": {
+    "item": "basemetals:diamond_rod"
+  },
+  "result": {
+    "item": "basemetals:diamond_nugget",
+    "count": 4
+  },
+  "experience": 0.04,
+  "cookingtime": 200
+}

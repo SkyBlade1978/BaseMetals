@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "tag": "forge:tiny_dusts/starsteel"
+  },
+  "result": "basemetals:starsteel_nugget",
+  "experience": 0.13,
+  "cookingtime": 200
+}

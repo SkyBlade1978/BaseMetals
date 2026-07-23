@@ -1,0 +1,10 @@
+{
+  "type": "basemetals:crushing",
+  "ingredient": {
+    "item": "minecraft:quartz_slab"
+  },
+  "result": {
+    "item": "minecraft:quartz",
+    "count": 2
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "basemetals:plate_repair",
+  "target": "basemetals:cupronickel_chestplate",
+  "plate": {
+    "tag": "forge:plates/cupronickel"
+  }
+}

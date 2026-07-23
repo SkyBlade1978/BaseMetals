@@ -24,5 +24,8 @@ class MechanicsContractTest {
         assertEquals(5, BaseMetalsEvents.shieldUpgradeCost(copper, silver, 0));
         assertEquals(35, BaseMetalsEvents.shieldUpgradeCost(copper, silver, 5));
         assertEquals(90, BaseMetalsEvents.shieldUpgradeCost(copper, starsteel, 5));
+        assertEquals(7, BaseMetalsEvents.shieldUpgradeCost(
+                MaterialCatalogue.get("brass"), copper, 1),
+                "The 1.12 recipe truncated fractional level costs");
     }
 }
