@@ -7,22 +7,32 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mcmoddev.basemetals.BaseMetals;
+import com.mcmoddev.basemetals.MissingMappings;
 import com.mcmoddev.basemetals.migration.Legacy112WorldMigrator;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -47,19 +57,25 @@ public final class UpgradeWorldSmoke {
         int itemMismatches = 0;
         int checkedStates = 0;
         int checkedItems = 0;
+        int checkedArmor = 0;
+        int checkedBuckets = 0;
+        int checkedPlayerItems = 0;
         try {
             if (!Files.isRegularFile(marker)) failures.add("missing legacy fixture marker");
             JsonObject manifest;
             try (Reader reader = Files.newBufferedReader(manifestPath, StandardCharsets.UTF_8)) {
                 manifest = JsonParser.parseReader(reader).getAsJsonObject();
             }
+            int format = manifest.has("fixture_format") ? manifest.get("fixture_format").getAsInt() : 1;
+            if (format < 2) failures.add("fixture format " + format + " does not cover the complete upgrade contract");
 
-            ServerLevel world = event.getServer().overworld();
             for (JsonElement blockElement : manifest.getAsJsonArray("blocks")) {
                 JsonObject block = blockElement.getAsJsonObject();
-                String expected = block.get("id").getAsString();
+                String expected = currentBlockId(block.get("id").getAsString());
                 for (JsonElement stateElement : block.getAsJsonArray("states")) {
                     JsonObject oldState = stateElement.getAsJsonObject();
+                    int dimension = oldState.has("dimension") ? oldState.get("dimension").getAsInt() : 0;
+                    ServerLevel world = level(event, dimension);
                     BlockPos pos = new BlockPos(oldState.get("x").getAsInt(), oldState.get("y").getAsInt(),
                             oldState.get("z").getAsInt());
                     String actual = String.valueOf(ForgeRegistries.BLOCKS.getKey(world.getBlockState(pos).getBlock()));
@@ -67,7 +83,7 @@ public final class UpgradeWorldSmoke {
                             oldState.get("metadata").getAsInt());
                     if (!expected.equals(actual) || !stateMatches) {
                         if (blockMismatches < 10) {
-                            failures.add("block " + pos + " expected " + expected + " metadata="
+                            failures.add("block dim=" + dimension + " " + pos + " expected " + expected + " metadata="
                                     + oldState.get("metadata").getAsInt() + " but found "
                                     + world.getBlockState(pos));
                         }
@@ -77,43 +93,120 @@ public final class UpgradeWorldSmoke {
                 }
             }
 
-            Map<String, Integer> expectedItems = new LinkedHashMap<>();
-            int highestChest = -1;
+            ServerLevel overworld = event.getServer().overworld();
             for (JsonElement itemElement : manifest.getAsJsonArray("items")) {
                 JsonObject oldItem = itemElement.getAsJsonObject();
-                String expected = oldItem.get("id").getAsString();
                 int chestIndex = oldItem.get("chest").getAsInt();
-                expectedItems.merge(expected, 1, Integer::sum);
-                highestChest = Math.max(highestChest, chestIndex);
-                checkedItems++;
-            }
-
-            Map<String, Integer> actualItems = new LinkedHashMap<>();
-            for (int chestIndex = 0; chestIndex <= highestChest; chestIndex++) {
-                BlockPos pos = gridPosition(chestIndex, -64, 120);
-                BlockEntity blockEntity = world.getBlockEntity(pos);
+                int slot = oldItem.get("slot").getAsInt();
+                BlockPos pos = oldItem.has("chest_x")
+                        ? new BlockPos(oldItem.get("chest_x").getAsInt(), oldItem.get("chest_y").getAsInt(),
+                                oldItem.get("chest_z").getAsInt())
+                        : gridPosition(chestIndex, -64, 120);
+                BlockEntity blockEntity = overworld.getBlockEntity(pos);
                 if (!(blockEntity instanceof ChestBlockEntity chest)) {
                     if (itemMismatches < 10) failures.add("missing inventory chest " + chestIndex + " at " + pos);
                     itemMismatches++;
-                } else {
-                    for (int slot = 0; slot < chest.getContainerSize(); slot++) {
-                        ItemStack stack = chest.getItem(slot);
-                        if (!stack.isEmpty()) {
-                            String actual = String.valueOf(ForgeRegistries.ITEMS.getKey(stack.getItem()));
-                            actualItems.merge(actual, stack.getCount(), Integer::sum);
+                    continue;
+                }
+                ItemStack stack = chest.getItem(slot);
+                String expected = currentItemId(oldItem.get("id").getAsString());
+                String actual = String.valueOf(ForgeRegistries.ITEMS.getKey(stack.getItem()));
+                int expectedCount = oldItem.has("count") ? oldItem.get("count").getAsInt() : 1;
+                int expectedDamage = oldItem.has("damage") ? oldItem.get("damage").getAsInt() : 0;
+                boolean proofMatches = format < 2 || stack.getOrCreateTagElement("basemetals_fixture")
+                        .getString("proof").equals(oldItem.get("id").getAsString());
+                boolean enchantmentMatches = !oldItem.has("enchanted") || !oldItem.get("enchanted").getAsBoolean()
+                        || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack) == 2;
+                if (!expected.equals(actual) || stack.getCount() != expectedCount
+                        || stack.getDamageValue() != expectedDamage || !proofMatches || !enchantmentMatches) {
+                    if (itemMismatches < 10) {
+                        failures.add("chest " + chestIndex + " slot " + slot + " expected "
+                                + expected + " x" + expectedCount + " damage=" + expectedDamage
+                                + " with fixture NBT but found " + stack + " damage="
+                                + stack.getDamageValue() + " proof=" + proofMatches
+                                + " unbreaking="
+                                + EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack));
+                    }
+                    itemMismatches++;
+                }
+                if (oldItem.has("armor_stand")) {
+                    BlockPos armorPos = new BlockPos(
+                            (int) Math.floor(oldItem.get("armor_x").getAsDouble()),
+                            (int) Math.floor(oldItem.get("armor_y").getAsDouble()),
+                            (int) Math.floor(oldItem.get("armor_z").getAsDouble()));
+                    overworld.getChunkAt(armorPos);
+                    List<ArmorStand> stands = overworld.getEntitiesOfClass(ArmorStand.class,
+                            new AABB(armorPos).inflate(0.75D));
+                    EquipmentSlot equipmentSlot = EquipmentSlot.byName(oldItem.get("armor_slot").getAsString());
+                    boolean equipped = stands.stream().anyMatch(stand -> {
+                        ItemStack worn = stand.getItemBySlot(equipmentSlot);
+                        return expected.equals(String.valueOf(ForgeRegistries.ITEMS.getKey(worn.getItem())))
+                                && worn.getDamageValue() == expectedDamage;
+                    });
+                    if (!equipped) {
+                        if (itemMismatches < 10) failures.add("missing armor-stand equipment " + expected);
+                        itemMismatches++;
+                    }
+                    checkedArmor++;
+                }
+                checkedItems++;
+            }
+
+            for (JsonElement fluidElement : manifest.getAsJsonArray("fluids")) {
+                JsonObject fluid = fluidElement.getAsJsonObject();
+                if (!fluid.has("bucket_chest")) continue;
+                int chestIndex = fluid.get("bucket_chest").getAsInt();
+                int slot = fluid.get("bucket_slot").getAsInt();
+                BlockPos pos = fluid.has("bucket_chest_x")
+                        ? new BlockPos(fluid.get("bucket_chest_x").getAsInt(),
+                                fluid.get("bucket_chest_y").getAsInt(),
+                                fluid.get("bucket_chest_z").getAsInt())
+                        : gridPosition(chestIndex, -64, 130);
+                BlockEntity blockEntity = overworld.getBlockEntity(pos);
+                String expected = BaseMetals.MOD_ID + ":"
+                        + MissingMappings.fluidTargetPath(fluid.get("name").getAsString()) + "_bucket";
+                if (!(blockEntity instanceof ChestBlockEntity chest)
+                        || !expected.equals(String.valueOf(ForgeRegistries.ITEMS.getKey(chest.getItem(slot).getItem())))) {
+                    if (itemMismatches < 10) failures.add("legacy filled bucket did not become " + expected);
+                    itemMismatches++;
+                }
+                checkedBuckets++;
+            }
+
+            if (manifest.has("players")) {
+                for (JsonElement playerElement : manifest.getAsJsonArray("players")) {
+                    JsonObject savedPlayer = playerElement.getAsJsonObject();
+                    String name = savedPlayer.has("name") ? savedPlayer.get("name").getAsString()
+                            : "BaseMetalsFixture";
+                    ServerPlayer player = new ServerPlayer(event.getServer(), overworld,
+                            new GameProfile(UUID.fromString(savedPlayer.get("uuid").getAsString()), name));
+                    CompoundTag loaded = event.getServer().getPlayerList().load(player);
+                    if (loaded == null) {
+                        failures.add("fixture playerdata did not load");
+                        continue;
+                    }
+                    for (JsonElement inventoryElement : savedPlayer.getAsJsonArray("inventory")) {
+                        JsonObject expectedItem = inventoryElement.getAsJsonObject();
+                        int slot = expectedItem.get("slot").getAsInt();
+                        ItemStack stack = player.getInventory().getItem(slot);
+                        String expected = currentItemId(expectedItem.get("id").getAsString());
+                        boolean proof = stack.getOrCreateTagElement("basemetals_fixture")
+                                .getString("player_proof").equals(expectedItem.get("id").getAsString());
+                        if (!expected.equals(String.valueOf(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+                                || !proof) {
+                            if (itemMismatches < 10) failures.add("player slot " + slot + " lost " + expected);
+                            itemMismatches++;
                         }
+                        checkedPlayerItems++;
                     }
                 }
             }
-            for (String id : union(expectedItems, actualItems)) {
-                int expected = expectedItems.getOrDefault(id, 0);
-                int actual = actualItems.getOrDefault(id, 0);
-                if (expected != actual) {
-                    if (itemMismatches < 10) {
-                        failures.add("inventory expected " + expected + " of " + id + " but found " + actual);
-                    }
-                    itemMismatches += Math.abs(expected - actual);
-                }
+
+            if (!Files.isRegularFile(root.resolve("legacy_orespawn3_basemetals.json"))) {
+                failures.add("missing packaged Base Metals OS3 rule fixture");
+            }
+            if (!Files.isRegularFile(root.resolve("legacy_orespawn3_orespawn.json"))) {
+                failures.add("missing configured OS3 rule fixture");
             }
         } catch (IOException | RuntimeException exception) {
             failures.add(exception.toString());
@@ -122,14 +215,19 @@ public final class UpgradeWorldSmoke {
         if (!failures.isEmpty()) {
             String result = "BASEMETALS_UPGRADE_SMOKE FAIL states=" + checkedStates
                     + " block_mismatches=" + blockMismatches + " items=" + checkedItems
+                    + " armor=" + checkedArmor + " buckets=" + checkedBuckets
+                    + " player_items=" + checkedPlayerItems
                     + " item_mismatches=" + itemMismatches + " samples=" + failures;
             writeResult(root, result);
             throw new IllegalStateException(result);
         }
 
-        writeResult(root, "BASEMETALS_UPGRADE_SMOKE PASS states=" + checkedStates + " items=" + checkedItems);
-        BaseMetals.LOGGER.info("BASEMETALS_UPGRADE_SMOKE PASS states={} items={} world={}",
-                checkedStates, checkedItems, root);
+        writeResult(root, "BASEMETALS_UPGRADE_SMOKE PASS states=" + checkedStates + " items=" + checkedItems
+                + " armor=" + checkedArmor + " buckets=" + checkedBuckets
+                + " player_items=" + checkedPlayerItems);
+        BaseMetals.LOGGER.info(
+                "BASEMETALS_UPGRADE_SMOKE PASS states={} items={} armor={} buckets={} player_items={} world={}",
+                checkedStates, checkedItems, checkedArmor, checkedBuckets, checkedPlayerItems, root);
         event.getServer().halt(false);
     }
 
@@ -137,10 +235,30 @@ public final class UpgradeWorldSmoke {
         return new BlockPos(xOffset + ordinal % 64, y, ordinal / 64);
     }
 
-    private static Iterable<String> union(Map<String, Integer> first, Map<String, Integer> second) {
-        Map<String, Integer> union = new LinkedHashMap<>(first);
-        second.forEach(union::putIfAbsent);
-        return union.keySet();
+    private static ServerLevel level(ServerStartedEvent event, int dimension) {
+        ServerLevel result = event.getServer().getLevel(switch (dimension) {
+            case -1 -> Level.NETHER;
+            case 1 -> Level.END;
+            default -> Level.OVERWORLD;
+        });
+        if (result == null) throw new IllegalStateException("Missing fixture dimension " + dimension);
+        return result;
+    }
+
+    private static String currentBlockId(String legacy) {
+        ResourceLocation id = new ResourceLocation(legacy);
+        if (id.getNamespace().equals("mmdlib") || id.getNamespace().equals(BaseMetals.MOD_ID)) {
+            return BaseMetals.MOD_ID + ":" + MissingMappings.blockTargetPath(id.getPath());
+        }
+        return legacy;
+    }
+
+    private static String currentItemId(String legacy) {
+        ResourceLocation id = new ResourceLocation(legacy);
+        if (id.getNamespace().equals("mmdlib") || id.getNamespace().equals(BaseMetals.MOD_ID)) {
+            return BaseMetals.MOD_ID + ":" + MissingMappings.itemTargetPath(id.getPath());
+        }
+        return legacy;
     }
 
     private static void writeResult(Path root, String result) {

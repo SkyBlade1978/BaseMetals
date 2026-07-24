@@ -19,6 +19,14 @@ Build OreSpawn 4.0.1 first, then run Base Metals tasks sequentially:
 .\gradlew.bat genEclipseRuns eclipse
 ```
 
+The generated Eclipse `runClient`, `runServer`, `runData`, and
+`runGameTestServer` configurations are direct Java launches. Their
+`MOD_CLASSES` entries combine `bin/main` with the stable processed-resource
+root at `build/resources/main`. This prevents Eclipse from starting Base
+Metals' Java registries without its generated data pack when an unrelated
+Gradle dependency check is temporarily unavailable. Rerun the command above
+after changing mod metadata or regenerating the workspace.
+
 Generated resources live under `src/generated/resources`. Registrations,
 recipes, blockstates, models, tags, loot, advancements, translations, optional
 integration data, and registry manifests derive from the immutable material
@@ -35,8 +43,12 @@ Forge's GameTest server.
 
 The validation-only `upgradeSmoke` source set is excluded from the release
 JAR. `runServer -PupgradeWorldSmoke` checks the captured Forge 1.12 fixture,
-including all 6,851 state placements and all 1,038 inventory items, after the
-production pre-flattening and vanilla data-fixer path.
+including 20,553 state placements across all three vanilla dimensions, 1,038
+exact inventory stacks, 96 equipped armor stacks, 33 filled-fluid buckets,
+representative playerdata, and the stock and Base Metals OS3 rule files. Use
+`-PupgradeWorldName=<copied-fixture-name>` to keep each direct-upgrade run
+isolated. The production migrator runs Mojang's data-fixer path and overlays
+only the third-party block states which Mojang cannot identify.
 
 See [VALIDATION.md](VALIDATION.md) for the recorded release-gate, deterministic
 world-generation, performance, JFR, and optional-integration results.

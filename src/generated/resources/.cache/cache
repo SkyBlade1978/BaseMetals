@@ -4162,6 +4162,7 @@ b3d4f82ed5eab53ea0189388e4418ffbb2833651 data/mekanism/tags/items/shards/bismuth
 50a52b0b52bb69ac41fe40a6d087603901bd19f5 data/mekanism/tags/items/shards/platinum.json
 c3a969a739c219559b2d3885ecf5a101b4257d1b data/mekanism/tags/items/shards/starsteel.json
 d5f947aa297b1af85c5b99cde67ed65baa066b31 data/mekanism/tags/items/shards/zinc.json
+6b425cef6aaf11c16d54922c075d346444a91c85 data/minecraft/tags/blocks/beacon_base_blocks.json
 3376e2b55994219e4081c1f2521cc1064ff8ff04 data/minecraft/tags/blocks/mineable/pickaxe.json
 21c460589f4332ccbb73a9f206441e3bb6c0b42a data/minecraft/tags/blocks/needs_diamond_tool.json
 a473c43136339066bcf15c6dc1978af8c4ec56d8 data/minecraft/tags/blocks/needs_iron_tool.json

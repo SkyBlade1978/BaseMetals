@@ -36,6 +36,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -66,11 +67,13 @@ public final class ModContent {
 
     static {
         MaterialCatalogue.ALL.forEach(ModContent::registerMaterial);
-        registerAnvil("stone_anvil", BlockBehaviour.Properties.of(Material.STONE).strength(5.0F, 10.0F));
+        registerAnvil("stone_anvil", BlockBehaviour.Properties.of(Material.STONE)
+                .sound(SoundType.STONE).strength(5.0F, 10.0F));
         registerAnvil("steel_anvil", metalProperties(MaterialCatalogue.get("steel")));
         registerAnvil("adamantine_anvil", metalProperties(MaterialCatalogue.get("adamantine")));
         HUMAN_DETECTOR = registerBlock("human_detector",
-                () -> new HumanDetectorBlock(BlockBehaviour.Properties.of(Material.METAL).strength(5.0F).noCollission()), true);
+                () -> new HumanDetectorBlock(BlockBehaviour.Properties.of(Material.METAL)
+                        .sound(SoundType.METAL).strength(5.0F).noCollission()), true);
         registerVanillaBits();
         MaterialCatalogue.ALL.forEach(material -> registerFluid(material.name(), material.colour(),
                 material.name().equals("mercury")));
@@ -157,23 +160,29 @@ public final class ModContent {
 
     private static RegistryObject<Block> registerMaterialBlock(String id, String form,
             MaterialDefinition material, boolean item) {
+        return registerMaterialBlock(id, form, material, item,
+                () -> metalProperties(material),
+                () -> MATERIALS.containsKey(material.name())
+                        ? MATERIALS.get(material.name()).blocks().get("block").get().defaultBlockState()
+                        : net.minecraft.world.level.block.Blocks.IRON_BLOCK.defaultBlockState());
+    }
+
+    private static RegistryObject<Block> registerMaterialBlock(String id, String form,
+            MaterialDefinition material, boolean item, Supplier<BlockBehaviour.Properties> properties,
+            Supplier<net.minecraft.world.level.block.state.BlockState> stairBase) {
         Supplier<Block> factory = switch (form) {
-            case "plate" -> () -> new PlateBlock(metalProperties(material).noOcclusion());
-            case "bars" -> () -> new IronBarsBlock(metalProperties(material).noOcclusion());
-            case "door" -> () -> new DoorBlock(metalProperties(material).noOcclusion());
-            case "trapdoor" -> () -> new TrapDoorBlock(metalProperties(material).noOcclusion());
-            case "button" -> () -> new StoneButtonBlock(metalProperties(material).noCollission());
-            case "slab" -> () -> new SlabBlock(metalProperties(material));
-            case "lever" -> () -> new LeverBlock(metalProperties(material).noCollission());
+            case "plate" -> () -> new PlateBlock(properties.get().noOcclusion());
+            case "bars" -> () -> new IronBarsBlock(properties.get().noOcclusion());
+            case "door" -> () -> new DoorBlock(properties.get().noOcclusion());
+            case "trapdoor" -> () -> new TrapDoorBlock(properties.get().noOcclusion());
+            case "button" -> () -> new StoneButtonBlock(properties.get().noCollission());
+            case "slab" -> () -> new SlabBlock(properties.get());
+            case "lever" -> () -> new LeverBlock(properties.get().noCollission());
             case "pressure_plate" -> () -> new PressurePlateBlock(
-                    PressurePlateBlock.Sensitivity.MOBS, metalProperties(material));
-            case "stairs" -> () -> new StairBlock(
-                    () -> MATERIALS.containsKey(material.name())
-                            ? MATERIALS.get(material.name()).blocks().get("block").get().defaultBlockState()
-                            : net.minecraft.world.level.block.Blocks.IRON_BLOCK.defaultBlockState(),
-                    metalProperties(material));
-            case "wall" -> () -> new WallBlock(metalProperties(material));
-            default -> () -> new Block(metalProperties(material));
+                    PressurePlateBlock.Sensitivity.MOBS, properties.get());
+            case "stairs" -> () -> new StairBlock(stairBase, properties.get());
+            case "wall" -> () -> new WallBlock(properties.get());
+            default -> () -> new Block(properties.get());
         };
         return registerBlock(id, factory, item);
     }
@@ -236,7 +245,7 @@ public final class ModContent {
         Map<String, MaterialDefinition> vanilla = vanillaDefinitions();
         RegistryObject<Block> charcoalBlock = registerBlock("charcoal_block",
                 () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
-                        .requiresCorrectToolForDrops().strength(5.0F)), false);
+                        .sound(SoundType.SAND).requiresCorrectToolForDrops().strength(5.0F)), false);
         registerItem("charcoal_block", () -> new MaterialItems.BurnableBlock(
                 charcoalBlock.get(), 16000, new Item.Properties().tab(ModTabs.BLOCKS)));
         registerVanillaDecorative("diamond", vanilla.get("diamond"),
@@ -287,13 +296,42 @@ public final class ModContent {
     private static void registerVanillaDecorative(String name, MaterialDefinition material,
             List<String> forms) {
         for (String form : forms) {
-            registerMaterialBlock(name + "_" + form, form, material, true);
+            registerMaterialBlock(name + "_" + form, form, material, true,
+                    () -> vanillaDecorativeProperties(name, form, material),
+                    () -> vanillaStorageBlock(name).defaultBlockState());
         }
         if (forms.contains("slab")) {
             String id = "double_" + name + "_slab";
-            registerBlock(id, () -> new CompatibilityDoubleSlabBlock(metalProperties(material)), false);
+            registerBlock(id, () -> new CompatibilityDoubleSlabBlock(
+                    vanillaDecorativeProperties(name, "slab", material)), false);
             HIDDEN_BLOCKS.add(id);
         }
+    }
+
+    private static BlockBehaviour.Properties vanillaDecorativeProperties(String name, String form,
+            MaterialDefinition material) {
+        boolean gem = name.equals("diamond") || name.equals("emerald")
+                || name.equals("obsidian") || name.equals("quartz");
+        boolean lockedGemDoor = gem && !name.equals("quartz")
+                && (form.equals("door") || form.equals("trapdoor"));
+        Material blockMaterial = name.equals("gold") || name.equals("iron") || lockedGemDoor
+                ? Material.METAL : Material.STONE;
+        return BlockBehaviour.Properties.of(blockMaterial)
+                .sound(gem ? SoundType.GLASS : SoundType.METAL)
+                .requiresCorrectToolForDrops()
+                .strength(material.blockHardness(), material.blastResistance());
+    }
+
+    private static Block vanillaStorageBlock(String name) {
+        return switch (name) {
+            case "diamond" -> net.minecraft.world.level.block.Blocks.DIAMOND_BLOCK;
+            case "emerald" -> net.minecraft.world.level.block.Blocks.EMERALD_BLOCK;
+            case "gold" -> net.minecraft.world.level.block.Blocks.GOLD_BLOCK;
+            case "iron" -> net.minecraft.world.level.block.Blocks.IRON_BLOCK;
+            case "obsidian" -> net.minecraft.world.level.block.Blocks.OBSIDIAN;
+            case "quartz" -> net.minecraft.world.level.block.Blocks.QUARTZ_BLOCK;
+            default -> throw new IllegalArgumentException("No vanilla storage block for " + name);
+        };
     }
 
     private static void registerVanillaCombatAndUtility(MaterialDefinition material) {
@@ -423,9 +461,17 @@ public final class ModContent {
     private static int burnTime(String id) {
         if (id.equals("charcoal_block")) return 16000;
         if (id.equals("wood_gear")) return 300;
+        String material = id.substring(0, id.lastIndexOf('_'));
+        if (!isLegacyFuelMaterial(material)) return -1;
         if (id.endsWith("_powder")) return 1600;
         if (id.endsWith("_nugget") || id.endsWith("_smallpowder")) return 200;
         return -1;
+    }
+
+    private static boolean isLegacyFuelMaterial(String name) {
+        if (name.equals("coal") || name.equals("charcoal")) return true;
+        return MaterialCatalogue.ALL.stream()
+                .anyMatch(material -> material.name().equals(name) && material.hasEquipment());
     }
 
     private static RegistryObject<Item> registerItem(String id, Supplier<? extends Item> factory) {
@@ -437,11 +483,13 @@ public final class ModContent {
 
     private static BlockBehaviour.Properties metalProperties(MaterialDefinition material) {
         return BlockBehaviour.Properties.of(Material.METAL)
-                .requiresCorrectToolForDrops().strength(material.blockHardness(), material.blastResistance());
+                .sound(SoundType.METAL).requiresCorrectToolForDrops()
+                .strength(material.blockHardness(), material.blastResistance());
     }
 
     private static BlockBehaviour.Properties oreProperties(MaterialDefinition material) {
         return BlockBehaviour.Properties.of(Material.STONE)
-                .requiresCorrectToolForDrops().strength(material.oreHardness(), material.blastResistance());
+                .sound(SoundType.STONE).requiresCorrectToolForDrops()
+                .strength(material.oreHardness(), material.blastResistance());
     }
 }

@@ -1,7 +1,9 @@
 package com.mcmoddev.basemetals.content;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
@@ -13,8 +15,10 @@ import com.mcmoddev.basemetals.entity.ModEntities;
 import com.mcmoddev.basemetals.material.MaterialCatalogue;
 import com.mcmoddev.basemetals.recipe.CrushingRecipe;
 import com.mcmoddev.basemetals.recipe.PlateRepairRecipe;
+import com.mcmoddev.basemetals.trade.BaseMetalsTrades;
 
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -25,6 +29,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -50,7 +55,10 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
@@ -63,6 +71,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -203,6 +212,26 @@ public final class BaseMetalsGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = EMPTY)
+    public static void stoneCrackhammerCraftsFromTheLegacyMiddleColumnPattern(GameTestHelper helper) {
+        CraftingContainer crafting = craftingContainer(3, 3);
+        crafting.setItem(1, new ItemStack(Blocks.STONE_BRICKS));
+        crafting.setItem(4, new ItemStack(Items.STICK));
+        crafting.setItem(7, new ItemStack(Items.STICK));
+
+        var recipe = helper.getLevel().getRecipeManager().getRecipeFor(
+                RecipeType.CRAFTING, crafting, helper.getLevel());
+        require(helper, recipe.isPresent(), "Stone bricks above two sticks matched no crafting recipe");
+        if (recipe.isEmpty()) return;
+        require(helper, recipe.orElseThrow().getId().equals(
+                new ResourceLocation(BaseMetals.MOD_ID, "stone_crackhammer")),
+                "The legacy stone crackhammer pattern matched the wrong recipe");
+        ItemStack output = recipe.orElseThrow().assemble(crafting);
+        require(helper, output.is(ModContent.item("stone_crackhammer").get()),
+                "The legacy middle-column pattern returned the wrong item");
+        helper.succeed();
+    }
+
     @GameTest(template = EMPTY, timeoutTicks = 250)
     public static void furnaceProcessesDustAndCountedLegacyRecovery(GameTestHelper helper) {
         BlockPos ironFurnacePosition = new BlockPos(1, 1, 1);
@@ -327,6 +356,99 @@ public final class BaseMetalsGameTests {
         require(helper, burnTime("coal_smallpowder") == 200, "Tiny coal dust has the wrong burn time");
         require(helper, burnTime("wood_gear") == 300, "Wood gear has the wrong burn time");
         require(helper, burnTime("charcoal_block") == 16000, "Charcoal block has the wrong burn time");
+        MaterialCatalogue.ALL.stream().filter(material -> material.hasEquipment()).forEach(material -> {
+            require(helper, burnTime(material.name() + "_powder") == 1600,
+                    material.name() + " powder lost its legacy fuel value");
+            require(helper, burnTime(material.name() + "_nugget") == 200,
+                    material.name() + " nugget lost its legacy fuel value");
+            require(helper, burnTime(material.name() + "_smallpowder") == 200,
+                    material.name() + " small powder lost its legacy fuel value");
+        });
+        for (String id : List.of(
+                "mercury_nugget", "mercury_powder", "mercury_smallpowder",
+                "diamond_nugget", "diamond_powder", "diamond_smallpowder",
+                "emerald_nugget", "emerald_powder", "emerald_smallpowder",
+                "gold_powder", "gold_smallpowder",
+                "iron_powder", "iron_smallpowder",
+                "obsidian_nugget", "obsidian_powder", "obsidian_smallpowder",
+                "quartz_nugget", "quartz_powder", "quartz_smallpowder",
+                "redstone_smallpowder", "lapis_smallpowder")) {
+            require(helper, burnTime(id) == -1, id + " is an ahistorical furnace fuel");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void crackhammerUsesLegacySpeedForEveryHarvestableCrushingInput(GameTestHelper helper) {
+        ItemStack stoneHammer = ModContent.item("stone_crackhammer").get().getDefaultInstance();
+        float expected = ((MaterialBacked) stoneHammer.getItem()).baseMetalsMaterial()
+                .crackhammerDestroySpeed();
+        require(helper, close(stoneHammer.getDestroySpeed(Blocks.GRAVEL.defaultBlockState()), expected),
+                "Crushable gravel retained hand-speed mining");
+        require(helper, close(stoneHammer.getDestroySpeed(Blocks.GLASS.defaultBlockState()), expected),
+                "Crushable glass retained hand-speed mining");
+        require(helper, close(stoneHammer.getDestroySpeed(Blocks.SUGAR_CANE.defaultBlockState()), expected),
+                "Crushable sugar cane retained hand-speed mining");
+        require(helper, stoneHammer.getDestroySpeed(Blocks.OBSIDIAN.defaultBlockState()) == 1.0F,
+                "An under-tier crackhammer mined Obsidian at crackhammer speed");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void legacyBlockCapabilitiesSoundsAndQuartzInteractionSurvive(GameTestHelper helper) {
+        MaterialCatalogue.ALL.stream().filter(material -> material.hasEquipment()).forEach(material ->
+                require(helper, ModContent.blocksById().get(material.name() + "_block").get()
+                        .defaultBlockState().is(BlockTags.BEACON_BASE_BLOCKS),
+                        material.name() + " storage block is missing from beacon bases"));
+        require(helper, ModContent.blocksById().get("charcoal_block").get().defaultBlockState()
+                .is(BlockTags.BEACON_BASE_BLOCKS), "Charcoal block is missing from beacon bases");
+        require(helper, !ModContent.blocksById().get("mercury").get().defaultBlockState()
+                .is(BlockTags.BEACON_BASE_BLOCKS), "Molten Mercury became a beacon base");
+
+        require(helper, ModContent.blocksById().get("bronze_block").get().defaultBlockState()
+                .getSoundType() == SoundType.METAL, "Base-metal storage blocks use the wrong sound");
+        require(helper, ModContent.blocksById().get("diamond_wall").get().defaultBlockState()
+                .getSoundType() == SoundType.GLASS, "Gem decorations use the wrong sound");
+        require(helper, ModContent.blocksById().get("charcoal_block").get().defaultBlockState()
+                .getSoundType() == SoundType.SAND, "Charcoal block uses the wrong sound");
+        require(helper, ModContent.blocksById().get("tin_ore").get().defaultBlockState()
+                .getSoundType() == SoundType.STONE, "Ore blocks use the wrong sound");
+        require(helper, ModContent.blocksById().get("steel_anvil").get().defaultBlockState()
+                .getSoundType() == SoundType.METAL, "Steel anvil uses the wrong sound");
+        require(helper, ModContent.blocksById().get("stone_anvil").get().defaultBlockState()
+                .getSoundType() == SoundType.STONE, "Stone anvil uses the wrong sound");
+
+        Player player = helper.makeMockPlayer();
+        for (String form : List.of("door", "trapdoor")) {
+            BlockPos relative = form.equals("door") ? new BlockPos(1, 1, 1) : new BlockPos(2, 1, 1);
+            BlockPos position = helper.absolutePos(relative);
+            helper.setBlock(relative, ModContent.blocksById().get("quartz_" + form).get());
+            BlockState state = helper.getLevel().getBlockState(position);
+            InteractionResult result = state.use(helper.getLevel(), player, InteractionHand.MAIN_HAND,
+                    new BlockHitResult(Vec3.atCenterOf(position), Direction.UP, position, false));
+            require(helper, result.consumesAction(), "Quartz " + form + " cannot be opened by hand");
+        }
+        BlockPos diamondRelative = new BlockPos(3, 1, 1);
+        BlockPos diamondPosition = helper.absolutePos(diamondRelative);
+        helper.setBlock(diamondRelative, ModContent.blocksById().get("diamond_door").get());
+        BlockState diamond = helper.getLevel().getBlockState(diamondPosition);
+        require(helper, diamond.use(helper.getLevel(), player, InteractionHand.MAIN_HAND,
+                new BlockHitResult(Vec3.atCenterOf(diamondPosition), Direction.UP, diamondPosition, false))
+                == InteractionResult.PASS, "Diamond door became hand-openable");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void smithsRetainTheLegacyMercuryIngotSale(GameTestHelper helper) {
+        Int2ObjectOpenHashMap<List<ItemListing>> trades = new Int2ObjectOpenHashMap<>();
+        for (int level = 1; level <= 5; level++) trades.put(level, new ArrayList<>());
+        BaseMetalsTrades.add(new VillagerTradesEvent(trades, VillagerProfession.ARMORER));
+        boolean found = trades.values().stream().flatMap(List::stream)
+                .map(listing -> listing.getOffer(null, new Random(0L)))
+                .anyMatch(offer -> offer != null
+                        && offer.getResult().is(ModContent.item("mercury_ingot").get())
+                        && offer.getResult().getCount() == 12);
+        require(helper, found, "Armorer lost the legacy 12-Mercury-ingot sale");
         helper.succeed();
     }
 
@@ -487,6 +609,8 @@ public final class BaseMetalsGameTests {
         require(helper, player.getEffect(MobEffects.DAMAGE_RESISTANCE) != null
                 && player.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() == 1,
                 "Four Adamantine pieces did not grant Resistance II");
+        require(helper, player.getEffect(MobEffects.DAMAGE_RESISTANCE).getDuration() == 45,
+                "Armor effects linger far beyond the legacy refresh window");
 
         ItemStack starsteel = ModContent.item("starsteel_pickaxe").get().getDefaultInstance();
         starsteel.setDamageValue(5);

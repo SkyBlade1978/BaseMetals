@@ -335,6 +335,13 @@ class ResourceIntegrityTest {
         assertTrue(iron.contains("basemetals:bronze_block"));
         assertTrue(diamond.contains("basemetals:adamantine_ore"));
 
+        Set<String> beaconBases = strings(read(resource("data/minecraft/tags/blocks/beacon_base_blocks.json"))
+                .getAsJsonObject().getAsJsonArray("values"));
+        assertEquals(22, beaconBases.size());
+        assertTrue(beaconBases.contains("basemetals:adamantine_block"));
+        assertTrue(beaconBases.contains("basemetals:charcoal_block"));
+        assertFalse(beaconBases.contains("basemetals:mercury"));
+
         Set<String> arrows = strings(read(resource("data/minecraft/tags/items/arrows.json"))
                 .getAsJsonObject().getAsJsonArray("values"));
         assertTrue(arrows.contains("basemetals:tin_arrow"));

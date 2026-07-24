@@ -17,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,15 @@ import java.util.zip.InflaterInputStream;
 import java.util.zip.DeflaterOutputStream;
 
 import com.mcmoddev.basemetals.BaseMetals;
+import com.mcmoddev.basemetals.MissingMappings;
 import com.mcmoddev.basemetals.content.BaseMetalAnvilBlock;
 import com.mcmoddev.basemetals.content.CompatibilityDoubleSlabBlock;
+import com.mcmoddev.basemetals.content.ModContent;
 import com.mcmoddev.basemetals.content.PlateBlock;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.serialization.Dynamic;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -40,18 +43,18 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.datafix.fixes.BlockStateData;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
@@ -62,10 +65,10 @@ import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
- * Converts Forge 1.12 numeric chunk sections to the first flattened palette
- * format before vanilla's data fixer sees them. Vanilla cannot infer the
- * pre-flattening numeric IDs of third-party blocks, even when their registry
- * names still exist in level.dat.
+ * Runs Mojang's complete 1.12-to-flattening chunk data fixes, then restores the
+ * third-party block positions whose numeric IDs Mojang cannot know. This keeps
+ * all of the context-sensitive vanilla, entity, block-entity, and item fixes
+ * while preserving Base Metals and other mod blocks by registry name.
  */
 public final class Legacy112WorldMigrator {
     private static final int LAST_SUPPORTED_LEGACY_DATA_VERSION = 1_343;
@@ -90,33 +93,61 @@ public final class Legacy112WorldMigrator {
         if (oldBlockIds.values().stream().noneMatch(id -> id.startsWith(BaseMetals.MOD_ID + ":"))) return;
 
         List<Path> regions = findRegionFiles(root);
-        if (regions.isEmpty()) return;
 
         int convertedRegions = 0;
         int convertedChunks = 0;
         int externalStates = 0;
+        int convertedBuckets = 0;
+        int convertedDamageValues = 0;
         for (Path region : regions) {
             RegionConversion result = convertRegion(root, region, oldBlockIds);
             if (result.convertedChunks() > 0) {
                 convertedRegions++;
                 convertedChunks += result.convertedChunks();
                 externalStates += result.externalStates();
+                convertedBuckets += result.convertedBuckets();
+                convertedDamageValues += result.convertedDamageValues();
             }
         }
+        ItemMigration looseItems = migrateLooseInventories(root);
+        convertedBuckets += looseItems.convertedBuckets();
+        convertedDamageValues += looseItems.convertedDamageValues();
 
-        if (convertedChunks == 0) {
+        if (convertedChunks == 0 && convertedBuckets == 0 && convertedDamageValues == 0) {
             Files.writeString(root.resolve(MARKER),
-                    "No Forge 1.12 numeric chunks required Base Metals migration." + System.lineSeparator(),
+                    "No Forge 1.12 numeric chunks or filled buckets required Base Metals migration."
+                            + System.lineSeparator(),
                     StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
             return;
         }
 
         String result = "Converted " + convertedChunks + " legacy chunks in " + convertedRegions
-                + " region files before vanilla data fixing. Backups: " + BACKUP_DIRECTORY
-                + ". External mod states reduced to their named default state: " + externalStates + ".";
+                + " region files through Mojang's 1.12 flattening fixes. Backups: " + BACKUP_DIRECTORY
+                + ". Third-party states preserved by registry name at their default state: "
+                + externalStates + ". Legacy filled buckets converted: " + convertedBuckets
+                + ". Mod-item damage values preserved: " + convertedDamageValues + ".";
         Files.writeString(root.resolve(MARKER), result + System.lineSeparator(), StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE_NEW);
         BaseMetals.LOGGER.info(result);
+    }
+
+    /**
+     * The integrated server reads the root Player tag before
+     * {@link net.minecraftforge.event.server.ServerAboutToStartEvent}. Reload
+     * that one tag from the corrected level.dat so the first upgraded
+     * single-player session receives the same item migration as playerdata.
+     */
+    public static void refreshLoadedSingleplayerPlayer(MinecraftServer server, Path worldRoot) throws IOException {
+        CompoundTag loaded = server.getWorldData().getLoadedPlayerTag();
+        if (loaded == null) return;
+        CompoundTag level = NbtIo.readCompressed(worldRoot.resolve("level.dat").toFile());
+        CompoundTag data = level.getCompound("Data");
+        if (!data.contains("Player", Tag.TAG_COMPOUND)) return;
+        int version = data.getInt("DataVersion");
+        CompoundTag corrected = NbtUtils.update(DataFixers.getDataFixer(), DataFixTypes.PLAYER,
+                data.getCompound("Player"), version);
+        for (String key : List.copyOf(loaded.getAllKeys())) loaded.remove(key);
+        loaded.merge(corrected);
     }
 
     private static Map<Integer, String> oldBlockIds(CompoundTag level) {
@@ -179,6 +210,8 @@ public final class Legacy112WorldMigrator {
         List<RegionChunk> chunks = new ArrayList<>();
         int converted = 0;
         int externalStates = 0;
+        int convertedBuckets = 0;
+        int convertedDamageValues = 0;
 
         for (int index = 0; index < 1_024; index++) {
             int location = locations.getInt(index * 4);
@@ -198,16 +231,18 @@ public final class Legacy112WorldMigrator {
             ChunkConversion conversion = convertChunk(chunk, ids);
             byte[] record;
             if (conversion.converted()) {
-                record = writeChunk(chunk);
+                record = writeChunk(conversion.chunk());
                 converted++;
                 externalStates += conversion.externalStates();
+                convertedBuckets += conversion.convertedBuckets();
+                convertedDamageValues += conversion.convertedDamageValues();
             } else {
                 record = Arrays.copyOfRange(source, position, position + 4 + length);
             }
             chunks.add(new RegionChunk(index, record));
         }
 
-        if (converted == 0) return new RegionConversion(0, 0);
+        if (converted == 0) return new RegionConversion(0, 0, 0, 0);
         ensureBackupCapacity(root, List.of(region));
         byte[] output = buildRegion(chunks, timestamps);
         Path backup = root.resolve(BACKUP_DIRECTORY).resolve(root.relativize(region));
@@ -221,37 +256,159 @@ public final class Legacy112WorldMigrator {
         } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
             Files.move(temporary, region, StandardCopyOption.REPLACE_EXISTING);
         }
-        return new RegionConversion(converted, externalStates);
+        return new RegionConversion(converted, externalStates, convertedBuckets, convertedDamageValues);
     }
 
     private static ChunkConversion convertChunk(CompoundTag chunk, Map<Integer, String> ids) throws IOException {
-        if (chunk.getInt("DataVersion") > LAST_SUPPORTED_LEGACY_DATA_VERSION) {
-            return new ChunkConversion(false, 0);
+        int sourceVersion = chunk.getInt("DataVersion");
+        if (sourceVersion > LAST_SUPPORTED_LEGACY_DATA_VERSION) {
+            return new ChunkConversion(false, 0, 0, 0, chunk);
         }
+
+        ItemMigration itemMigration = convertLegacyItems(chunk);
         CompoundTag level = chunk.getCompound("Level");
         ListTag sections = level.getList("Sections", Tag.TAG_COMPOUND);
+        List<LegacyBlock> savedBlocks = new ArrayList<>();
         int externalStates = 0;
-        boolean converted = false;
         for (Tag value : sections) {
             CompoundTag section = (CompoundTag) value;
             if (!section.contains("Blocks", Tag.TAG_BYTE_ARRAY)) continue;
-            externalStates += convertSection(section, ids);
-            converted = true;
+            SectionSnapshot snapshot = snapshotSection(section, ids);
+            savedBlocks.addAll(snapshot.blocks());
+            externalStates += snapshot.externalStates();
         }
-        if (converted) chunk.putInt("DataVersion", PALETTED_PRE_PROTOCHUNK_DATA_VERSION);
-        return new ChunkConversion(converted, externalStates);
+        if (savedBlocks.isEmpty() && itemMigration.isEmpty()) {
+            return new ChunkConversion(false, 0, 0, 0, chunk);
+        }
+
+        CompoundTag fixed = NbtUtils.update(DataFixers.getDataFixer(), DataFixTypes.CHUNK,
+                chunk, sourceVersion, PALETTED_PRE_PROTOCHUNK_DATA_VERSION);
+        fixed.putInt("DataVersion", PALETTED_PRE_PROTOCHUNK_DATA_VERSION);
+        if (!savedBlocks.isEmpty()) restoreSavedBlocks(fixed, savedBlocks);
+        return new ChunkConversion(true, externalStates, itemMigration.convertedBuckets(),
+                itemMigration.convertedDamageValues(), fixed);
     }
 
-    private static int convertSection(CompoundTag section, Map<Integer, String> ids) throws IOException {
+    static CompoundTag convertChunkForTest(CompoundTag chunk, Map<Integer, String> ids) throws IOException {
+        ChunkConversion conversion = convertChunk(chunk, ids);
+        if (!conversion.converted()) throw new IOException("Validation chunk did not contain a third-party block");
+        return conversion.chunk();
+    }
+
+    private static ItemMigration migrateLooseInventories(Path root) throws IOException {
+        List<Path> files = new ArrayList<>();
+        files.add(root.resolve("level.dat"));
+        Path playerData = root.resolve("playerdata");
+        if (Files.isDirectory(playerData)) {
+            try (var paths = Files.list(playerData)) {
+                paths.filter(Files::isRegularFile)
+                        .filter(path -> path.getFileName().toString().endsWith(".dat"))
+                        .sorted()
+                        .forEach(files::add);
+            }
+        }
+
+        ItemMigration converted = ItemMigration.NONE;
+        for (Path file : files) {
+            if (!Files.isRegularFile(file)) continue;
+            CompoundTag data = NbtIo.readCompressed(file.toFile());
+            ItemMigration changed = convertLegacyItems(data);
+            if (changed.isEmpty()) continue;
+            Path backup = root.resolve(BACKUP_DIRECTORY).resolve(root.relativize(file));
+            Files.createDirectories(backup.getParent());
+            if (!Files.exists(backup)) Files.copy(file, backup, StandardCopyOption.COPY_ATTRIBUTES);
+            writeCompressedAtomically(file, data);
+            converted = converted.plus(changed);
+        }
+        return converted;
+    }
+
+    private static ItemMigration convertLegacyItems(Tag value) {
+        int convertedBuckets = 0;
+        int convertedDamageValues = 0;
+        if (value instanceof CompoundTag compound) {
+            if (compound.getString("id").equals("forge:bucketfilled")
+                    && compound.contains("tag", Tag.TAG_COMPOUND)) {
+                CompoundTag itemTag = compound.getCompound("tag");
+                String fluid = itemTag.getString("FluidName");
+                String target = MissingMappings.fluidTargetPath(fluid);
+                if (ModContent.fluids().containsKey(target)) {
+                    compound.putString("id", BaseMetals.MOD_ID + ":" + target + "_bucket");
+                    itemTag.remove("FluidName");
+                    itemTag.remove("Amount");
+                    if (itemTag.isEmpty()) compound.remove("tag");
+                    convertedBuckets++;
+                }
+            } else {
+                ResourceLocation oldId = ResourceLocation.tryParse(compound.getString("id"));
+                if (oldId != null && (oldId.getNamespace().equals(BaseMetals.MOD_ID)
+                        || oldId.getNamespace().equals("mmdlib"))
+                        && compound.contains("Damage", Tag.TAG_ANY_NUMERIC)) {
+                    ResourceLocation targetId = new ResourceLocation(BaseMetals.MOD_ID,
+                            MissingMappings.itemTargetPath(oldId.getPath()));
+                    net.minecraft.world.item.Item item = ForgeRegistries.ITEMS.getValue(targetId);
+                    int damage = compound.getInt("Damage");
+                    if (item != null && item.canBeDepleted() && damage > 0) {
+                        CompoundTag itemTag = compound.contains("tag", Tag.TAG_COMPOUND)
+                                ? compound.getCompound("tag") : new CompoundTag();
+                        if (!itemTag.contains("Damage", Tag.TAG_ANY_NUMERIC)) {
+                            itemTag.putInt("Damage", damage);
+                            compound.put("tag", itemTag);
+                            convertedDamageValues++;
+                        }
+                    }
+                }
+            }
+            for (String key : List.copyOf(compound.getAllKeys())) {
+                Tag child = compound.get(key);
+                if (child != null) {
+                    ItemMigration childMigration = convertLegacyItems(child);
+                    convertedBuckets += childMigration.convertedBuckets();
+                    convertedDamageValues += childMigration.convertedDamageValues();
+                }
+            }
+        } else if (value instanceof ListTag list) {
+            for (Tag child : list) {
+                ItemMigration childMigration = convertLegacyItems(child);
+                convertedBuckets += childMigration.convertedBuckets();
+                convertedDamageValues += childMigration.convertedDamageValues();
+            }
+        }
+        return new ItemMigration(convertedBuckets, convertedDamageValues);
+    }
+
+    private static void writeCompressedAtomically(Path file, CompoundTag data) throws IOException {
+        Path temporary = file.resolveSibling(file.getFileName() + ".basemetals.tmp");
+        NbtIo.writeCompressed(data, temporary.toFile());
+        try {
+            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
+            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    static CompoundTag stateAtForTest(CompoundTag chunk, int sectionY, int index) throws IOException {
+        ListTag sections = chunk.getCompound("Level").getList("Sections", Tag.TAG_COMPOUND);
+        for (Tag value : sections) {
+            CompoundTag section = (CompoundTag) value;
+            if (section.getByte("Y") != sectionY) continue;
+            ListTag palette = section.getList("Palette", Tag.TAG_COMPOUND);
+            int[] values = unpackBlockStates(section, palette.size());
+            return ((CompoundTag) palette.get(values[index])).copy();
+        }
+        throw new IOException("Validation chunk has no section Y=" + sectionY);
+    }
+
+    private static SectionSnapshot snapshotSection(CompoundTag section, Map<Integer, String> ids)
+            throws IOException {
         byte[] blocks = section.getByteArray("Blocks");
         byte[] metadata = section.getByteArray("Data");
         byte[] add = section.contains("Add", Tag.TAG_BYTE_ARRAY) ? section.getByteArray("Add") : null;
-        ListTag palette = new ListTag();
-        Map<CompoundTag, Integer> paletteIds = new LinkedHashMap<>();
-        int[] values = new int[4_096];
+        int sectionY = section.getByte("Y");
+        List<LegacyBlock> savedBlocks = new ArrayList<>();
         int externalStates = 0;
 
-        for (int index = 0; index < values.length; index++) {
+        for (int index = 0; index < 4_096; index++) {
             int blockId = Byte.toUnsignedInt(blocks[index]);
             if (add != null) blockId |= nibble(add, index) << 8;
             int meta = nibble(metadata, index);
@@ -260,18 +417,85 @@ public final class Legacy112WorldMigrator {
                 throw new IOException("Legacy chunk uses numeric block ID " + blockId
                         + " which is absent from the exact Base Metals 2.5.0 runtime map");
             }
-            CompoundTag state = flattenedState(blockId, name, meta);
-            if (!name.startsWith("minecraft:") && !name.startsWith(BaseMetals.MOD_ID + ":")) externalStates++;
-            Integer paletteId = paletteIds.get(state);
-            if (paletteId == null) {
-                paletteId = palette.size();
-                paletteIds.put(state, paletteId);
-                palette.add(state);
-            }
-            values[index] = paletteId;
+            if (name.startsWith("minecraft:")) continue;
+            savedBlocks.add(new LegacyBlock(sectionY, index, name, meta));
+            if (!name.startsWith(BaseMetals.MOD_ID + ":") && !name.startsWith("mmdlib:")) externalStates++;
+        }
+        return new SectionSnapshot(savedBlocks, externalStates);
+    }
+
+    private static void restoreSavedBlocks(CompoundTag chunk, List<LegacyBlock> savedBlocks) throws IOException {
+        Map<Integer, CompoundTag> targetSections = new HashMap<>();
+        ListTag sections = chunk.getCompound("Level").getList("Sections", Tag.TAG_COMPOUND);
+        for (Tag value : sections) {
+            CompoundTag section = (CompoundTag) value;
+            targetSections.put((int) section.getByte("Y"), section);
         }
 
-        int bits = Math.max(4, 32 - Integer.numberOfLeadingZeros(Math.max(1, palette.size() - 1)));
+        Map<Long, LegacyBlock> byPosition = new HashMap<>();
+        Map<Integer, List<LegacyBlock>> bySection = new LinkedHashMap<>();
+        for (LegacyBlock block : savedBlocks) {
+            byPosition.put(block.positionKey(), block);
+            bySection.computeIfAbsent(block.sectionY(), ignored -> new ArrayList<>()).add(block);
+        }
+
+        for (Map.Entry<Integer, List<LegacyBlock>> entry : bySection.entrySet()) {
+            CompoundTag section = targetSections.get(entry.getKey());
+            if (section == null) {
+                throw new IOException("Mojang's flattening data fix removed legacy section Y=" + entry.getKey());
+            }
+            ListTag palette = section.getList("Palette", Tag.TAG_COMPOUND);
+            if (palette.isEmpty()) {
+                throw new IOException("Mojang's flattening data fix produced an empty palette at section Y="
+                        + entry.getKey());
+            }
+            int[] values = unpackBlockStates(section, palette.size());
+            Map<CompoundTag, Integer> paletteIds = new LinkedHashMap<>();
+            for (int index = 0; index < palette.size(); index++) {
+                paletteIds.put(((CompoundTag) palette.get(index)).copy(), index);
+            }
+
+            for (LegacyBlock legacy : entry.getValue()) {
+                CompoundTag state = restoredState(legacy, byPosition);
+                Integer paletteId = paletteIds.get(state);
+                if (paletteId == null) {
+                    paletteId = palette.size();
+                    paletteIds.put(state, paletteId);
+                    palette.add(state);
+                }
+                values[legacy.index()] = paletteId;
+            }
+            section.put("Palette", palette);
+            section.put("BlockStates", new LongArrayTag(packBlockStates(values, palette.size())));
+        }
+    }
+
+    private static int[] unpackBlockStates(CompoundTag section, int paletteSize) throws IOException {
+        int[] values = new int[4_096];
+        long[] packed = section.getLongArray("BlockStates");
+        if (packed.length == 0 && paletteSize == 1) return values;
+        int bits = bitsForPalette(paletteSize);
+        int requiredLongs = (int) Math.ceil(values.length * (double) bits / 64.0D);
+        if (packed.length < requiredLongs) {
+            throw new IOException("Flattened block-state array is shorter than its palette requires");
+        }
+        long mask = (1L << bits) - 1L;
+        for (int index = 0; index < values.length; index++) {
+            int bitIndex = index * bits;
+            int longIndex = bitIndex >>> 6;
+            int offset = bitIndex & 63;
+            long value = packed[longIndex] >>> offset;
+            if (offset + bits > 64) value |= packed[longIndex + 1] << (64 - offset);
+            values[index] = (int) (value & mask);
+            if (values[index] >= paletteSize) {
+                throw new IOException("Flattened block-state index is outside its palette");
+            }
+        }
+        return values;
+    }
+
+    private static long[] packBlockStates(int[] values, int paletteSize) {
+        int bits = bitsForPalette(paletteSize);
         long[] packed = new long[(int) Math.ceil(values.length * (double) bits / 64.0D)];
         long mask = (1L << bits) - 1L;
         for (int index = 0; index < values.length; index++) {
@@ -282,30 +506,51 @@ public final class Legacy112WorldMigrator {
             packed[longIndex] |= value << offset;
             if (offset + bits > 64) packed[longIndex + 1] |= value >>> (64 - offset);
         }
-
-        section.put("Palette", palette);
-        section.put("BlockStates", new LongArrayTag(packed));
-        section.remove("Blocks");
-        section.remove("Data");
-        section.remove("Add");
-        return externalStates;
+        return packed;
     }
 
-    private static CompoundTag flattenedState(int oldId, String name, int metadata) {
-        if (name.startsWith("minecraft:") && oldId >= 0 && oldId < 256) {
-            Dynamic<?> dynamic = BlockStateData.getTag((oldId << 4) | metadata);
-            Object value = dynamic.getValue();
-            if (value instanceof CompoundTag state) return state.copy();
+    private static int bitsForPalette(int paletteSize) {
+        return Math.max(4, 32 - Integer.numberOfLeadingZeros(Math.max(1, paletteSize - 1)));
+    }
+
+    private static CompoundTag restoredState(LegacyBlock legacy, Map<Long, LegacyBlock> byPosition)
+            throws IOException {
+        ResourceLocation oldId = ResourceLocation.tryParse(legacy.name());
+        if (oldId == null) throw new IOException("Invalid legacy block registry name " + legacy.name());
+        if (oldId.getNamespace().equals(BaseMetals.MOD_ID) || oldId.getNamespace().equals("mmdlib")) {
+            String path = MissingMappings.blockTargetPath(oldId.getPath());
+            ResourceLocation targetId = new ResourceLocation(BaseMetals.MOD_ID, path);
+            Block block = ForgeRegistries.BLOCKS.getValue(targetId);
+            if (block == null) throw new IOException("No 1.18 block exists for legacy block " + legacy.name());
+            BlockState state = stateForLegacyMetadata(block, legacy.metadata());
+            if (block instanceof DoorBlock) {
+                LegacyBlock lower = (legacy.metadata() & 8) == 0
+                        ? legacy : byPosition.get(legacy.offsetPositionKey(-1));
+                LegacyBlock upper = (legacy.metadata() & 8) != 0
+                        ? legacy : byPosition.get(legacy.offsetPositionKey(1));
+                if (sameTargetBlock(lower, path) && sameTargetBlock(upper, path)) {
+                    BlockState lowerState = stateForLegacyMetadata(block, lower.metadata());
+                    BlockState upperState = stateForLegacyMetadata(block, upper.metadata());
+                    state = state.setValue(DoorBlock.FACING, lowerState.getValue(DoorBlock.FACING))
+                            .setValue(DoorBlock.OPEN, lowerState.getValue(DoorBlock.OPEN))
+                            .setValue(DoorBlock.HINGE, upperState.getValue(DoorBlock.HINGE))
+                            .setValue(DoorBlock.POWERED, upperState.getValue(DoorBlock.POWERED));
+                }
+            }
+            return NbtUtils.writeBlockState(state);
         }
 
-        ResourceLocation id = ResourceLocation.tryParse(name);
-        Block block = id == null ? null : ForgeRegistries.BLOCKS.getValue(id);
-        if (block != null && name.startsWith(BaseMetals.MOD_ID + ":")) {
-            return NbtUtils.writeBlockState(stateForLegacyMetadata(block, metadata));
-        }
         CompoundTag state = new CompoundTag();
-        state.putString("Name", name);
+        state.putString("Name", legacy.name());
         return state;
+    }
+
+    private static boolean sameTargetBlock(LegacyBlock block, String targetPath) {
+        if (block == null) return false;
+        ResourceLocation id = ResourceLocation.tryParse(block.name());
+        return id != null
+                && (id.getNamespace().equals(BaseMetals.MOD_ID) || id.getNamespace().equals("mmdlib"))
+                && MissingMappings.blockTargetPath(id.getPath()).equals(targetPath);
     }
 
     /** Maps Base Metals' persisted 1.12 metadata onto its 1.18 state schema. */
@@ -375,10 +620,9 @@ public final class Legacy112WorldMigrator {
         return state;
     }
 
-    /** Runtime fixture comparison, excluding neighbour-derived pane/wall state. */
+    /** Runtime fixture comparison for the persisted properties represented by 1.12 metadata. */
     public static boolean matchesLegacyMetadata(BlockState actual, int metadata) {
         Block block = actual.getBlock();
-        if (block instanceof IronBarsBlock || block instanceof WallBlock) return true;
         BlockState expected = stateForLegacyMetadata(block, metadata);
         if (block instanceof DoorBlock) {
             if ((metadata & 8) != 0) {
@@ -492,6 +736,42 @@ public final class Legacy112WorldMigrator {
     }
 
     private record RegionChunk(int index, byte[] record) {}
-    private record RegionConversion(int convertedChunks, int externalStates) {}
-    private record ChunkConversion(boolean converted, int externalStates) {}
+    private record RegionConversion(int convertedChunks, int externalStates, int convertedBuckets,
+            int convertedDamageValues) {}
+    private record ChunkConversion(boolean converted, int externalStates, int convertedBuckets,
+            int convertedDamageValues, CompoundTag chunk) {}
+    private record ItemMigration(int convertedBuckets, int convertedDamageValues) {
+        private static final ItemMigration NONE = new ItemMigration(0, 0);
+
+        private boolean isEmpty() {
+            return convertedBuckets == 0 && convertedDamageValues == 0;
+        }
+
+        private ItemMigration plus(ItemMigration other) {
+            return new ItemMigration(convertedBuckets + other.convertedBuckets,
+                    convertedDamageValues + other.convertedDamageValues);
+        }
+    }
+    private record SectionSnapshot(List<LegacyBlock> blocks, int externalStates) {}
+    private record LegacyBlock(int sectionY, int index, String name, int metadata) {
+        private int x() {
+            return index & 15;
+        }
+
+        private int y() {
+            return sectionY * 16 + (index >>> 8);
+        }
+
+        private int z() {
+            return index >>> 4 & 15;
+        }
+
+        private long positionKey() {
+            return BlockPos.asLong(x(), y(), z());
+        }
+
+        private long offsetPositionKey(int yOffset) {
+            return BlockPos.asLong(x(), y() + yOffset, z());
+        }
+    }
 }

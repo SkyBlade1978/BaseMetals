@@ -145,6 +145,12 @@ final class GeneratedData implements DataProvider {
             if (!ModContent.fluids().containsKey(id)) allBlockDrops.add("basemetals:" + id);
         }
         tag(cache, "minecraft", "blocks/mineable/pickaxe", allBlockDrops);
+        List<String> beaconBases = MaterialCatalogue.ALL.stream()
+                .filter(MaterialDefinition::hasEquipment)
+                .map(material -> "basemetals:" + material.name() + "_block")
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        beaconBases.add("basemetals:charcoal_block");
+        tag(cache, "minecraft", "blocks/beacon_base_blocks", beaconBases);
         // AnvilBlock.damage is hard-coded to the three vanilla blocks in 1.18.
         // Tagging a custom anvil makes any damaging fall delete it immediately.
         // BaseMetalAnvilBlock supplies the menu and durability handling itself.

@@ -2,7 +2,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.minecraftforge.gradle' version '6.0.54'
 }
 
 version = mod_version
@@ -163,6 +163,9 @@ minecraft {
                 property 'fml.doNotBackup', 'true'
                 property 'fml.queryResult', 'confirm'
                 property 'basemetals.upgradeWorldSmoke', 'true'
+                if (providers.gradleProperty('upgradeWorldName').isPresent()) {
+                    args '--world', providers.gradleProperty('upgradeWorldName').get()
+                }
                 mods {
                     "${mod_id}" {
                         source sourceSets.upgradeSmoke
@@ -286,6 +289,13 @@ tasks.named('processResources', ProcessResources).configure {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
+}
+
+// Eclipse launches use this processed directory as a stable metadata/resource
+// root. This prevents a transient Gradle resolution failure immediately before
+// launch from starting Forge with Java classes but no Base Metals data pack.
+tasks.matching { it.name in ['genEclipseRuns', 'eclipse'] }.configureEach {
+    dependsOn tasks.named('processResources')
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
@@ -573,6 +583,18 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
 
         int changedLaunches = 0
         if (eclipseLaunchDir.isDirectory()) {
+            File eclipseClasses = file('bin/main').canonicalFile
+            File processedResources = layout.buildDirectory.dir('resources/main').get().asFile.canonicalFile
+            for (String requiredResource : ['META-INF/mods.toml', 'pack.mcmeta',
+                    'data/basemetals/recipes/stone_crackhammer.json']) {
+                File resource = new File(processedResources, requiredResource)
+                if (!resource.isFile()) {
+                    throw new GradleException(
+                            "Missing processed Eclipse runtime resource: ${resource}")
+                }
+            }
+            String modClasses = "${mod_id}%%${processedResources.absolutePath};" +
+                    "${mod_id}%%${eclipseClasses.absolutePath}"
             fileTree(eclipseLaunchDir) {
                 include '*Slim.launch'
             }.files.each { File launchFile ->
@@ -583,6 +605,10 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
                             .replace(generated.absolutePath, stable.absolutePath)
                             .replace(generated.absolutePath.replace('\\', '/'), stable.absolutePath.replace('\\', '/'))
                 }
+                synced = synced.replaceFirst(
+                        /<mapEntry key="MOD_CLASSES" value="[^"]*"\/>/) {
+                    "<mapEntry key=\"MOD_CLASSES\" value=\"${modClasses}\"/>"
+                }
                 if (original != synced) {
                     launchFile.setText(synced, 'UTF-8')
                     changedLaunches++
@@ -590,26 +616,27 @@ def syncEclipseRunClasspaths = tasks.register('syncEclipseRunClasspaths') {
             }
         }
 
-        // ForgeGradle's launch group otherwise starts copyEclipseResources and
-        // Minecraft concurrently. Base Metals expands placeholders in
-        // mods.toml, so the game must not scan bin/main until that copy exits.
+        // ForgeGradle normally creates a launch group which invokes Gradle and
+        // then starts Minecraft even when that preparation failed. Replace the
+        // public project launch with the already-synchronised Java launch. Its
+        // MOD_CLASSES entry uses the stable processed-resource root above, so
+        // Java classes can never start without the Base Metals data pack.
         int changedLaunchGroups = 0
         fileTree(projectDir) {
-            include '*.launch'
+            include 'run*.launch'
         }.files.each { File launchFile ->
-            String original = launchFile.getText('UTF-8')
-            if (!original.contains('prepareRun') || !original.contains('Slim')) {
+            String runName = launchFile.name.substring(0, launchFile.name.length() - '.launch'.length())
+            File slimLaunch = new File(eclipseLaunchDir, "BaseMetals - ${runName}Slim.launch")
+            if (!slimLaunch.isFile()) {
                 return
             }
-            String synced = original.replace(
-                    'key="org.eclipse.debug.core.launchGroup.0.action" value="NONE"',
-                    'key="org.eclipse.debug.core.launchGroup.0.action" value="WAIT_FOR_TERMINATION"')
-            if (original != synced) {
-                launchFile.setText(synced, 'UTF-8')
+            String replacement = slimLaunch.getText('UTF-8')
+            if (launchFile.getText('UTF-8') != replacement) {
+                launchFile.setText(replacement, 'UTF-8')
                 changedLaunchGroups++
             }
         }
-        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedPrepareLaunches} terminating prepare launches, ${changedLaunches} slim launches, ${changedLaunchGroups} sequential launch groups updated)")
+        logger.lifecycle("Eclipse runtime paths aligned with ${eclipseCache} (${stableClasspaths.size()} Forge classpaths, ${changedProjectClasspath} project classpath, ${changedResourceExclusions} metadata exclusion, ${changedPrepareLaunches} prepare launches, ${changedLaunches} slim launches, ${changedLaunchGroups} direct project launches updated)")
     }
 }
 

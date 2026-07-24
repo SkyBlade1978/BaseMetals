@@ -37,7 +37,7 @@ public final class CrackhammerItem extends DiggerItem implements MaterialBacked 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         return state.is(com.mcmoddev.basemetals.ModTags.CRACKHAMMER_CRUSHABLE)
-                && stack.isCorrectToolForDrops(state)
+                && canHarvest(stack, state)
                 ? material.crackhammerDestroySpeed()
                 : 1.0F;
     }
@@ -94,7 +94,10 @@ public final class CrackhammerItem extends DiggerItem implements MaterialBacked 
 
     private static boolean canCrushDroppedBlock(ItemStack hammer, ItemStack input) {
         if (!(input.getItem() instanceof BlockItem blockItem)) return true;
-        BlockState state = blockItem.getBlock().defaultBlockState();
+        return canHarvest(hammer, blockItem.getBlock().defaultBlockState());
+    }
+
+    private static boolean canHarvest(ItemStack hammer, BlockState state) {
         return !state.requiresCorrectToolForDrops() || hammer.isCorrectToolForDrops(state);
     }
 

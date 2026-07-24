@@ -3,11 +3,15 @@
 `registry_manifest.json` is the compact, tracked form of a live Forge 1.12.2
 capture made with Base Metals 2.5.0-rc2.332 and MMDLib 1.0.0-rc2.36. The
 capture enumerated every registered Base Metals block, valid block state,
-item, and source fluid, placed the block states in a world, and stored every
-item in chests before saving and reopening the fixture under Forge 1.12.2.
+item, and source fluid. Fixture format 2 places all 6,851 states independently
+in each vanilla dimension, stores all 1,038 item stacks in exact chest slots,
+equips representative damaged armor, stores every legacy filled-fluid bucket,
+and writes representative playerdata before saving and reopening the world
+under Forge 1.12.2.
 
-The full coordinate/state manifest and fixture world are validation outputs,
-not release resources. Regenerate this compact reference with:
+The full coordinate/state manifest, OS3 configuration samples, and fixture
+world are validation outputs, not release resources. Regenerate this compact
+registry reference with:
 
 ```powershell
 .\tools\validation\compact_runtime_manifest.ps1 `

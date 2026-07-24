@@ -53,7 +53,9 @@ public final class BaseMetalsEvents {
     @SubscribeEvent
     public void onServerAboutToStart(ServerAboutToStartEvent event) {
         try {
-            Legacy112WorldMigrator.migrateIfNeeded(event.getServer().getWorldPath(LevelResource.ROOT));
+            java.nio.file.Path worldRoot = event.getServer().getWorldPath(LevelResource.ROOT);
+            Legacy112WorldMigrator.migrateIfNeeded(worldRoot);
+            Legacy112WorldMigrator.refreshLoadedSingleplayerPlayer(event.getServer(), worldRoot);
         } catch (java.io.IOException exception) {
             throw new IllegalStateException("Base Metals could not safely pre-flatten the Forge 1.12 world", exception);
         }
@@ -154,7 +156,7 @@ public final class BaseMetalsEvents {
     }
 
     private static void add(Player player, net.minecraft.world.effect.MobEffect effect, int amplifier) {
-        player.addEffect(new MobEffectInstance(effect, 220, amplifier, false, false, true));
+        player.addEffect(new MobEffectInstance(effect, 45, amplifier, false, false, true));
     }
 
     @SubscribeEvent

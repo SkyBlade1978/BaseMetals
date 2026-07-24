@@ -9,9 +9,12 @@ estimate. It used Forge 14.23.5.2847, Java 8, and these public artifacts:
   `FE2229E6755A5FD306C33CC22DCCF055378D371339133E4912C5DC9213E360AF`.
 
 The capture found 354 registered Base Metals blocks, 1,038 items, 33 source
-fluids, and 6,851 valid block states. It placed the states, stored every item
-in chests, saved the world, and reopened it under Forge 1.12 before the 1.18
-upgrade test. The compact machine-readable baseline is tracked at
+fluids, and 6,851 valid block states. Fixture format 2 places all 6,851 states
+in each of the Overworld, Nether, and End, stores every item in an exact
+non-adjacent chest slot with representative damage, enchantment, and custom
+NBT, equips all armor on stands, stores every legacy filled-fluid bucket, and
+saves a representative player inventory. The compact machine-readable
+registry baseline is tracked at
 `reference/1.12/runtime/registry_manifest.json` and is copied into the
 generated `data/basemetals/registry_manifest_1_12.json` resource.
 

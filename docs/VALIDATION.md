@@ -35,14 +35,21 @@ The following commands pass with Java 17 and
 .\gradlew runGameTestServer
 ```
 
-The unit/resource suite contains 28 tests. The Forge server suite passes all 25
+The unit/resource suite contains 28 tests. The Forge server suite passes all 30
 required GameTests. The latter includes real recipe loading and furnace use,
 crackhammer and scythe behavior, equipment effects, shield repair/upgrades,
 ammunition and projectile persistence, fluids, advancements, and compatibility
-recipe counts.
+recipe counts. It also covers non-pickaxe crackhammer speed, the complete fuel
+allow/deny matrix, beacon bases, legacy sounds, Quartz versus metal door
+interaction, Mercury trades, short-lived armor effects, and a synthetic
+1.12 chunk containing vanilla contextual fixes, MMDLib state aliases, a
+universal bucket, and damaged mod equipment. The stone-brick-and-two-sticks
+middle-column crackhammer recipe is also assembled through the live Forge
+recipe manager rather than checked only as JSON.
 
-Each supported compatibility profile passes the same 25-test server suite
-independently, and the complete set passes together:
+Each supported compatibility profile passed the preceding 29-test suite
+independently, and the complete set passed together. The additional
+stone-crackhammer crafting test has no optional-integration branch:
 
 ```powershell
 .\gradlew runGameTestServer -PcompatSmoke=mekanism
@@ -73,14 +80,15 @@ The authoritative server bake succeeds without a placement warning.
 - A fresh bounded client smoke created and joined
   `basemetals-integrated-smoke-20260723`, ticked the integrated server for 208
   ticks, saved all three vanilla dimensions, and shut down cleanly.
-- The captured upgraded 1.12 fixture was re-read with the current code. All
-  6,851 migrated block-state placements and 1,038 saved item stacks matched.
-- The fixture's original conversion marker records 648 converted legacy chunks
-  in four region files, with a recoverable pre-conversion region backup.
-
-The upgraded-world rerun validates current read compatibility. It is not a
-second pristine direct conversion; the preserved marker and backup are the
-evidence for the original direct conversion.
+- A fresh fixture-format-2 copy was upgraded directly from Forge 1.12. All
+  20,553 block-state placements, 1,038 exact chest stacks, 96 equipped armor
+  stacks, 33 legacy filled-fluid buckets, and nine player-inventory stacks
+  matched after loading.
+- The production marker records 1,302 converted legacy chunks in eight region
+  files, 33 bucket conversions, and 571 preserved mod-item damage values.
+  The original regions, `level.dat`, and playerdata remain recoverable inside
+  the copied world's migration-backup directory.
+- The direct-upgrade server saved all three dimensions and shut down cleanly.
 
 ## Release archive audit
 
@@ -88,6 +96,8 @@ evidence for the original direct conversion.
 provider and requires OreSpawn `[4.0.1,5.0.0)`. The archive contains no MMDLib,
 Mineralogy, native/fallback generator, removed integration classes,
 `forge_marker`, recipes under `assets`, or plural legacy texture paths.
+Its SHA-256 is
+`464C5BB0D0122DFE596782082F4C0A56F0361A2CC3F2758E77C85AC5F4284CA7`.
 
 ## Separate performance gate
 

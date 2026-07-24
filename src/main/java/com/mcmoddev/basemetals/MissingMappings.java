@@ -22,7 +22,8 @@ public final class MissingMappings {
             if (target != null) mapping.remap(target.get());
         });
         event.getMappings("mmdlib").forEach(mapping -> {
-            RegistryObject<? extends Block> target = ModContent.blocksById().get(mapping.key.getPath());
+            RegistryObject<? extends Block> target = ModContent.blocksById()
+                    .get(blockTargetPath(mapping.key.getPath()));
             if (target != null) mapping.remap(target.get());
         });
     }
@@ -35,7 +36,8 @@ public final class MissingMappings {
             if (target != null) mapping.remap(target.get());
         });
         event.getMappings("mmdlib").forEach(mapping -> {
-            RegistryObject<Item> target = ModContent.itemsById().get(mapping.key.getPath());
+            RegistryObject<Item> target = ModContent.itemsById()
+                    .get(itemTargetPath(mapping.key.getPath()));
             if (target != null) mapping.remap(target.get());
         });
     }
@@ -52,15 +54,15 @@ public final class MissingMappings {
         });
     }
 
-    static String blockTargetPath(String path) {
+    public static String blockTargetPath(String path) {
         return path.equals("liquid_mercury") ? "mercury" : path;
     }
 
-    static String itemTargetPath(String path) {
+    public static String itemTargetPath(String path) {
         return path.equals("carbon_powder") ? "coal_powder" : path;
     }
 
-    static String fluidTargetPath(String path) {
+    public static String fluidTargetPath(String path) {
         return path.equals("liquid_mercury") ? "mercury" : path;
     }
 }

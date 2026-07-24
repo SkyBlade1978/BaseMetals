@@ -11,6 +11,8 @@ class MechanicsContractTest {
         assertEquals("mercury", MissingMappings.blockTargetPath("liquid_mercury"));
         assertEquals("mercury", MissingMappings.fluidTargetPath("liquid_mercury"));
         assertEquals("coal_powder", MissingMappings.itemTargetPath("carbon_powder"));
+        assertEquals("mercury", MissingMappings.blockTargetPath(
+                new net.minecraft.resources.ResourceLocation("mmdlib", "liquid_mercury").getPath()));
         assertEquals("double_diamond_slab", MissingMappings.blockTargetPath("double_diamond_slab"));
         assertEquals("human_detector", MissingMappings.blockTargetPath("human_detector"));
         assertEquals("emerald_bow", MissingMappings.itemTargetPath("emerald_bow"));

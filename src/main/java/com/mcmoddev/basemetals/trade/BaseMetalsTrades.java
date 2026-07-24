@@ -25,13 +25,14 @@ public final class BaseMetalsTrades {
                 && event.getType() != VillagerProfession.TOOLSMITH
                 && event.getType() != VillagerProfession.WEAPONSMITH) return;
         for (MaterialDefinition material : MaterialCatalogue.ALL) {
-            if (!material.hasEquipment() || material.kind() == MaterialDefinition.Kind.RARE_ORE
+            if (material.kind() == MaterialDefinition.Kind.RARE_ORE
                     || material.kind() == MaterialDefinition.Kind.RARE_ALLOY) continue;
             int value = (int) (material.hardness() + material.strength() + material.magic() + material.toolLevel());
             int emeraldCost = Math.max(1, (int) (0.2F * value));
             int level = Math.max(1, Math.min(4, (int) (0.1F * value)));
             Item ingot = ModContent.item(material.name() + "_ingot").get();
             event.getTrades().get(level).add(selling(ingot, 12, emeraldCost));
+            if (!material.hasEquipment()) continue;
             if (event.getType() == VillagerProfession.ARMORER) {
                 addSales(event, level, emeraldCost + (int) (material.hardness() / 2.0D),
                         material, "helmet", "chestplate", "leggings", "boots");
