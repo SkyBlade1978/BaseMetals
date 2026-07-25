@@ -2,6 +2,7 @@ package com.mcmoddev.basemetals.data;
 
 import com.mcmoddev.basemetals.BaseMetals;
 
+import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -58,7 +59,7 @@ public final class BaseMetalsDataGenerators {
                 net.minecraft.world.level.block.Block block = object.get();
                 if (block instanceof LiquidBlock) return;
                 if (block instanceof PlateBlock) {
-                    directionalBlock(block, existing(id));
+                    plateBlock(block, existing(id));
                 } else if (block instanceof IronBarsBlock bars) {
                     paneBlock(bars, panePart(id, "_post"), panePart(id, "_side"),
                             panePart(id, "_side_alt"), panePart(id, "_cap"), panePart(id, "_cap_alt"));
@@ -104,6 +105,28 @@ public final class BaseMetalsDataGenerators {
                 } else {
                     simpleBlock(block, existing(id));
                 }
+            });
+        }
+
+        private void plateBlock(net.minecraft.world.level.block.Block block, ModelFile model) {
+            getVariantBuilder(block).forAllStates(state -> {
+                Direction facing = state.getValue(PlateBlock.FACING);
+                int x = switch (facing) {
+                    case DOWN -> 90;
+                    case UP -> 270;
+                    default -> 0;
+                };
+                int y = switch (facing) {
+                    case EAST -> 90;
+                    case SOUTH -> 180;
+                    case WEST -> 270;
+                    default -> 0;
+                };
+                return ConfiguredModel.builder()
+                        .modelFile(model)
+                        .rotationX(x)
+                        .rotationY(y)
+                        .build();
             });
         }
 

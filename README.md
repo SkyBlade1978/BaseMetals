@@ -58,9 +58,4 @@ Forge item, block, and fluid tags are the public compatibility API. Conditional
 data is included for Mekanism 10.2, Thermal Expansion 9, Tinkers' Construct 3.7,
 and Ender IO 6 alpha. See [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
-## Development
-
-Use Java 17 and the workspace Gradle cache. The complete verification and data
-generation workflow is documented in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
-
 Base Metals is licensed under LGPL-2.1.

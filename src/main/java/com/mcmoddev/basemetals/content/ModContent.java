@@ -15,7 +15,6 @@ import com.mcmoddev.basemetals.entity.ModEntities;
 
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.AnvilBlock;
@@ -429,7 +428,7 @@ public final class ModContent {
         // Forge 1.12 registered an ItemBlock under every molten block ID. Keep
         // those hidden inventory IDs so old stacks can survive a world upgrade.
         registerItem(name, () -> new BlockItem(block[0].get(), new Item.Properties()));
-        bucket[0] = registerItem(name + "_bucket", () -> new BucketItem(() -> source[0].get(),
+        bucket[0] = registerItem(name + "_bucket", () -> new BaseMetalBucketItem(() -> source[0].get(),
                 new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(ModTabs.ITEMS)));
         FLUID_CONTENT.put(name, new FluidContent(source[0], flowing[0], block[0], bucket[0]));
     }

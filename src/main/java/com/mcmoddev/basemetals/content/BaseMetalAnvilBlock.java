@@ -53,6 +53,11 @@ public final class BaseMetalAnvilBlock extends AnvilBlock {
         }
 
         @Override
+        protected boolean isValidBlock(BlockState state) {
+            return state.getBlock() instanceof BaseMetalAnvilBlock;
+        }
+
+        @Override
         protected void onTake(Player player, ItemStack output) {
             BlockState original = level.getBlockState(pos);
             if (!(original.getBlock() instanceof BaseMetalAnvilBlock)) {

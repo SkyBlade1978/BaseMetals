@@ -2,28 +2,25 @@
   "variants": {
     "facing=down": {
       "model": "basemetals:block/coldiron_plate",
-      "x": 180
+      "x": 90
     },
     "facing=up": {
-      "model": "basemetals:block/coldiron_plate"
+      "model": "basemetals:block/coldiron_plate",
+      "x": 270
     },
     "facing=north": {
-      "model": "basemetals:block/coldiron_plate",
-      "x": 90
+      "model": "basemetals:block/coldiron_plate"
     },
     "facing=south": {
       "model": "basemetals:block/coldiron_plate",
-      "x": 90,
       "y": 180
     },
     "facing=west": {
       "model": "basemetals:block/coldiron_plate",
-      "x": 90,
       "y": 270
     },
     "facing=east": {
       "model": "basemetals:block/coldiron_plate",
-      "x": 90,
       "y": 90
     }
   }

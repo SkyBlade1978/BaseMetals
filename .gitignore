@@ -52,3 +52,11 @@ Desktop.ini
 /.codex/
 /CLAUDE.md
 /.claude/
+
+# local validation/audit reports
+**/VALIDATION.md
+**/validation.md
+**/DEVELOPMENT.md
+**/development.md
+**/REGISTRY_AUDIT.md
+**/registry_audit.md

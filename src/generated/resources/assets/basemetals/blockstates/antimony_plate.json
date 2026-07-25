@@ -2,28 +2,25 @@
   "variants": {
     "facing=down": {
       "model": "basemetals:block/antimony_plate",
-      "x": 180
+      "x": 90
     },
     "facing=up": {
-      "model": "basemetals:block/antimony_plate"
+      "model": "basemetals:block/antimony_plate",
+      "x": 270
     },
     "facing=north": {
-      "model": "basemetals:block/antimony_plate",
-      "x": 90
+      "model": "basemetals:block/antimony_plate"
     },
     "facing=south": {
       "model": "basemetals:block/antimony_plate",
-      "x": 90,
       "y": 180
     },
     "facing=west": {
       "model": "basemetals:block/antimony_plate",
-      "x": 90,
       "y": 270
     },
     "facing=east": {
       "model": "basemetals:block/antimony_plate",
-      "x": 90,
       "y": 90
     }
   }

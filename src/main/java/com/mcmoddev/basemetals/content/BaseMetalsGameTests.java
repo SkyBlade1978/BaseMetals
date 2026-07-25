@@ -21,6 +21,7 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -48,6 +49,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -65,6 +68,7 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.TickEvent;
@@ -90,6 +94,20 @@ public final class BaseMetalsGameTests {
         Player player = helper.makeMockPlayer();
         BlockPos position = helper.absolutePos(new BlockPos(1, 1, 1));
 
+        Map<Direction, Vec3> faceCentres = Map.of(
+                Direction.DOWN, new Vec3(position.getX() + 0.5D, position.getY(), position.getZ() + 0.5D),
+                Direction.UP, new Vec3(position.getX() + 0.5D, position.getY() + 1.0D, position.getZ() + 0.5D),
+                Direction.NORTH, new Vec3(position.getX() + 0.5D, position.getY() + 0.5D, position.getZ()),
+                Direction.SOUTH, new Vec3(position.getX() + 0.5D, position.getY() + 0.5D, position.getZ() + 1.0D),
+                Direction.WEST, new Vec3(position.getX(), position.getY() + 0.5D, position.getZ() + 0.5D),
+                Direction.EAST, new Vec3(position.getX() + 1.0D, position.getY() + 0.5D, position.getZ() + 0.5D));
+        for (Map.Entry<Direction, Vec3> entry : faceCentres.entrySet()) {
+            BlockState state = plate.getStateForPlacement(
+                    context(helper, player, position, entry.getValue(), entry.getKey()));
+            require(helper, state != null && state.getValue(PlateBlock.FACING) == entry.getKey(),
+                    "Centred " + entry.getKey() + " placement did not retain the clicked face");
+        }
+
         BlockState centred = plate.getStateForPlacement(context(helper, player, position,
                 new Vec3(position.getX() + 0.5D, position.getY() + 1.0D, position.getZ() + 0.5D), Direction.UP));
         BlockState easternEdge = plate.getStateForPlacement(context(helper, player, position,
@@ -101,6 +119,18 @@ public final class BaseMetalsGameTests {
         // retaining that WEST result is part of old block-state compatibility.
         require(helper, easternEdge != null && easternEdge.getValue(PlateBlock.FACING) == Direction.WEST,
                 "A top-face east-edge placement did not retain legacy west-facing orientation");
+
+        Map<Direction, AABB> expectedBounds = Map.of(
+                Direction.DOWN, new AABB(0, 15.0D / 16.0D, 0, 1, 1, 1),
+                Direction.UP, new AABB(0, 0, 0, 1, 1.0D / 16.0D, 1),
+                Direction.NORTH, new AABB(0, 0, 15.0D / 16.0D, 1, 1, 1),
+                Direction.SOUTH, new AABB(0, 0, 0, 1, 1, 1.0D / 16.0D),
+                Direction.WEST, new AABB(15.0D / 16.0D, 0, 0, 1, 1, 1),
+                Direction.EAST, new AABB(0, 0, 0, 1.0D / 16.0D, 1, 1));
+        expectedBounds.forEach((facing, bounds) -> require(helper,
+                plate.getShape(plate.defaultBlockState().setValue(PlateBlock.FACING, facing),
+                        helper.getLevel(), position, CollisionContext.empty()).bounds().equals(bounds),
+                facing + " plate bounds do not match the legacy attachment plane"));
         helper.succeed();
     }
 
@@ -135,6 +165,7 @@ public final class BaseMetalsGameTests {
 
     @GameTest(template = EMPTY)
     public static void everyFluidHasSourceFlowingBlockAndBucket(GameTestHelper helper) {
+        BlockPos position = helper.absolutePos(new BlockPos(2, 1, 2));
         ModContent.fluids().forEach((id, fluid) -> {
             require(helper, ForgeRegistries.FLUIDS.getKey(fluid.source().get()).equals(
                     new ResourceLocation(BaseMetals.MOD_ID, id)), id + " source fluid is not registered correctly");
@@ -144,6 +175,26 @@ public final class BaseMetalsGameTests {
                     new ResourceLocation(BaseMetals.MOD_ID, id)), id + " fluid block is not registered correctly");
             require(helper, ForgeRegistries.ITEMS.getKey(fluid.bucket().get()).equals(
                     new ResourceLocation(BaseMetals.MOD_ID, id + "_bucket")), id + " bucket is not registered correctly");
+            require(helper, fluid.bucket().get() instanceof BaseMetalBucketItem,
+                    id + " does not use the visible functional bucket implementation");
+
+            BucketItem bucket = (BucketItem) fluid.bucket().get();
+            require(helper, bucket.getFluid() == fluid.source().get(),
+                    id + " bucket does not retain its source fluid");
+            for (CreativeModeTab tab : List.of(ModTabs.ITEMS, CreativeModeTab.TAB_SEARCH)) {
+                NonNullList<ItemStack> visible = NonNullList.create();
+                bucket.fillItemCategory(tab, visible);
+                require(helper, visible.stream().anyMatch(stack -> stack.is(bucket)),
+                        id + " bucket is absent from " + tab.getRecipeFolderName());
+            }
+
+            helper.getLevel().setBlock(position, Blocks.AIR.defaultBlockState(), 3);
+            require(helper, bucket.emptyContents(null, helper.getLevel(), position, null,
+                    bucket.getDefaultInstance()), id + " bucket could not place its fluid");
+            require(helper, helper.getLevel().getFluidState(position).getType() == fluid.source().get()
+                    && helper.getLevel().getFluidState(position).isSource(),
+                    id + " bucket placed the wrong or non-source fluid");
+            helper.getLevel().removeBlock(position, false);
         });
         helper.succeed();
     }
@@ -435,6 +486,40 @@ public final class BaseMetalsGameTests {
         require(helper, diamond.use(helper.getLevel(), player, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(diamondPosition), Direction.UP, diamondPosition, false))
                 == InteractionResult.PASS, "Diamond door became hand-openable");
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void customAnvilMenusRemainValidWithoutTheVanillaAnvilTag(GameTestHelper helper) {
+        ServerPlayer player = survivalPlayer(helper);
+        BlockPos relative = new BlockPos(1, 1, 3);
+        BlockPos position = helper.absolutePos(relative);
+        player.moveTo(position, 0.0F, 0.0F);
+
+        int containerId = 1;
+        for (String id : List.of("stone_anvil", "steel_anvil", "adamantine_anvil")) {
+            BaseMetalAnvilBlock anvil = (BaseMetalAnvilBlock) ModContent.blocksById().get(id).get();
+            helper.setBlock(relative, anvil);
+            BlockState state = helper.getLevel().getBlockState(position);
+            require(helper, !state.is(BlockTags.ANVIL),
+                    id + " must remain outside the vanilla tag which deletes falling custom anvils");
+
+            var provider = anvil.getMenuProvider(state, helper.getLevel(), position);
+            require(helper, provider != null, id + " has no menu provider");
+            AbstractContainerMenu menu = provider == null ? null
+                    : provider.createMenu(containerId++, player.getInventory(), player);
+            require(helper, menu != null && menu.stillValid(player),
+                    id + " menu rejected its own workstation immediately: state="
+                            + ForgeRegistries.BLOCKS.getKey(state.getBlock())
+                            + ", workstation=" + position
+                            + ", player=" + player.position()
+                            + ", distance=" + player.distanceToSqr(Vec3.atCenterOf(position)));
+
+            helper.getLevel().removeBlock(position, false);
+            require(helper, menu == null || !menu.stillValid(player),
+                    id + " menu remained valid after its workstation was removed");
+            if (menu != null) menu.removed(player);
+        }
         helper.succeed();
     }
 

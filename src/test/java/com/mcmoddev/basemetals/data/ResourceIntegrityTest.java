@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,8 @@ import java.util.Deque;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -158,6 +161,85 @@ class ResourceIntegrityTest {
         }
         assertTrue(!Files.exists(MAIN.resolve("assets/minecraft/models/item/oak_door.json")),
                 "Base Metals must not replace vanilla door models");
+    }
+
+    @Test
+    void everyTransparentBlockTextureHasAnExplicitRenderLayerFamily() throws Exception {
+        JsonObject manifest = read(resource("data/basemetals/registry_manifest.json")).getAsJsonObject();
+        Set<String> expectedCutouts = new LinkedHashSet<>();
+        for (String block : strings(manifest.getAsJsonArray("blocks"))) {
+            String id = path(block);
+            if (id.endsWith("_bars")) {
+                expectedCutouts.add(id + ".png");
+            } else if (id.endsWith("_door")) {
+                expectedCutouts.add(id.substring(0, id.length() - "_door".length())
+                        + "_door_upper.png");
+            } else if (id.endsWith("_trapdoor")) {
+                expectedCutouts.add(id + ".png");
+            }
+        }
+        assertEquals(78, expectedCutouts.size());
+
+        Path textures = MAIN.resolve("assets/basemetals/textures/block");
+        Set<String> transparent = new LinkedHashSet<>();
+        try (Stream<Path> paths = Files.walk(textures)) {
+            for (Path texture : (Iterable<Path>) paths.filter(Files::isRegularFile)
+                    .filter(file -> file.toString().endsWith(".png"))::iterator) {
+                if (hasTransparentPixel(texture)) transparent.add(texture.getFileName().toString());
+            }
+        }
+        assertTrue(transparent.containsAll(expectedCutouts),
+                "Cutout block textures lost their transparent pixels: "
+                        + difference(expectedCutouts, transparent));
+
+        Set<String> exemptTextureSheetSpace = Set.of(
+                "adamantine_anvil_top_damaged_0.png",
+                "adamantine_anvil_top_damaged_1.png",
+                "adamantine_anvil_top_damaged_2.png",
+                "steel_anvil_top_damaged_0.png",
+                "steel_anvil_top_damaged_1.png",
+                "steel_anvil_top_damaged_2.png",
+                "stone_anvil_top_damaged_0.png",
+                "stone_anvil_top_damaged_1.png",
+                "stone_anvil_top_damaged_2.png",
+                "door_iron_upper.png");
+        Set<String> unexplained = new LinkedHashSet<>(transparent);
+        unexplained.removeAll(expectedCutouts);
+        unexplained.removeAll(exemptTextureSheetSpace);
+        assertTrue(unexplained.isEmpty(),
+                "Transparent block textures are outside a registered cutout family: " + unexplained);
+        assertEquals(88, transparent.size());
+    }
+
+    @Test
+    void plateModelsUseTheLegacyDirectionToPlaneTransform() throws Exception {
+        JsonObject manifest = read(resource("data/basemetals/registry_manifest.json")).getAsJsonObject();
+        Map<String, int[]> rotations = Map.of(
+                "down", new int[] {90, 0},
+                "up", new int[] {270, 0},
+                "north", new int[] {0, 0},
+                "south", new int[] {0, 180},
+                "west", new int[] {0, 270},
+                "east", new int[] {0, 90});
+        int plates = 0;
+        for (String block : strings(manifest.getAsJsonArray("blocks"))) {
+            String id = path(block);
+            if (!id.endsWith("_plate") || id.endsWith("_pressure_plate")) continue;
+            plates++;
+            JsonObject variants = read(resource("assets/basemetals/blockstates/" + id + ".json"))
+                    .getAsJsonObject().getAsJsonObject("variants");
+            for (Map.Entry<String, int[]> expected : rotations.entrySet()) {
+                JsonObject variant = variants.getAsJsonObject("facing=" + expected.getKey());
+                assertNotNull(variant, id + " is missing facing=" + expected.getKey());
+                int x = variant.has("x") ? variant.get("x").getAsInt() : 0;
+                int y = variant.has("y") ? variant.get("y").getAsInt() : 0;
+                assertEquals(expected.getValue()[0], x,
+                        id + " facing=" + expected.getKey() + " has the wrong X rotation");
+                assertEquals(expected.getValue()[1], y,
+                        id + " facing=" + expected.getKey() + " has the wrong Y rotation");
+            }
+        }
+        assertEquals(23, plates, "Plate transform coverage no longer matches the registered family");
     }
 
     @Test
@@ -617,6 +699,23 @@ class ResourceIntegrityTest {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             return JsonParser.parseReader(reader);
         }
+    }
+
+    private static boolean hasTransparentPixel(Path path) throws IOException {
+        BufferedImage image = ImageIO.read(path.toFile());
+        assertNotNull(image, "Unreadable PNG " + path);
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) >>> 24) < 255) return true;
+            }
+        }
+        return false;
+    }
+
+    private static Set<String> difference(Set<String> expected, Set<String> actual) {
+        Set<String> result = new LinkedHashSet<>(expected);
+        result.removeAll(actual);
+        return result;
     }
 
     @FunctionalInterface
