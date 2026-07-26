@@ -174,6 +174,7 @@ public final class IntegratedWorldSmoke {
                 .getSearchTree(SearchRegistry.CREATIVE_NAMES).search("bucket");
         for (var fluid : ModContent.fluids().entrySet()) {
             net.minecraft.world.item.Item bucket = fluid.getValue().bucket().get();
+            ItemStack bucketStack = bucket.getDefaultInstance();
             if (itemsTab.stream().noneMatch(stack -> stack.is(bucket))
                     || searchTab.stream().noneMatch(stack -> stack.is(bucket))
                     || bucketSearch.stream().noneMatch(stack -> stack.is(bucket))) {
@@ -182,6 +183,11 @@ public final class IntegratedWorldSmoke {
                                 + fluid.getKey() + " direct_items=" + itemsTab.size()
                                 + " direct_search=" + searchTab.size()
                                 + " indexed_bucket_results=" + bucketSearch.size());
+            }
+            var model = minecraft.getItemRenderer().getModel(bucketStack, null, null, 0);
+            if (model.getQuads(null, null, new java.util.Random(0L)).isEmpty()) {
+                throw new IllegalStateException(
+                        "BASEMETALS_INTEGRATED_SMOKE FAIL: invisible bucket model " + fluid.getKey());
             }
         }
         BaseMetals.LOGGER.info(

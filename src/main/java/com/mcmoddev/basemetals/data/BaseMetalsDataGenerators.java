@@ -174,7 +174,7 @@ public final class BaseMetalsDataGenerators {
             }
 
             ModContent.fluids().forEach((name, fluid) -> getBuilder(name + "_bucket")
-                    .parent(getExistingFile(mcLoc("item/generated")))
+                    .parent(getExistingFile(new net.minecraft.resources.ResourceLocation("forge", "item/bucket")))
                     .customLoader(DynamicBucketModelBuilder::begin)
                     .fluid(fluid.source().get()));
 

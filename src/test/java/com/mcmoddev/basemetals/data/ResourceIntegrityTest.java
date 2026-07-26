@@ -164,6 +164,23 @@ class ResourceIntegrityTest {
     }
 
     @Test
+    void fluidBucketModelsUseTheForgeBucketTemplate() throws Exception {
+        JsonObject manifest = read(resource("data/basemetals/registry_manifest.json")).getAsJsonObject();
+        Set<String> buckets = strings(manifest.getAsJsonArray("new_items"));
+        assertEquals(36, buckets.size(), "Unexpected fluid bucket count");
+        for (String bucket : buckets) {
+            String id = path(bucket);
+            JsonObject model = read(resource("assets/basemetals/models/item/" + id + ".json")).getAsJsonObject();
+            assertEquals("forge:item/bucket", model.get("parent").getAsString(),
+                    bucket + " has no visible bucket base or fluid mask");
+            assertEquals("forge:bucket", model.get("loader").getAsString(),
+                    bucket + " does not use Forge's dynamic bucket loader");
+            assertEquals("basemetals:" + id.substring(0, id.length() - "_bucket".length()),
+                    model.get("fluid").getAsString(), bucket + " references the wrong fluid");
+        }
+    }
+
+    @Test
     void everyTransparentBlockTextureHasAnExplicitRenderLayerFamily() throws Exception {
         JsonObject manifest = read(resource("data/basemetals/registry_manifest.json")).getAsJsonObject();
         Set<String> expectedCutouts = new LinkedHashSet<>();
