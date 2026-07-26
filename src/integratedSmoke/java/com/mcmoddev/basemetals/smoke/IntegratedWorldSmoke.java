@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
@@ -49,6 +50,8 @@ public final class IntegratedWorldSmoke {
     private static boolean renderLayersChecked;
     private static boolean creativeBucketsChecked;
     private static boolean projectileRenderersChecked;
+    private static boolean projectileSyncProbesSpawned;
+    private static boolean projectileSyncChecked;
 
     private IntegratedWorldSmoke() {}
 
@@ -66,7 +69,7 @@ public final class IntegratedWorldSmoke {
             renderLayersChecked = true;
         }
         if (!creativeBucketsChecked) {
-            verifyCreativeBuckets();
+            verifyCreativeBuckets(minecraft);
             creativeBucketsChecked = true;
         }
         if (!creationStarted && minecraft.screen instanceof TitleScreen) {
@@ -93,8 +96,23 @@ public final class IntegratedWorldSmoke {
                     verifyProjectileRenderers(minecraft);
                     projectileRenderersChecked = true;
                 }
+                if (!projectileSyncProbesSpawned && !serverLevel.players().isEmpty()) {
+                    spawnProjectileSyncProbes(serverLevel);
+                    projectileSyncProbesSpawned = true;
+                }
                 joinedTicks++;
+                if (projectileSyncProbesSpawned && !projectileSyncChecked && joinedTicks >= 20) {
+                    projectileSyncChecked = verifyProjectileSync(minecraft);
+                    if (!projectileSyncChecked && joinedTicks >= 100) {
+                        throw new IllegalStateException(
+                                "BASEMETALS_INTEGRATED_SMOKE FAIL: projectile ammunition did not reach the client");
+                    }
+                }
                 if (joinedTicks >= READY_TICKS) {
+                    if (!projectileSyncChecked) {
+                        throw new IllegalStateException(
+                                "BASEMETALS_INTEGRATED_SMOKE FAIL: projectile sync was never verified");
+                    }
                     completed = true;
                     BaseMetals.LOGGER.info(
                             "BASEMETALS_INTEGRATED_SMOKE PASS world={} dimension={} client_ticks={} server_ticks={}",
@@ -147,18 +165,23 @@ public final class IntegratedWorldSmoke {
                 bars, doors, trapdoors);
     }
 
-    private static void verifyCreativeBuckets() {
+    private static void verifyCreativeBuckets(Minecraft minecraft) {
         NonNullList<ItemStack> itemsTab = NonNullList.create();
         NonNullList<ItemStack> searchTab = NonNullList.create();
         ModTabs.ITEMS.fillItemList(itemsTab);
         CreativeModeTab.TAB_SEARCH.fillItemList(searchTab);
+        java.util.List<ItemStack> bucketSearch = minecraft
+                .getSearchTree(SearchRegistry.CREATIVE_NAMES).search("bucket");
         for (var fluid : ModContent.fluids().entrySet()) {
             net.minecraft.world.item.Item bucket = fluid.getValue().bucket().get();
             if (itemsTab.stream().noneMatch(stack -> stack.is(bucket))
-                    || searchTab.stream().noneMatch(stack -> stack.is(bucket))) {
+                    || searchTab.stream().noneMatch(stack -> stack.is(bucket))
+                    || bucketSearch.stream().noneMatch(stack -> stack.is(bucket))) {
                 throw new IllegalStateException(
                         "BASEMETALS_INTEGRATED_SMOKE FAIL: hidden creative bucket "
-                                + fluid.getKey());
+                                + fluid.getKey() + " direct_items=" + itemsTab.size()
+                                + " direct_search=" + searchTab.size()
+                                + " indexed_bucket_results=" + bucketSearch.size());
             }
         }
         BaseMetals.LOGGER.info(
@@ -177,5 +200,39 @@ public final class IntegratedWorldSmoke {
             }
         }
         BaseMetals.LOGGER.info("BASEMETALS_INTEGRATED_SMOKE projectile renderers PASS");
+    }
+
+    private static void spawnProjectileSyncProbes(ServerLevel level) {
+        var player = level.players().get(0);
+        level.getServer().execute(() -> {
+            MaterialProjectile arrow = new MaterialProjectile(ModEntities.CUSTOM_ARROW.get(), level, player,
+                    ModContent.item("starsteel_arrow").get().getDefaultInstance());
+            arrow.setNoGravity(true);
+            arrow.setDeltaMovement(0.0D, 0.0D, 0.0D);
+            level.addFreshEntity(arrow);
+
+            MaterialProjectile bolt = new MaterialProjectile(ModEntities.CUSTOM_BOLT.get(), level, player,
+                    ModContent.item("tin_bolt").get().getDefaultInstance());
+            bolt.setNoGravity(true);
+            bolt.setDeltaMovement(0.0D, 0.0D, 0.0D);
+            level.addFreshEntity(bolt);
+        });
+    }
+
+    private static boolean verifyProjectileSync(Minecraft minecraft) {
+        var projectiles = minecraft.level.getEntitiesOfClass(MaterialProjectile.class,
+                minecraft.player.getBoundingBox().inflate(16.0D));
+        boolean arrow = projectiles.stream().anyMatch(projectile ->
+                projectile.getType() == ModEntities.CUSTOM_ARROW.get()
+                        && projectile.getItem().is(ModContent.item("starsteel_arrow").get()));
+        boolean bolt = projectiles.stream().anyMatch(projectile ->
+                projectile.getType() == ModEntities.CUSTOM_BOLT.get()
+                        && projectile.getItem().is(ModContent.item("tin_bolt").get()));
+        if (arrow && bolt) {
+            BaseMetals.LOGGER.info(
+                    "BASEMETALS_INTEGRATED_SMOKE projectile ammunition sync PASS");
+            return true;
+        }
+        return false;
     }
 }

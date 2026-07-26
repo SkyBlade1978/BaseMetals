@@ -913,6 +913,8 @@ public final class BaseMetalsGameTests {
         Player shooter = helper.makeMockPlayer();
         ItemStack ammunition = ModContent.item("starsteel_bolt").get().getDefaultInstance();
         MaterialProjectile original = new MaterialProjectile(ModEntities.CUSTOM_BOLT.get(), helper.getLevel(), shooter, ammunition);
+        require(helper, original.getAddEntityPacket().getClass().getName().contains("CustomPayload"),
+                "Projectile uses the vanilla packet, so Forge ammunition data cannot reach the client");
 
         CompoundTag saved = new CompoundTag();
         original.addAdditionalSaveData(saved);
