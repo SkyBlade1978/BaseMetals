@@ -158,13 +158,21 @@ minecraft {
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
-            if (providers.gradleProperty('upgradeWorldSmoke').isPresent()) {
+            if (providers.gradleProperty('upgradeWorldSmoke').isPresent()
+                    || providers.gradleProperty('legacyWorldSmoke').isPresent()) {
                 workingDirectory project.file('run-upgrade')
                 property 'fml.doNotBackup', 'true'
                 property 'fml.queryResult', 'confirm'
-                property 'basemetals.upgradeWorldSmoke', 'true'
-                if (providers.gradleProperty('upgradeWorldName').isPresent()) {
-                    args '--world', providers.gradleProperty('upgradeWorldName').get()
+                if (providers.gradleProperty('upgradeWorldSmoke').isPresent()) {
+                    property 'basemetals.upgradeWorldSmoke', 'true'
+                    if (providers.gradleProperty('upgradeWorldName').isPresent()) {
+                        args '--world', providers.gradleProperty('upgradeWorldName').get()
+                    }
+                } else {
+                    property 'basemetals.legacyWorldSmoke', 'true'
+                    if (providers.gradleProperty('legacyWorldName').isPresent()) {
+                        args '--world', providers.gradleProperty('legacyWorldName').get()
+                    }
                 }
                 mods {
                     "${mod_id}" {
@@ -202,8 +210,12 @@ repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
-    flatDir {
-        dir rootProject.file('../../../MinecraftMineralogy/OS118/OreSpawn/build/libs')
+    maven {
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com/'
+        content {
+            includeGroup 'curse.maven'
+        }
     }
     flatDir {
         dir rootProject.file('../../benchmarks/external/EnderIO-1.18.2/build/libs')
@@ -221,13 +233,10 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // Workspace development runtime only. OreSpawn remains an ordinary hard
-    // mod dependency in metadata and is never shaded into Base Metals.
-    def oreSpawnDevJar = rootProject.file('../../../MinecraftMineralogy/OS118/OreSpawn/build/libs/OreSpawn-1.18.2-4.0.1.jar')
-    if (oreSpawnDevJar.isFile()) {
-        // A module coordinate lets ForgeGradle remap the release JAR for userdev.
-        runtimeOnly fg.deobf('local:OreSpawn-1.18.2:4.0.1')
-    }
+    // OreSpawn remains an ordinary hard mod dependency in metadata and is
+    // never shaded into Base Metals. Use the published 1.18.2 release in
+    // development so clean checkouts exercise the same artifact as players.
+    runtimeOnly fg.deobf("curse.maven:mmd-orespawn-${orespawn_curse_project_id}:${orespawn_curse_file_id}")
 
     // API only: Mekanism remains optional at runtime. Its public slurry
     // registry is required to provide the eight historical processing chains.

@@ -1,18 +1,20 @@
-# Migrating from Base Metals 1.12
+# Migrating from Base Metals 1.10 or 1.12
 
-Always upgrade a copy and retain the original 1.12 world. Install Base Metals
+Always upgrade a copy and retain the original legacy world. Install Base Metals
 3.0.0 and OreSpawn 4.0.1, but do not carry MMDLib, Additional Loot Tables, the
 OreSpawn 3 plugin, or the old native fallback generator into the 1.18 instance.
 
 Minecraft's data fixer cannot identify third-party numeric block IDs from
 before the 1.13 flattening. Base Metals snapshots those positions, runs
 Mojang's complete chunk fixes through the 1.13 palette transition, and then
-overlays only the saved third-party blocks. Vanilla's context-sensitive block,
+overlays only the saved third-party blocks and their original block entities.
+Any vanilla block entities which Mojang's fixer inferred from a reused mod
+numeric ID are removed at those positions. Vanilla's context-sensitive block,
 block-entity, entity, inventory, map, statistics, objective, jukebox, spawn
-egg, banner, and villager fixes therefore still run. The migrator reads the
-exact numeric map from an untouched legacy `level.dat` when available,
-otherwise it uses the map captured from the public Base Metals
-2.5.0-rc2.332 and MMDLib 1.0.0-rc2.36 runtime.
+egg, banner, and villager fixes still run everywhere else. The migrator reads
+the exact numeric map from an untouched legacy `level.dat` or `level.dat_old`
+when available. If neither retains a legacy map, it uses the map captured from
+the public Base Metals 2.5.0-rc2.332 and MMDLib 1.0.0-rc2.36 runtime.
 
 Before replacing any region file, `level.dat`, or playerdata file, the
 migrator copies the original to
@@ -23,14 +25,26 @@ summary or that no legacy content was present; subsequent starts do nothing.
 The fresh direct-upgrade fixture retained 20,553 block-state placements,
 1,038 exact chest stacks, 96 equipped armor stacks, 33 filled-fluid buckets,
 and nine player-inventory stacks across the Overworld, Nether, and End.
+Separate DataVersion-512 validation covers both public 1.10 lines. A bounded
+copy of a Cyano 2.4.0 world retained every one of 323,429 Base Metals block
+positions, 10,153 mod-block entities, and 378 Base Metals stacks. A world made
+with the public MMD 2.5.0-beta4.238 release retained all 345 registered block
+IDs and all 1,030 registered item IDs, then completed a 1.18 server start.
 
-The packaged map covers the exact public runtime. If a chunk contains a
-numeric block ID belonging to some other 1.12 mod, migration stops instead of
-guessing or deleting it. Restore the backed-up regions and migrate that mod's
-content separately before retrying. External mod states which are present in
-the captured map retain their registry name but may fall back to that mod's
-default state. Base Metals and historical `mmdlib:*` states retain their old
-metadata semantics, including complete paired-door state.
+The packaged fallback map covers the exact public 1.12 runtime. With a saved
+legacy registry map, blocks from the world's other 1.10/1.12 mods also retain
+their registry name and original block-entity data, although block states
+without a Base Metals-owned metadata decoder fall back to that mod's default
+state. Base Metals and historical `mmdlib:*` states retain their old metadata
+semantics, including complete paired-door state. If neither legacy level file
+contains an ID used by a numeric chunk, migration stops instead of guessing or
+deleting it. Restore the backed-up regions and recover the world's original
+`level.dat_old` before retrying. Forge normally creates that file before Base
+Metals' migration hook runs; keep it beside `level.dat` for the first upgrade.
+This supports both the original Cyano Base Metals 2.4 line and the later MMD
+Base Metals 2.5 line. Registry paths containing uppercase characters, which
+Minecraft 1.10 still allowed, are normalized to the lowercase form required by
+modern Minecraft.
 
 Base Metals 3.0.0 preserves historical `basemetals:*` IDs, including hidden
 `double_<material>_slab` blocks and molten-fluid block IDs such as
@@ -44,6 +58,10 @@ upgrade start. Missing mappings also forward:
 
 - `basemetals:liquid_mercury` to `basemetals:mercury`;
 - `basemetals:carbon_powder` to `basemetals:coal_powder`;
+- Cyano-era `basemetals:<material>_door_item` IDs to the corresponding
+  `basemetals:<material>_door`;
+- Cyano-era `basemetals:iron_nugget` to `minecraft:iron_nugget`, and its
+  `basemetals:liquid_mercury` block item to `basemetals:mercury_bucket`;
 - historical `mmdlib:*` Vanilla Bits blocks, items, and fluids to matching
   `basemetals:*` IDs.
 
