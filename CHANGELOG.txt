@@ -1,2 +1,9 @@
-1) (@dshadowwolf) Masses of bug-fixes
-2) (@dshadowwolf) Move vanilla extensions out of MMDLib - the lib should be providing anything but raw materials
+Base Metals 3.0.1.118021
+
+- Modernize the Minecraft 1.18.2 build to ForgeGradle 7.0.34 and Gradle 9.6.1.
+- Qualify against the exact OreSpawn 4.0.16.118021 CurseForge release while retaining the supported OreSpawn 4.x runtime range.
+- Add deterministic main, sources, and Javadocs artifacts with release checksums and guarded publication validation.
+- Isolate GameTests and smoke fixtures from production artifacts and Eclipse production launches.
+- Add pinned GitHub Actions for build, GameTests, generated-data drift, CodeQL, wrapper validation, and target-qualified releases.
+
+Gameplay, registry IDs, recipes, save migration, and the OreSpawn provider rules are unchanged from Base Metals 3.0.0.

@@ -43,6 +43,11 @@ classes
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# python
+__pycache__/
+*.py[cod]
+
 /bugreport.md
 
 # machine-specific agent context (public project notes belong under /docs)
