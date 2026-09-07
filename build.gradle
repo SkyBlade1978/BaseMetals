@@ -1145,6 +1145,14 @@ def preparePackagedClientSmoke = tasks.register('preparePackagedClientSmoke') {
             from configurations.orespawnRelease
             into new File(runDirectory, 'mods')
         }
+        File probeJar = new File(runDirectory, 'mods/basemetals-client-smoke.jar')
+        new java.util.zip.ZipFile(probeJar).withCloseable { zip ->
+            ['META-INF/mods.toml', 'pack.mcmeta'].each { requiredEntry ->
+                if (zip.getEntry(requiredEntry) == null) {
+                    throw new GradleException("Packaged client smoke probe is missing ${requiredEntry}")
+                }
+            }
+        }
         new File(runDirectory, 'options.txt').setText('fullscreen:false\nlang:en_us\n', 'UTF-8')
     }
 }
