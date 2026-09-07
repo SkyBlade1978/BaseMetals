@@ -1296,7 +1296,6 @@ def syncForge40EclipseLaunches = tasks.register('syncForge40EclipseLaunches') {
     description = 'Normalizes Forge 40 Eclipse launches to the production-only merged output.'
     dependsOn tasks.named('processResources')
     doLast {
-        String mainClass = 'net.minecraftforge.userdev.LaunchTesting'
         String mainOutput = new File(projectDir, 'bin/main').absolutePath
         String modClasses = "${mod_id}%%${mainOutput}"
         String eclipseGradleJavaHome = System.getenv('JAVA_HOME') ?: System.getProperty('java.home')
@@ -1339,10 +1338,6 @@ def syncForge40EclipseLaunches = tasks.register('syncForge40EclipseLaunches') {
                                 "    <mapEntry key=\"MOD_CLASSES\" value=\"${modClasses}\"/>\r\n" +
                                 '</mapAttribute>')
             }
-            text = text.replaceFirst(
-                    /<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="[^"]*"\/>/,
-                    java.util.regex.Matcher.quoteReplacement(
-                            "<stringAttribute key=\"org.eclipse.jdt.launching.MAIN_TYPE\" value=\"${mainClass}\"/>"))
             text = text.replaceFirst(
                     /<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="[^"]*"\/>/,
                     java.util.regex.Matcher.quoteReplacement(
@@ -1407,12 +1402,20 @@ def verifyEclipseProductionClasspath = tasks.register('verifyEclipseProductionCl
             throw new GradleException("Eclipse project is not named ${eclipseWorkspaceProjectName}")
         }
         File buildshipPreferences = file('.settings/org.eclipse.buildship.core.prefs')
-        String expectedJavaHome = (System.getenv('JAVA_HOME') ?: System.getProperty('java.home'))
-                .replace('\\', '\\\\').replace(':', '\\:')
-        if (!buildshipPreferences.isFile()
-                || !buildshipPreferences.getText('UTF-8').contains("java.home=${expectedJavaHome}")
-                || !buildshipPreferences.getText('UTF-8').contains('override.workspace.settings=true')) {
-            throw new GradleException('Eclipse Buildship is not bound to the Gradle-compatible Java runtime')
+        if (!buildshipPreferences.isFile()) {
+            throw new GradleException('Missing Eclipse Buildship preferences')
+        }
+        Properties buildshipConfiguration = new Properties()
+        buildshipPreferences.withInputStream { buildshipConfiguration.load(it) }
+        String expectedGradleHome = gradle.gradleUserHomeDir.canonicalPath
+        String expectedJavaHome = new File(
+                System.getenv('JAVA_HOME') ?: System.getProperty('java.home')).canonicalPath
+        if (buildshipConfiguration.getProperty('connection.gradle.user.home') != expectedGradleHome
+                || buildshipConfiguration.getProperty('gradle.user.home') != expectedGradleHome
+                || buildshipConfiguration.getProperty('java.home') != expectedJavaHome
+                || buildshipConfiguration.getProperty('override.workspace.settings') != 'true') {
+            throw new GradleException(
+                    "Eclipse Buildship must use Gradle home ${expectedGradleHome} and Java ${expectedJavaHome}")
         }
         def classpathXml = new XmlSlurper(false, false).parse(classpath)
         classpathXml.classpathentry.each { entry ->
@@ -1429,9 +1432,31 @@ def verifyEclipseProductionClasspath = tasks.register('verifyEclipseProductionCl
             }
         }
         ['runClient.launch', 'runServer.launch'].each { name ->
-            String launch = file(name).getText('UTF-8')
-            if (!launch.contains("key=\"org.eclipse.jdt.launching.MAIN_TYPE\" value=\"net.minecraftforge.userdev.LaunchTesting\"")) {
+            File launchFile = file(name)
+            String launch = launchFile.getText('UTF-8')
+            def launchXml = new XmlSlurper(false, false).parse(launchFile)
+            String mainType = launchXml.stringAttribute.find {
+                it.@key.text() == 'org.eclipse.jdt.launching.MAIN_TYPE'
+            }?.@value?.text()
+            if (mainType != 'net.minecraftforge.launcher.Main') {
                 throw new GradleException("Eclipse launch has the wrong ForgeGradle 7 main class: ${name}")
+            }
+            String mainClassEntry = mainType.replace('.', '/') + '.class'
+            List<File> explicitArchives = launchXml.listAttribute.find {
+                it.@key.text() == 'org.eclipse.jdt.launching.CLASSPATH'
+            }?.listEntry?.collect { entry ->
+                def runtimeEntry = new XmlSlurper(false, false).parseText(entry.@value.text())
+                String archive = runtimeEntry.@externalArchive.text()
+                archive ? file(archive) : null
+            }?.findAll { it != null } ?: []
+            boolean mainClassAvailable = explicitArchives.any { archive ->
+                archive.isFile() && new java.util.zip.ZipFile(archive).withCloseable { zip ->
+                    zip.getEntry(mainClassEntry) != null
+                }
+            }
+            if (!mainClassAvailable) {
+                throw new GradleException(
+                        "Eclipse launch main class ${mainType} is absent from its explicit classpath: ${name}")
             }
             if (!launch.contains('ATTR_EXCLUDE_TEST_CODE')
                     || launch =~ /(?i)(junit|mockito|src[\\\/]test|src[\\\/]gametest|integratedsmoke|packagedclientsmoke|upgradesmoke|packagedserversmoke)/) {
