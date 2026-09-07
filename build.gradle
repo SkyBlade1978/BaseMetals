@@ -114,6 +114,14 @@ sourceSets {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
+    packagedClientSmoke {
+        java.srcDir 'src/packagedClientSmoke/java'
+        resources.setSrcDirs([])
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.integratedSmoke.output
+        runtimeClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.integratedSmoke.output
+    }
     upgradeSmoke {
         java.srcDir 'src/upgradeSmoke/java'
         resources.setSrcDirs([])
@@ -136,6 +144,9 @@ configurations {
     integratedSmokeImplementation.extendsFrom implementation
     integratedSmokeCompileOnly.extendsFrom compileOnly
     integratedSmokeRuntimeOnly.extendsFrom runtimeOnly
+    packagedClientSmokeImplementation.extendsFrom implementation
+    packagedClientSmokeCompileOnly.extendsFrom compileOnly
+    packagedClientSmokeRuntimeOnly.extendsFrom runtimeOnly
     upgradeSmokeImplementation.extendsFrom implementation
     upgradeSmokeCompileOnly.extendsFrom compileOnly
     upgradeSmokeRuntimeOnly.extendsFrom runtimeOnly
@@ -542,10 +553,12 @@ def packagedServerSmokeProbe = renamer.classes(packagedServerSmokeJar) {
 
 def packagedClientSmokeJar = tasks.register('packagedClientSmokeJar', Jar) {
     dependsOn tasks.named(sourceSets.integratedSmoke.classesTaskName)
+    dependsOn tasks.named(sourceSets.packagedClientSmoke.classesTaskName)
     archiveFileName = 'basemetals-client-smoke-dev.jar'
     destinationDirectory = layout.buildDirectory.dir('packaged-smoke-probes')
     from sourceSets.integratedSmoke.output.classesDirs
-    from 'src/integratedSmoke/packaged-resources'
+    from sourceSets.packagedClientSmoke.output.classesDirs
+    from 'src/packagedClientSmoke/packaged-resources'
 }
 def packagedClientSmokeProbe = renamer.classes(packagedClientSmokeJar) {
     map.from minecraft.dependency.toSrgFile
@@ -728,6 +741,7 @@ def forbiddenReleasePath = { String entryName ->
             || name.contains('/agent-notes/')
             || name.startsWith('src/gametest/')
             || name.startsWith('src/integratedsmoke/')
+            || name.startsWith('src/packagedclientsmoke/')
             || name.startsWith('src/upgradesmoke/')
             || name.startsWith('src/packagedserversmoke/')
             || name.contains('minecraft-mavenizer')
@@ -1251,7 +1265,8 @@ eclipse {
             classpath.entries.findAll { entry ->
                 String path = entry.path?.replace('\\', '/') ?: ''
                 path.startsWith('src/test/') || path.startsWith('src/gametest/')
-                        || path.startsWith('src/integratedSmoke/') || path.startsWith('src/upgradeSmoke/')
+                        || path.startsWith('src/integratedSmoke/') || path.startsWith('src/packagedClientSmoke/')
+                        || path.startsWith('src/upgradeSmoke/')
                         || path.startsWith('src/packagedServerSmoke/')
             }.each { entry ->
                 entry.entryAttributes['test'] = 'true'
@@ -1395,7 +1410,8 @@ def verifyEclipseProductionClasspath = tasks.register('verifyEclipseProductionCl
         classpathXml.classpathentry.each { entry ->
             String path = entry.@path.text().replace('\\', '/')
             boolean validationSource = path.startsWith('src/test/') || path.startsWith('src/gametest/')
-                    || path.startsWith('src/integratedSmoke/') || path.startsWith('src/upgradeSmoke/')
+                    || path.startsWith('src/integratedSmoke/') || path.startsWith('src/packagedClientSmoke/')
+                    || path.startsWith('src/upgradeSmoke/')
                     || path.startsWith('src/packagedServerSmoke/')
             if (validationSource) {
                 String testFlag = entry.attributes.attribute.find { it.@name.text() == 'test' }?.@value?.text()
@@ -1410,7 +1426,7 @@ def verifyEclipseProductionClasspath = tasks.register('verifyEclipseProductionCl
                 throw new GradleException("Eclipse launch has the wrong ForgeGradle 7 main class: ${name}")
             }
             if (!launch.contains('ATTR_EXCLUDE_TEST_CODE')
-                    || launch =~ /(?i)(junit|mockito|src[\\\/]test|src[\\\/]gametest|integratedsmoke|upgradesmoke|packagedserversmoke)/) {
+                    || launch =~ /(?i)(junit|mockito|src[\\\/]test|src[\\\/]gametest|integratedsmoke|packagedclientsmoke|upgradesmoke|packagedserversmoke)/) {
                 throw new GradleException("Eclipse launch is not production-only: ${name}")
             }
             if (!launch.contains("key=\"org.eclipse.jdt.launching.PROJECT_ATTR\" value=\"${eclipseWorkspaceProjectName}\"")) {
