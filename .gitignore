@@ -25,13 +25,27 @@ eclipse
 run
 run-data
 run-upgrade
+/run-*/
 logs
 classes
+/crash-reports/
+/screenshots/
 /mcmodsrepo/
 /run.*
 /*.log
 /*.jfr
 /*.hprof
+/hs_err_pid*.log
+/replay_pid*.log
+
+# local regression, benchmark, and profiling evidence
+/benchmark-*/
+/preferred-seed-*/
+/validation/
+/regression-*/
+/evidence/
+/evidence-*/
+/*-evidence/
 
 /README.txt
 /forge-*-changelog.txt
@@ -43,15 +57,26 @@ classes
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# python
+__pycache__/
+*.py[cod]
+
 /bugreport.md
 
 # machine-specific agent context (public project notes belong under /docs)
-/AGENTS.md
-/agent-notes/
-/.agents/
-/.codex/
-/CLAUDE.md
-/.claude/
+AGENT.md
+AGENTS.md
+agent-notes/
+.agent/
+.agents/
+.codex/
+CLAUDE.md
+.claude/
+GEMINI.md
+.gemini/
+agent-*.md
+codex-*.md
 
 # local validation/audit reports
 **/VALIDATION.md

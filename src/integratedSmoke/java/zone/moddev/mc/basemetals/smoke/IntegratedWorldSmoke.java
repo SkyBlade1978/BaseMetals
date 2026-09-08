@@ -15,6 +15,8 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.GameRules;
@@ -71,6 +73,11 @@ public final class IntegratedWorldSmoke {
         if (!creativeBucketsChecked) {
             verifyCreativeBuckets(minecraft);
             creativeBucketsChecked = true;
+        }
+        if (!creationStarted && elapsedTicks % 200 == 0) {
+            BaseMetals.LOGGER.info("BASEMETALS_INTEGRATED_SMOKE waiting for title screen current={} overlay={}",
+                    minecraft.screen == null ? "none" : minecraft.screen.getClass().getName(),
+                    minecraft.getOverlay() == null ? "none" : minecraft.getOverlay().getClass().getName());
         }
         if (!creationStarted && minecraft.screen instanceof TitleScreen) {
             creationStarted = true;
@@ -213,14 +220,14 @@ public final class IntegratedWorldSmoke {
         level.getServer().execute(() -> {
             MaterialProjectile arrow = new MaterialProjectile(ModEntities.CUSTOM_ARROW.get(), level, player,
                     ModContent.item("starsteel_arrow").get().getDefaultInstance());
-            arrow.setNoGravity(true);
-            arrow.setDeltaMovement(0.0D, 0.0D, 0.0D);
+            ((Entity) arrow).setNoGravity(true);
+            ((Entity) arrow).setDeltaMovement(0.0D, 0.0D, 0.0D);
             level.addFreshEntity(arrow);
 
             MaterialProjectile bolt = new MaterialProjectile(ModEntities.CUSTOM_BOLT.get(), level, player,
                     ModContent.item("tin_bolt").get().getDefaultInstance());
-            bolt.setNoGravity(true);
-            bolt.setDeltaMovement(0.0D, 0.0D, 0.0D);
+            ((Entity) bolt).setNoGravity(true);
+            ((Entity) bolt).setDeltaMovement(0.0D, 0.0D, 0.0D);
             level.addFreshEntity(bolt);
         });
     }
@@ -229,11 +236,11 @@ public final class IntegratedWorldSmoke {
         var projectiles = minecraft.level.getEntitiesOfClass(MaterialProjectile.class,
                 minecraft.player.getBoundingBox().inflate(16.0D));
         boolean arrow = projectiles.stream().anyMatch(projectile ->
-                projectile.getType() == ModEntities.CUSTOM_ARROW.get()
-                        && projectile.getItem().is(ModContent.item("starsteel_arrow").get()));
+                ((Entity) projectile).getType() == ModEntities.CUSTOM_ARROW.get()
+                        && ((ItemSupplier) projectile).getItem().is(ModContent.item("starsteel_arrow").get()));
         boolean bolt = projectiles.stream().anyMatch(projectile ->
-                projectile.getType() == ModEntities.CUSTOM_BOLT.get()
-                        && projectile.getItem().is(ModContent.item("tin_bolt").get()));
+                ((Entity) projectile).getType() == ModEntities.CUSTOM_BOLT.get()
+                        && ((ItemSupplier) projectile).getItem().is(ModContent.item("tin_bolt").get()));
         if (arrow && bolt) {
             BaseMetals.LOGGER.info(
                     "BASEMETALS_INTEGRATED_SMOKE projectile ammunition sync PASS");
