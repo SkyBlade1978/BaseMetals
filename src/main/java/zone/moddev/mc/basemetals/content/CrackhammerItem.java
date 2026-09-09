@@ -1,115 +1,121 @@
 package zone.moddev.mc.basemetals.content;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import javax.annotation.Nullable;
+
+import zone.moddev.mc.basemetals.ModTags;
 import zone.moddev.mc.basemetals.material.MaterialDefinition;
 import zone.moddev.mc.basemetals.recipe.CrushingRecipe;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DiggerItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
-public final class CrackhammerItem extends DiggerItem implements MaterialBacked {
+public final class CrackhammerItem extends ItemTool implements MaterialBacked {
     private final MaterialDefinition material;
 
-    public CrackhammerItem(MaterialDefinition material, Properties properties) {
-        super(5.0F + material.baseAttackDamage(), -3.5F, new MaterialTier(material),
-                BlockTags.MINEABLE_WITH_PICKAXE,
-                properties.durability(material.crackhammerDurability()));
+    public CrackhammerItem(MaterialDefinition material, Item.Properties properties) {
+        super(material.crackhammerAttackDamage() - material.baseAttackDamage(), -3.5F,
+                new MaterialTier(material), Collections.<Block>emptySet(),
+                properties.defaultMaxDamage(material.crackhammerDurability())
+                        .addToolType(ToolType.PICKAXE, material.toolLevel()));
         this.material = material;
     }
 
     @Override public MaterialDefinition baseMetalsMaterial() { return material; }
 
-    @Override
-    public float getDestroySpeed(ItemStack stack, BlockState state) {
-        return state.is(zone.moddev.mc.basemetals.ModTags.CRACKHAMMER_CRUSHABLE)
-                && canHarvest(stack, state)
-                ? material.crackhammerDestroySpeed()
-                : 1.0F;
+    @Override public float getDestroySpeed(ItemStack stack, IBlockState state) {
+        return state.isIn(ModTags.CRACKHAMMER_CRUSHABLE) && canHarvestBlock(state)
+                ? material.crackhammerDestroySpeed() : 1.0F;
     }
 
-    @Override
-    public boolean canPerformAction(ItemStack stack, ToolAction action) {
-        return ToolActions.DEFAULT_PICKAXE_ACTIONS.contains(action);
+    @Override public boolean canHarvestBlock(IBlockState state) {
+        if (state.getHarvestTool() == ToolType.PICKAXE) return material.toolLevel() >= state.getHarvestLevel();
+        Material blockMaterial = state.getMaterial();
+        return blockMaterial == Material.ROCK || blockMaterial == Material.IRON
+                || blockMaterial == Material.ANVIL;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level,
-            List<net.minecraft.network.chat.Component> tooltip,
-            net.minecraft.world.item.TooltipFlag flag) {
-        MaterialItems.addToolTooltip(material, tooltip);
-    }
+    @Override public void addInformation(ItemStack stack, @Nullable World world,
+            List<ITextComponent> tooltip, ITooltipFlag flag) { MaterialItems.addToolTooltip(material, tooltip); }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
-        if (context.getClickedFace() != Direction.UP || context.getLevel().isClientSide
-                || context.getPlayer() == null) {
-            return InteractionResult.PASS;
-        }
-        AABB area = new AABB(context.getClickedPos().above());
-        List<ItemEntity> entities = context.getLevel().getEntitiesOfClass(ItemEntity.class, area,
-                entity -> entity.isAlive() && !entity.getItem().isEmpty());
-        for (ItemEntity entity : entities) {
+    public EnumActionResult onItemUse(ItemUseContext context) {
+        World world = context.getWorld();
+        EntityPlayer player = context.getPlayer();
+        if (context.getFace() != EnumFacing.UP || world.isRemote || player == null) return EnumActionResult.PASS;
+
+        AxisAlignedBB area = new AxisAlignedBB(context.getPos().up());
+        List<EntityItem> entities = world.getEntitiesWithinAABB(EntityItem.class, area);
+        for (EntityItem entity : entities) {
             ItemStack input = entity.getItem();
-            Optional<CrushingRecipe> recipe = context.getLevel().getRecipeManager().getRecipeFor(
-                    CrushingRecipe.TYPE.get(), new SimpleContainer(input), context.getLevel());
-            if (recipe.isEmpty() || !canCrushDroppedBlock(context.getItemInHand(), input)) continue;
-            // Sneaking is the per-use full-stack control; ordinary use crushes
-            // one item and never changes a persistent config contract.
-            int requested = context.getPlayer().isShiftKeyDown() ? input.getCount() : 1;
-            ItemStack hammer = context.getItemInHand();
-            int durability = hammer.isDamageableItem()
-                    ? Math.max(0, hammer.getMaxDamage() - hammer.getDamageValue())
-                    : requested;
+            CrushingRecipe recipe = findRecipe(world, input);
+            if (recipe == null || !canCrushDroppedBlock(input)) continue;
+            int requested = player.isSneaking() ? input.getCount() : 1;
+            ItemStack hammer = context.getItem();
+            int durability = hammer.isDamageable()
+                    ? Math.max(0, hammer.getMaxDamage() - hammer.getDamage()) : requested;
             int operations = Math.min(requested, durability);
-            if (operations == 0) break;
-            ItemStack output = recipe.get().getResultItem().copy();
+            if (operations <= 0) break;
+            ItemStack output = recipe.getRecipeOutput().copy();
             input.shrink(operations);
-            if (input.isEmpty()) entity.discard(); else entity.setItem(input);
-            spawnOutputs(context.getLevel(), entity, output, operations);
-            hammer.hurtAndBreak(operations, context.getPlayer(),
-                    player -> player.broadcastBreakEvent(context.getHand()));
-            context.getLevel().playSound(null, context.getClickedPos(),
-                    net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 0.5F,
-                    0.5F + (context.getLevel().random.nextFloat() * 0.3F));
-            return InteractionResult.CONSUME;
+            if (input.isEmpty()) entity.remove(); else entity.setItem(input);
+            spawnOutputs(world, entity, output, operations);
+            hammer.damageItem(operations, player);
+            world.playSound(null, context.getPos(), net.minecraft.init.SoundEvents.BLOCK_GRAVEL_BREAK,
+                    SoundCategory.BLOCKS, 0.5F, 0.5F + world.rand.nextFloat() * 0.3F);
+            return EnumActionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return EnumActionResult.PASS;
     }
 
-    private static boolean canCrushDroppedBlock(ItemStack hammer, ItemStack input) {
-        if (!(input.getItem() instanceof BlockItem blockItem)) return true;
-        return canHarvest(hammer, blockItem.getBlock().defaultBlockState());
+    @Nullable
+    private static CrushingRecipe findRecipe(World world, ItemStack input) {
+        InventoryBasic inventory = new InventoryBasic(new TextComponentString("crushing"), 1);
+        inventory.setInventorySlotContents(0, input);
+        for (net.minecraft.item.crafting.IRecipe candidate : world.getRecipeManager().getRecipes()) {
+            if (candidate instanceof CrushingRecipe && candidate.matches(inventory, world)) {
+                return (CrushingRecipe) candidate;
+            }
+        }
+        return null;
     }
 
-    private static boolean canHarvest(ItemStack hammer, BlockState state) {
-        return !state.requiresCorrectToolForDrops() || hammer.isCorrectToolForDrops(state);
+    private boolean canCrushDroppedBlock(ItemStack input) {
+        if (!(input.getItem() instanceof ItemBlock)) return true;
+        return canHarvestBlock(((ItemBlock) input.getItem()).getBlock().getDefaultState());
     }
 
-    private static void spawnOutputs(Level level, ItemEntity source, ItemStack result, int operations) {
-        int remaining = Math.multiplyExact(result.getCount(), operations);
+    private static void spawnOutputs(World world, EntityItem source, ItemStack result, int operations) {
+        int remaining = result.getCount() * operations;
         while (remaining > 0) {
             ItemStack output = result.copy();
             output.setCount(Math.min(output.getMaxStackSize(), remaining));
             remaining -= output.getCount();
-            ItemEntity crushed = new ItemEntity(level, source.getX(), source.getY(), source.getZ(), output);
-            crushed.setDefaultPickUpDelay();
-            level.addFreshEntity(crushed);
+            EntityItem crushed = new EntityItem(world, source.posX, source.posY, source.posZ, output);
+            crushed.setDefaultPickupDelay();
+            world.spawnEntity(crushed);
         }
     }
 }

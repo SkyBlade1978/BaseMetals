@@ -1,22 +1,92 @@
-name: Base Metals 1.18.2 CI
+name: Base Metals 1.13.2 CI
 
 on:
   push:
     branches:
-      - master-1.18
+      - master-1.13.2
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.18
+      - master-1.13.2
 
 permissions:
   contents: read
 
 concurrency:
-  group: basemetals-1.18-${{ github.workflow }}-${{ github.ref }}
+  group: basemetals-1.13-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  cold-forge-bootstrap:
+    name: Cold Forge bootstrap
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install pinned Java 25 ForgeGradle Mavenizer runtime
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '25.0.3+9.0.LTS'
+
+      - name: Install pinned Java 8 compilation toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '8.0.502+7'
+
+      - name: Install pinned Java 17 Gradle runtime
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17.0.1+12'
+
+      - name: Stage exact OreSpawn release dependency
+        id: orespawn
+        run: |
+          mirror="$RUNNER_TEMP/orespawn-mirror"
+          bash gradle/stage-orespawn-release.sh "$mirror"
+          echo "repository=$mirror" >> "$GITHUB_OUTPUT"
+
+      - name: Bootstrap Forge from an empty cache
+        shell: bash
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/basemetals-cold-gradle
+        run: |
+          set -euo pipefail
+          test ! -e .gradle
+          test ! -e "$GRADLE_USER_HOME"
+          mkdir -p "$GRADLE_USER_HOME"
+          chmod +x ./gradlew
+          gradle_args=(
+            classes test verifyReleaseDependencies
+            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}"
+            --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
+      - name: Verify same-cache bootstrap offline
+        shell: bash
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/basemetals-cold-gradle
+        run: |
+          set -euo pipefail
+          gradle_args=(
+            classes test verifyReleaseDependencies
+            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}"
+            --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
   build:
     name: Build, test, and audit
     runs-on: ubuntu-latest
@@ -26,7 +96,19 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install pinned Java 17 runtime and toolchain
+      - name: Install pinned Java 25 ForgeGradle Mavenizer runtime
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '25.0.3+9.0.LTS'
+
+      - name: Install pinned Java 8 compilation toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '8.0.502+7'
+
+      - name: Install pinned Java 17 Gradle runtime
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -43,94 +125,69 @@ jobs:
           echo "repository=$mirror" >> "$GITHUB_OUTPUT"
 
       - name: Build, test, and audit first candidate
+        shell: bash
         run: |
+          set -euo pipefail
           chmod +x ./gradlew
-          ./gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums \
-            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}" \
-            --no-daemon --stacktrace
+          gradle_args=(
+            clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
+            verifyEclipseProductionClasspath
+            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}"
+            --no-daemon --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
           first="$RUNNER_TEMP/basemetals-first"
           mkdir -p "$first"
-          cp build/libs/BaseMetals-3.0.1.118021.jar "$first/"
-          cp build/libs/BaseMetals-3.0.1.118021-sources.jar "$first/"
-          cp build/libs/BaseMetals-3.0.1.118021-javadoc.jar "$first/"
+          cp build/libs/BaseMetals-3.0.1.113021.jar "$first/"
+          cp build/libs/BaseMetals-3.0.1.113021-sources.jar "$first/"
+          cp build/libs/BaseMetals-3.0.1.113021-javadoc.jar "$first/"
           cp build/release/SHA256SUMS "$first/"
 
       - name: Rebuild and prove byte-identical archives
+        shell: bash
         run: |
-          ./gradlew clean assemble verifyReleaseArtifacts writeReleaseChecksums \
-            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}" \
-            --no-daemon --stacktrace
-          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.118021.jar" build/libs/BaseMetals-3.0.1.118021.jar
-          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.118021-sources.jar" build/libs/BaseMetals-3.0.1.118021-sources.jar
-          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.118021-javadoc.jar" build/libs/BaseMetals-3.0.1.118021-javadoc.jar
+          set -euo pipefail
+          gradle_args=(
+            clean assemble verifyReleaseArtifacts writeReleaseChecksums
+            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}"
+            --no-daemon --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.113021.jar" build/libs/BaseMetals-3.0.1.113021.jar
+          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.113021-sources.jar" build/libs/BaseMetals-3.0.1.113021-sources.jar
+          cmp "$RUNNER_TEMP/basemetals-first/BaseMetals-3.0.1.113021-javadoc.jar" build/libs/BaseMetals-3.0.1.113021-javadoc.jar
           cmp "$RUNNER_TEMP/basemetals-first/SHA256SUMS" build/release/SHA256SUMS
 
-      - name: Run all required GameTests
-        run: >-
-          timeout 15m ./gradlew runGameTestServer
-          -PorespawnVerificationRepository=${{ steps.orespawn.outputs.repository }}
-          --no-daemon --stacktrace
-
-      - name: Install official Forge packaged runtimes
-        id: forge-runtimes
+      - name: Run exact-OreSpawn dedicated-server probe
+        shell: bash
         run: |
-          server_runtime="$RUNNER_TEMP/forge-1.18.2-40.3.0-server"
-          client_runtime="$RUNNER_TEMP/forge-1.18.2-40.3.0-client"
-          installer="$RUNNER_TEMP/forge-1.18.2-40.3.0-installer.jar"
-          mkdir -p "$server_runtime" "$client_runtime"
-          curl --fail --location --retry 3 \
-            --output "$installer" \
-            https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.3.0/forge-1.18.2-40.3.0-installer.jar
-          echo "9434c29790504dcd11ce97cb30dd8891b4b18848982357bc1b5abfa79fb95103  $installer" | sha256sum --check --strict
-          (
-            cd "$server_runtime"
-            java -jar "$installer" --installServer
+          set -euo pipefail
+          gradle_args=(
+            runRuntimeProbeServer
+            -PorespawnVerificationRepository="${{ steps.orespawn.outputs.repository }}"
+            --no-daemon --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
           )
-          python3 gradle/prepare-forge-client-runtime.py \
-            --installer "$installer" \
-            --runtime "$client_runtime" \
-            --java "$JAVA_HOME/bin/java"
-          echo "server_runtime=$server_runtime" >> "$GITHUB_OUTPUT"
-          echo "client_runtime=$client_runtime" >> "$GITHUB_OUTPUT"
-
-      - name: Run exact packaged dedicated-server smoke
-        run: >-
-          timeout 15m ./gradlew packagedServerStartupSmoke
-          -PpackagedForgeServerRuntime=${{ steps.forge-runtimes.outputs.server_runtime }}
-          -PorespawnVerificationRepository=${{ steps.orespawn.outputs.repository }}
-          --no-daemon --stacktrace
-
-      - name: Run exact packaged integrated-world client smoke
-        run: >-
-          timeout 15m xvfb-run -a ./gradlew packagedClientStartupSmoke
-          -PpackagedForgeClientRuntime=${{ steps.forge-runtimes.outputs.client_runtime }}
-          -PorespawnVerificationRepository=${{ steps.orespawn.outputs.repository }}
-          --no-daemon --stacktrace
-
-      - name: Run bounded development integrated-world client smoke
-        run: >-
-          timeout 15m xvfb-run -a ./gradlew runClient
-          -PintegratedWorldSmoke=true
-          -PintegratedWorldSmokeName=basemetals-ci-${{ github.run_id }}
-          -PorespawnVerificationRepository=${{ steps.orespawn.outputs.repository }}
-          --no-daemon --stacktrace
-
-      - name: Generate and audit Eclipse production launches
-        run: >-
-          ./gradlew genEclipseRuns eclipse isolateEclipseProductionRuns verifyEclipseProductionClasspath
-          -PorespawnVerificationRepository=${{ steps.orespawn.outputs.repository }}
-          --no-daemon --stacktrace
+          timeout 15m ./gradlew "${gradle_args[@]}"
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: BaseMetals-1.18.2-${{ github.sha }}
+          name: BaseMetals-1.13.2-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/BaseMetals-3.0.1.118021.jar
-            build/libs/BaseMetals-3.0.1.118021-sources.jar
-            build/libs/BaseMetals-3.0.1.118021-javadoc.jar
+            build/libs/BaseMetals-3.0.1.113021.jar
+            build/libs/BaseMetals-3.0.1.113021-sources.jar
+            build/libs/BaseMetals-3.0.1.113021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.txt
 
@@ -138,17 +195,12 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: BaseMetals-1.18.2-diagnostics-${{ github.sha }}
+          name: BaseMetals-1.13.2-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |
             build/test-results/**
             build/reports/**
-            run/logs/**
-            run/crash-reports/**
-            run-data/logs/**
+            build/integration-test-run/logs/**
+            build/integration-test-run/crash-reports/**
             build/problems/**
-            build/packaged-server-run/logs/**
-            build/packaged-server-run/crash-reports/**
-            build/packaged-client-run/logs/**
-            build/packaged-client-run/crash-reports/**

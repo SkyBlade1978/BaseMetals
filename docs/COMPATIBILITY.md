@@ -1,32 +1,21 @@
-# Optional compatibility
+# Compatibility
 
-Base Metals' permanent public contract is data-driven. Recipes consume Forge
-tags for ingots, nuggets, ores, storage blocks, dusts, small dusts, blends,
-plates, rods, gears, casings, dense plates, crushed and purified ores, crystals,
-shards, clumps, dirty dusts, and molten fluids.
+Base Metals' permanent public compatibility contract is data-driven. Recipes
+consume Forge tags for ingots, nuggets, ores, storage blocks, dusts, small
+dusts, blends, plates, rods, gears, casings, dense plates, crushed and purified
+ores, crystals, shards, clumps, dirty dusts, and molten fluids.
 
 Adamantite, Adamantium, Adamant, Quicksilver, and steel-sprocket names are
 forwarding tags. Copper-consuming recipes accept `forge:ingots/copper`, except
-Base Metals' own compacting and decompacting recipes, whose unambiguous output
-must remain the Base Metals item. Copper ore and storage tags contain both
-vanilla and Base Metals entries; Base Metals copper ore smelts to the Base
-Metals ingot.
+Base Metals' own compacting and decompacting recipes, whose output must remain
+the Base Metals item. On Minecraft 1.13.2 the copper ore, ingot, and storage
+tags contain Base Metals entries; other mods can add their equivalents through
+normal tag merging.
 
-Conditional resources are included for:
+This target deliberately has no direct Mekanism, Thermal Expansion, Tinkers'
+Construct, Ender IO, IC2, Thaumcraft, Dense Ores, VeinMiner, or Constructs
+Armory plugin. Their version-specific 1.18 data and APIs are not valid on Forge
+25. Generic processors and tools can interoperate through Forge tags.
 
-- Mekanism 10.2: dirty and clean slurries plus the complete ore-processing
-  sequence for Adamantine, Antimony, Bismuth, Cold Iron, Nickel, Platinum,
-  Starsteel, and Zinc. The slurry objects are registered only when Mekanism is
-  loaded and use its public API.
-- Thermal Expansion 9: pulverizer, furnace, crucible, press, and induction
-  smelter recipes.
-- Tinkers' Construct 3.7: common tags, melting, casting, alloying, and
-  data-defined material stats. No removed foreign traits are reimplemented.
-- Ender IO 6 alpha: SAG Mill and Alloy Smelter recipes.
-
-IC2, Thaumcraft, Dense Ores, VeinMiner, and Constructs Armory do not have direct
-1.18 integrations. Their generic tools and ore processors can still interoperate
-through Forge tags.
-
-Mineralogy is entirely optional. Base Metals never links to its Java classes;
-OreSpawn's rock-family host matching is the only integration point.
+Mineralogy is entirely optional. Base Metals does not link to Mineralogy Java
+classes; OreSpawn's rock-family host matching is the only integration point.

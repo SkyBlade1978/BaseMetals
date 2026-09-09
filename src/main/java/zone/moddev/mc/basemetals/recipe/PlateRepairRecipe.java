@@ -1,28 +1,26 @@
 package zone.moddev.mc.basemetals.recipe;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
+import zone.moddev.mc.basemetals.BaseMetals;
+
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeHidden;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.JsonUtils;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
-/**
- * One tagged plate fully repairs one damaged armor piece or shield. As in the
- * 1.12 recipe, enchantments survive but unrelated NBT and damage do not.
- */
-public final class PlateRepairRecipe extends CustomRecipe {
+public final class PlateRepairRecipe extends IRecipeHidden {
     private final Item target;
     private final Ingredient plate;
 
@@ -32,83 +30,56 @@ public final class PlateRepairRecipe extends CustomRecipe {
         this.plate = plate;
     }
 
-    @Override
-    public boolean matches(CraftingContainer container, Level level) {
+    @Override public boolean matches(IInventory inventory, World world) {
         ItemStack foundTarget = ItemStack.EMPTY;
         boolean foundPlate = false;
-        for (int slot = 0; slot < container.getContainerSize(); slot++) {
-            ItemStack stack = container.getItem(slot);
+        for (int slot = 0; slot < inventory.getSizeInventory(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
             if (stack.isEmpty()) continue;
-            if (stack.is(target) && stack.isDamaged() && foundTarget.isEmpty()) {
-                foundTarget = stack;
-            } else if (plate.test(stack) && !foundPlate) {
-                foundPlate = true;
-            } else {
-                return false;
-            }
+            if (stack.getItem() == target && stack.isDamaged() && foundTarget.isEmpty()) foundTarget = stack;
+            else if (plate.test(stack) && !foundPlate) foundPlate = true;
+            else return false;
         }
         return !foundTarget.isEmpty() && foundPlate;
     }
-
-    @Override
-    public ItemStack assemble(CraftingContainer container) {
-        for (int slot = 0; slot < container.getContainerSize(); slot++) {
-            ItemStack stack = container.getItem(slot);
-            if (stack.is(target) && stack.isDamaged()) {
-                ItemStack repaired = target.getDefaultInstance();
+    @Override public ItemStack getCraftingResult(IInventory inventory) {
+        for (int slot = 0; slot < inventory.getSizeInventory(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
+            if (stack.getItem() == target && stack.isDamaged()) {
+                ItemStack repaired = new ItemStack(target);
                 EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(stack), repaired);
                 return repaired;
             }
         }
         return ItemStack.EMPTY;
     }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
+    @Override public boolean canFit(int width, int height) { return width * height >= 2; }
+    @Override public ItemStack getRecipeOutput() { return new ItemStack(target); }
+    @Override public NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> ingredients = NonNullList.create();
+        ingredients.add(Ingredient.fromItems(target));
+        ingredients.add(plate);
+        return ingredients;
     }
+    @Override public IRecipeSerializer<?> getSerializer() { return CrushingRecipe.PLATE_REPAIR_SERIALIZER; }
 
-    @Override
-    public ItemStack getResultItem() {
-        return target.getDefaultInstance();
-    }
-
-    @Override
-    public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.of(Ingredient.EMPTY, Ingredient.of(target), plate);
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return CrushingRecipe.PLATE_REPAIR_SERIALIZER.get();
-    }
-
-    public static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<PlateRepairRecipe> {
-        @Override
-        public PlateRepairRecipe fromJson(ResourceLocation id, JsonObject json) {
-            ResourceLocation targetId = new ResourceLocation(GsonHelper.getAsString(json, "target"));
+    public static final class Serializer implements IRecipeSerializer<PlateRepairRecipe> {
+        private final ResourceLocation name = new ResourceLocation(BaseMetals.MOD_ID, "plate_repair");
+        @Override public PlateRepairRecipe read(ResourceLocation id, JsonObject json) {
+            ResourceLocation targetId = new ResourceLocation(JsonUtils.getString(json, "target"));
             Item target = ForgeRegistries.ITEMS.getValue(targetId);
-            if (target == null || target == Items.AIR) {
-                throw new com.google.gson.JsonSyntaxException("Unknown plate-repair target " + targetId);
-            }
-            return new PlateRepairRecipe(id, target,
-                    Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "plate")));
+            if (target == null || target == Items.AIR) throw new JsonSyntaxException("Unknown target " + targetId);
+            return new PlateRepairRecipe(id, target, Ingredient.fromJson(JsonUtils.getJsonObject(json, "plate")));
         }
-
-        @Override
-        public PlateRepairRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
+        @Override public PlateRepairRecipe read(ResourceLocation id, PacketBuffer buffer) {
             Item target = ForgeRegistries.ITEMS.getValue(buffer.readResourceLocation());
-            if (target == null || target == Items.AIR) {
-                throw new IllegalStateException("Missing plate-repair target");
-            }
-            return new PlateRepairRecipe(id, target, Ingredient.fromNetwork(buffer));
+            if (target == null || target == Items.AIR) throw new IllegalStateException("Missing target");
+            return new PlateRepairRecipe(id, target, Ingredient.fromBuffer(buffer));
         }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, PlateRepairRecipe recipe) {
+        @Override public void write(PacketBuffer buffer, PlateRepairRecipe recipe) {
             buffer.writeResourceLocation(recipe.target.getRegistryName());
-            recipe.plate.toNetwork(buffer);
+            recipe.plate.writeToBuffer(buffer);
         }
+        @Override public ResourceLocation getName() { return name; }
     }
 }

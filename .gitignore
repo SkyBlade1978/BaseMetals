@@ -65,18 +65,23 @@ __pycache__/
 /bugreport.md
 
 # machine-specific agent context (public project notes belong under /docs)
-AGENT.md
-AGENTS.md
-agent-notes/
+[Aa][Gg][Ee][Nn][Tt].md
+[Aa][Gg][Ee][Nn][Tt][Ss].md
+[Aa][Gg][Ee][Nn][Tt]-notes/
 .agent/
 .agents/
 .codex/
-CLAUDE.md
+[Cc][Ll][Aa][Uu][Dd][Ee].md
 .claude/
-GEMINI.md
+[Gg][Ee][Mm][Ii][Nn][Ii].md
 .gemini/
-agent-*.md
-codex-*.md
+[Cc][Uu][Rr][Ss][Oo][Rr].md
+.cursor/
+[Jj][Uu][Nn][Ii][Ee].md
+.junie/
+[Cc][Oo][Pp][Ii][Ll][Oo][Tt]-[Ii][Nn][Ss][Tt][Rr][Uu][Cc][Tt][Ii][Oo][Nn][Ss].md
+[Aa][Gg][Ee][Nn][Tt]-*.md
+[Cc][Oo][Dd][Ee][Xx]-*.md
 
 # local validation/audit reports
 **/VALIDATION.md

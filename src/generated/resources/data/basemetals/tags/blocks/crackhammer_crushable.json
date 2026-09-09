@@ -43,7 +43,6 @@
     "#forge:ores/lapis",
     "#forge:ores/redstone",
     "#forge:ores/quartz",
-    "#forge:ores/netherite_scrap",
     "#forge:storage_blocks/coal",
     "#forge:storage_blocks/charcoal",
     "#forge:storage_blocks/diamond",
@@ -54,7 +53,6 @@
     "#forge:storage_blocks/redstone",
     "#forge:stone",
     "#forge:cobblestone",
-    "#forge:gravel",
     "minecraft:stone_bricks",
     "minecraft:stone_slab",
     "minecraft:stone_brick_slab",
@@ -76,6 +74,7 @@
     "minecraft:prismarine_bricks",
     "minecraft:dark_prismarine",
     "minecraft:sea_lantern",
-    "minecraft:slime_block"
+    "minecraft:slime_block",
+    "minecraft:gravel"
   ]
 }

@@ -10,7 +10,16 @@
     },
     {
       "when": {
-        "east": "low"
+        "north": "true"
+      },
+      "apply": {
+        "model": "basemetals:block/adamantine_wall_side",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "true"
       },
       "apply": {
         "model": "basemetals:block/adamantine_wall_side",
@@ -20,35 +29,7 @@
     },
     {
       "when": {
-        "east": "tall"
-      },
-      "apply": {
-        "model": "basemetals:block/adamantine_wall_side_tall",
-        "y": 90,
-        "uvlock": true
-      }
-    },
-    {
-      "when": {
-        "north": "low"
-      },
-      "apply": {
-        "model": "basemetals:block/adamantine_wall_side",
-        "uvlock": true
-      }
-    },
-    {
-      "when": {
-        "north": "tall"
-      },
-      "apply": {
-        "model": "basemetals:block/adamantine_wall_side_tall",
-        "uvlock": true
-      }
-    },
-    {
-      "when": {
-        "south": "low"
+        "south": "true"
       },
       "apply": {
         "model": "basemetals:block/adamantine_wall_side",
@@ -58,30 +39,10 @@
     },
     {
       "when": {
-        "south": "tall"
-      },
-      "apply": {
-        "model": "basemetals:block/adamantine_wall_side_tall",
-        "y": 180,
-        "uvlock": true
-      }
-    },
-    {
-      "when": {
-        "west": "low"
+        "west": "true"
       },
       "apply": {
         "model": "basemetals:block/adamantine_wall_side",
-        "y": 270,
-        "uvlock": true
-      }
-    },
-    {
-      "when": {
-        "west": "tall"
-      },
-      "apply": {
-        "model": "basemetals:block/adamantine_wall_side_tall",
         "y": 270,
         "uvlock": true
       }

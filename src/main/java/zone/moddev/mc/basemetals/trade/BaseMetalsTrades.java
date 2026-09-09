@@ -1,108 +1,74 @@
 package zone.moddev.mc.basemetals.trade;
 
-import java.util.List;
-
 import zone.moddev.mc.basemetals.config.BaseMetalsConfig;
 import zone.moddev.mc.basemetals.content.ModContent;
 import zone.moddev.mc.basemetals.material.MaterialCatalogue;
 import zone.moddev.mc.basemetals.material.MaterialDefinition;
 
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraftforge.event.village.VillagerTradesEvent;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerCareer;
+import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
+import net.minecraftforge.registries.ForgeRegistries;
 
+/** Adds the historical smith careers' Base Metals offers after item registration. */
 public final class BaseMetalsTrades {
+    private static boolean registered;
     private BaseMetalsTrades() {}
 
-    public static void add(VillagerTradesEvent event) {
-        if (!BaseMetalsConfig.VILLAGER_TRADES.get()) return;
-        if (event.getType() != VillagerProfession.ARMORER
-                && event.getType() != VillagerProfession.TOOLSMITH
-                && event.getType() != VillagerProfession.WEAPONSMITH) return;
+    public static synchronized void register() {
+        if (registered) return;
+        VillagerProfession smith = ForgeRegistries.VILLAGER_PROFESSIONS.getValue(
+                new ResourceLocation("minecraft", "smith"));
+        if (smith == null) return;
+        VillagerCareer armor = smith.getCareer(1);
+        VillagerCareer weapons = smith.getCareer(2);
+        VillagerCareer tools = smith.getCareer(3);
+
+        armor.addTrade(1, selling(ModContent.item("coal_powder").get(), 10, 1),
+                selling(ModContent.item("charcoal_powder").get(), 10, 1));
+        weapons.addTrade(1, selling(ModContent.item("coal_powder").get(), 10, 1),
+                selling(ModContent.item("charcoal_powder").get(), 10, 1));
+        tools.addTrade(1, selling(ModContent.item("coal_powder").get(), 10, 1),
+                selling(ModContent.item("charcoal_powder").get(), 10, 1));
+
         for (MaterialDefinition material : MaterialCatalogue.ALL) {
             if (material.kind() == MaterialDefinition.Kind.RARE_ORE
                     || material.kind() == MaterialDefinition.Kind.RARE_ALLOY) continue;
             int value = (int) (material.hardness() + material.strength() + material.magic() + material.toolLevel());
-            int emeraldCost = Math.max(1, (int) (0.2F * value));
+            int cost = Math.max(1, (int) (0.2F * value));
             int level = Math.max(1, Math.min(4, (int) (0.1F * value)));
-            Item ingot = ModContent.item(material.name() + "_ingot").get();
-            event.getTrades().get(level).add(selling(ingot, 12, emeraldCost));
+            EntityVillager.ITradeList ingot = selling(ModContent.item(material.name() + "_ingot").get(), 12, cost);
+            armor.addTrade(level, ingot);
+            weapons.addTrade(level, ingot);
+            tools.addTrade(level, ingot);
             if (!material.hasEquipment()) continue;
-            if (event.getType() == VillagerProfession.ARMORER) {
-                addSales(event, level, emeraldCost + (int) (material.hardness() / 2.0D),
-                        material, "helmet", "chestplate", "leggings", "boots");
-            } else if (event.getType() == VillagerProfession.TOOLSMITH) {
-                addSales(event, level, emeraldCost, material, "pickaxe", "axe", "shovel", "hoe", "crackhammer");
-            } else if (event.getType() == VillagerProfession.WEAPONSMITH) {
-                addSales(event, level,
-                        emeraldCost + ((int) (material.baseAttackDamage() / 2.0F)) - 1,
-                        material, "sword");
-                addSales(event, level, emeraldCost, material, "bow", "crossbow");
-            }
-            if (material.magic() > 5.0D) {
-                addEnchantedSales(event, level, emeraldCost, material);
-            }
+            addSales(armor, level, cost + (int) (material.hardness() / 2.0D), material,
+                    "helmet", "chestplate", "leggings", "boots");
+            addSales(tools, level, cost, material, "pickaxe", "axe", "shovel", "hoe", "crackhammer");
+            addSales(weapons, level, cost, material, "sword", "bow", "crossbow");
         }
-        if (event.getType() == VillagerProfession.ARMORER || event.getType() == VillagerProfession.TOOLSMITH
-                || event.getType() == VillagerProfession.WEAPONSMITH) {
-            event.getTrades().get(1).add(selling(ModContent.item("coal_powder").get(), 10, 1));
-            event.getTrades().get(1).add(selling(ModContent.item("charcoal_powder").get(), 10, 1));
-        }
+        registered = true;
     }
 
-    private static void addSales(VillagerTradesEvent event, int level, int cost,
+    private static void addSales(VillagerCareer career, int level, int cost,
             MaterialDefinition material, String... forms) {
         for (String form : forms) {
-            Item item = ModContent.item(material.name() + "_" + form).get();
-            event.getTrades().get(level).add(selling(item, cost));
+            career.addTrade(level, selling(ModContent.item(material.name() + "_" + form).get(), 1, cost));
         }
     }
 
-    private static void addEnchantedSales(VillagerTradesEvent event, int level, int cost,
-            MaterialDefinition material) {
-        int advanced = Math.min(5, level + 1);
-        if (event.getType() == VillagerProfession.ARMORER) {
-            int armorCost = cost + 7 + (int) (material.hardness() / 2.0D);
-            for (String form : List.of("helmet", "chestplate", "leggings", "boots")) {
-                event.getTrades().get(advanced).add(enchanted(
-                        ModContent.item(material.name() + "_" + form).get(), armorCost));
+    private static EntityVillager.ITradeList selling(final Item item, final int count, final int emeralds) {
+        return (merchant, recipes, random) -> {
+            if (BaseMetalsConfig.VILLAGER_TRADES.get()) {
+                recipes.add(new MerchantRecipe(
+                        new ItemStack(Items.EMERALD, Math.max(1, emeralds)),
+                        new ItemStack(item, count)));
             }
-        } else if (event.getType() == VillagerProfession.WEAPONSMITH) {
-            int weaponCost = cost + 6 + Math.max(0, (int) (material.baseAttackDamage() / 2.0F));
-            for (String form : List.of("sword", "crossbow", "bow")) {
-                event.getTrades().get(advanced).add(enchanted(
-                        ModContent.item(material.name() + "_" + form).get(), weaponCost));
-            }
-        } else if (event.getType() == VillagerProfession.TOOLSMITH) {
-            for (String form : List.of("axe", "hoe", "shovel", "pickaxe")) {
-                event.getTrades().get(advanced).add(enchanted(
-                        ModContent.item(material.name() + "_" + form).get(), cost + 7));
-            }
-            event.getTrades().get(Math.min(5, level + 2)).add(enchanted(
-                    ModContent.item(material.name() + "_crackhammer").get(), cost + 7));
-        }
-    }
-
-    private static ItemListing selling(Item item, int emeralds) {
-        return selling(item, 1, emeralds);
-    }
-
-    private static ItemListing selling(Item item, int count, int emeralds) {
-        return (trader, random) -> new MerchantOffer(new ItemStack(Items.EMERALD, Math.max(1, emeralds)),
-                new ItemStack(item, count), 6, 5, 0.2F);
-    }
-
-    private static ItemListing enchanted(Item item, int baseCost) {
-        return (trader, random) -> {
-            int enchantmentLevel = 5 + random.nextInt(15);
-            ItemStack result = EnchantmentHelper.enchantItem(random, new ItemStack(item), enchantmentLevel, false);
-            return new MerchantOffer(new ItemStack(Items.EMERALD, Math.min(64, baseCost + enchantmentLevel)),
-                    result, 3, 15, 0.2F);
         };
     }
 }

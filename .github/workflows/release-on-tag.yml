@@ -1,4 +1,4 @@
-name: Validate Base Metals release tag
+name: Start Base Metals release from tag
 
 on:
   push:

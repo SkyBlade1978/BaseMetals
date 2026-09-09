@@ -1,0 +1,275 @@
+/*
+ * Deterministic compatibility pass over the catalogue-generated 1.18 data.
+ * Minecraft 1.13 predates blast furnaces, block loot tables, global loot
+ * modifiers, tall wall sides, and the optional integrations shipped by the
+ * 1.18 branch. Keep this conversion mechanical and idempotent.
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const root = path.resolve(__dirname, '..');
+const generated = path.join(root, 'src', 'generated', 'resources');
+const main = path.join(root, 'src', 'main', 'resources');
+
+function inside(base, target) {
+  const relative = path.relative(base, target);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error(`Refusing to modify path outside ${base}: ${target}`);
+  }
+  return target;
+}
+
+function remove(relative) {
+  const target = inside(root, path.join(root, relative));
+  fs.rmSync(target, { recursive: true, force: true });
+}
+
+function writeJson(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(value, null, 2) + '\n', 'utf8');
+}
+
+function writeBase64(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, Buffer.from(value, 'base64'));
+}
+
+function filesUnder(directory, suffix) {
+  if (!fs.existsSync(directory)) return [];
+  const result = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const child = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...filesUnder(child, suffix));
+    else if (!suffix || entry.name.endsWith(suffix)) result.push(child);
+  }
+  return result.sort();
+}
+
+for (const relative of [
+  'src/generated/resources/data/mekanism',
+  'src/generated/resources/data/thermal',
+  'src/generated/resources/data/tconstruct',
+  'src/generated/resources/data/enderio',
+  'src/generated/resources/data/basemetals/mekanism',
+  'src/generated/resources/data/basemetals/thermal',
+  'src/generated/resources/data/basemetals/tinkering',
+  'src/generated/resources/data/basemetals/enderio',
+  'src/generated/resources/data/basemetals/recipes/compat',
+  'src/generated/resources/data/basemetals/loot_modifiers',
+  'src/generated/resources/data/forge/loot_modifiers',
+  'src/generated/resources/data/basemetals/loot_tables/blocks',
+  'src/generated/resources/data/minecraft/tags/blocks/mineable',
+  'src/generated/resources/data/minecraft/tags/blocks/needs_stone_tool.json',
+  'src/generated/resources/data/minecraft/tags/blocks/needs_iron_tool.json',
+  'src/generated/resources/data/minecraft/tags/blocks/needs_diamond_tool.json',
+  'src/generated/resources/data/minecraft/tags/blocks/beacon_base_blocks.json'
+]) remove(relative);
+
+// ContainerRepair only applies anvil wear to blocks in minecraft:anvil. The
+// compatibility coremod teaches BlockAnvil.damage how to advance these three
+// retained single-ID damage-state anvils.
+writeJson(path.join(generated, 'data', 'minecraft', 'tags', 'blocks', 'anvil.json'), {
+  replace: false,
+  values: [
+    'basemetals:stone_anvil',
+    'basemetals:steel_anvil',
+    'basemetals:adamantine_anvil'
+  ]
+});
+
+for (const file of filesUnder(path.join(generated, 'data', 'basemetals', 'recipes'), '.json')) {
+  const recipe = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (recipe.type === 'minecraft:blasting' || path.basename(file) === 'ancient_debris_crushing.json') {
+    fs.rmSync(file);
+  }
+}
+
+const manifestFile = path.join(generated, 'data', 'basemetals', 'registry_manifest.json');
+const manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
+manifest.source = 'Base Metals 1.13.2 catalogue';
+manifest.loot_modifier_serializers = [];
+manifest.new_loot_modifier_serializers = [];
+writeJson(manifestFile, manifest);
+
+// Forge 25's transitional forge:bucket model loader never completed fluid
+// lookup or resource injection, so it renders these buckets with missing
+// textures. Use the vanilla generated-item pipeline with a tintable fluid
+// mask instead. ClientSetup supplies the catalogue colour for layer 1.
+for (const bucket of manifest.new_items) {
+  const id = bucket.substring(bucket.indexOf(':') + 1);
+  writeJson(path.join(generated, 'assets', 'basemetals', 'models', 'item', `${id}.json`), {
+    parent: 'item/generated',
+    textures: {
+      layer0: 'minecraft:item/bucket',
+      layer1: 'basemetals:item/bucket_fluid',
+      layer2: 'basemetals:item/bucket_overlay'
+    }
+  });
+}
+writeBase64(path.join(generated, 'assets', 'basemetals', 'textures', 'item', 'bucket_fluid.png'),
+  'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVDhPY2AYnuA/DoCuDgOga8AF0PWhAHTF6ABdPU5AtkZcgGSD0BWj80kGFBtAMRh4FwxeAAB9Pod56G8eMAAAAABJRU5ErkJggg==');
+
+// Vanilla copper and the modern Nether/Caves & Cliffs plants do not exist in
+// 1.13.2. Keep Base Metals copper in the common tags and retain only plants
+// present in the target registry.
+for (const relative of [
+  'data/forge/tags/blocks/ores/copper.json',
+  'data/forge/tags/blocks/storage_blocks/copper.json',
+  'data/forge/tags/items/ingots/copper.json',
+  'data/forge/tags/items/ores/copper.json',
+  'data/forge/tags/items/storage_blocks/copper.json'
+]) {
+  const file = path.join(generated, relative);
+  const tag = JSON.parse(fs.readFileSync(file, 'utf8'));
+  tag.values = tag.values.filter(value => typeof value !== 'string' || !value.startsWith('minecraft:copper'))
+    .filter(value => value !== 'minecraft:deepslate_copper_ore');
+  writeJson(file, tag);
+}
+
+writeJson(path.join(generated, 'data', 'basemetals', 'tags', 'blocks', 'scythe_harvestable.json'), {
+  replace: false,
+  values: [
+    '#minecraft:leaves', '#minecraft:saplings',
+    'minecraft:oak_sapling', 'minecraft:spruce_sapling', 'minecraft:birch_sapling',
+    'minecraft:jungle_sapling', 'minecraft:acacia_sapling', 'minecraft:dark_oak_sapling',
+    'minecraft:oak_leaves', 'minecraft:spruce_leaves', 'minecraft:birch_leaves',
+    'minecraft:jungle_leaves', 'minecraft:acacia_leaves', 'minecraft:dark_oak_leaves',
+    'minecraft:cobweb', 'minecraft:grass', 'minecraft:fern', 'minecraft:dead_bush',
+    'minecraft:seagrass', 'minecraft:tall_seagrass', 'minecraft:dandelion',
+    'minecraft:poppy', 'minecraft:blue_orchid', 'minecraft:allium', 'minecraft:azure_bluet',
+    'minecraft:red_tulip', 'minecraft:orange_tulip', 'minecraft:white_tulip',
+    'minecraft:pink_tulip', 'minecraft:oxeye_daisy', 'minecraft:brown_mushroom',
+    'minecraft:red_mushroom', 'minecraft:wheat', 'minecraft:cactus', 'minecraft:sugar_cane',
+    'minecraft:pumpkin', 'minecraft:carved_pumpkin', 'minecraft:jack_o_lantern',
+    'minecraft:melon', 'minecraft:attached_pumpkin_stem', 'minecraft:attached_melon_stem',
+    'minecraft:pumpkin_stem', 'minecraft:melon_stem', 'minecraft:vine', 'minecraft:lily_pad',
+    'minecraft:nether_wart', 'minecraft:cocoa', 'minecraft:carrots', 'minecraft:potatoes',
+    'minecraft:sunflower', 'minecraft:lilac', 'minecraft:rose_bush', 'minecraft:peony',
+    'minecraft:tall_grass', 'minecraft:large_fern', 'minecraft:chorus_plant',
+    'minecraft:chorus_flower', 'minecraft:beetroots', 'minecraft:kelp', 'minecraft:kelp_plant',
+    'minecraft:tube_coral', 'minecraft:brain_coral', 'minecraft:bubble_coral',
+    'minecraft:fire_coral', 'minecraft:horn_coral', 'minecraft:tube_coral_fan',
+    'minecraft:brain_coral_fan', 'minecraft:bubble_coral_fan', 'minecraft:fire_coral_fan',
+    'minecraft:horn_coral_fan', 'minecraft:tube_coral_wall_fan',
+    'minecraft:brain_coral_wall_fan', 'minecraft:bubble_coral_wall_fan',
+    'minecraft:fire_coral_wall_fan', 'minecraft:horn_coral_wall_fan', 'minecraft:sea_pickle'
+  ]
+});
+
+const crushableFile = path.join(generated, 'data', 'basemetals', 'tags', 'blocks',
+  'crackhammer_crushable.json');
+const crushable = JSON.parse(fs.readFileSync(crushableFile, 'utf8'));
+crushable.values = crushable.values.filter(value =>
+  value !== '#forge:ores/netherite_scrap' && value !== '#forge:gravel');
+if (!crushable.values.includes('minecraft:gravel')) {
+  crushable.values.push('minecraft:gravel');
+}
+writeJson(crushableFile, crushable);
+
+// Forge 25 did not provide a forge:gravel item tag. Keep the historical
+// gravel-to-sand crushing recipe, but name the vanilla item directly.
+const gravelCrushingFile = path.join(generated, 'data', 'basemetals', 'recipes',
+  'gravel_crushing.json');
+const gravelCrushing = JSON.parse(fs.readFileSync(gravelCrushingFile, 'utf8'));
+gravelCrushing.ingredient = { item: 'minecraft:gravel' };
+writeJson(gravelCrushingFile, gravelCrushing);
+
+// These are the original 1.12 auxiliary tables and already use the 1.13 loot
+// grammar. They preserve the exact historical weights and enchanted-item rolls.
+const legacyChests = path.join(root, 'reference', '1.12', 'alt', 'chests');
+const targetChests = path.join(generated, 'data', 'basemetals', 'loot_tables', 'chests', 'inject');
+remove('src/generated/resources/data/basemetals/loot_tables/chests/inject');
+fs.mkdirSync(targetChests, { recursive: true });
+for (const file of filesUnder(legacyChests, '.json')) {
+  const target = path.join(targetChests, path.basename(file));
+  const table = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const tableName = path.basename(file, '.json');
+  // Forge 25 requires every loot pool to have a stable, unique name.
+  table.pools.forEach((pool, index) => {
+    pool.name = `basemetals_${tableName}_${index}`;
+  });
+  writeJson(target, table);
+}
+
+// Walls used booleans in 1.13; low/tall wall-height enums arrived later.
+for (const file of filesUnder(path.join(generated, 'assets', 'basemetals', 'blockstates'), '_wall.json')) {
+  const name = path.basename(file, '.json');
+  writeJson(file, {
+    multipart: [
+      { when: { up: 'true' }, apply: { model: `basemetals:block/${name}_post` } },
+      { when: { north: 'true' }, apply: { model: `basemetals:block/${name}_side`, uvlock: true } },
+      { when: { east: 'true' }, apply: { model: `basemetals:block/${name}_side`, y: 90, uvlock: true } },
+      { when: { south: 'true' }, apply: { model: `basemetals:block/${name}_side`, y: 180, uvlock: true } },
+      { when: { west: 'true' }, apply: { model: `basemetals:block/${name}_side`, y: 270, uvlock: true } }
+    ]
+  });
+}
+
+const common = {
+  enabled: true,
+  min_quantity: 4,
+  max_quantity: 11,
+  pattern: 'vein',
+  height_distribution: 'uniform',
+  discard_chance_on_air_exposure: 0,
+  spread: 8,
+  vertical_spread: 4,
+  node_size: 4,
+  length: 16
+};
+const rule = (minY, maxY, frequency, hosts, tags, families) => Object.assign({}, common, {
+  min_y: minY,
+  max_y: maxY,
+  frequency,
+  host_blocks: hosts || [],
+  host_tags: tags || [],
+  host_families: families || []
+});
+const ore = (name, dimensions, selectors) => ({
+  block: `basemetals:${name}_ore`,
+  enabled: true,
+  source_mod: 'basemetals',
+  retrogen: false,
+  ...(dimensions ? { dimensions } : { dimension_selectors: selectors })
+});
+const ordinaryHosts = ['minecraft:stone'];
+const ordinaryTags = ['forge:stone'];
+const ordinaryFamilies = ['sedimentary', 'metamorphic', 'igneous_intrusive', 'igneous_volcanic'];
+const ordinary = (minY, maxY, frequency) => ({
+  'orespawn:all_except_nether_end': rule(minY, maxY, frequency,
+    ordinaryHosts, ordinaryTags, ordinaryFamilies)
+});
+
+writeJson(path.join(main, 'data', 'basemetals', 'orespawn', 'provider.json'), {
+  schema_version: 3,
+  provider_modid: 'basemetals',
+  provider_revision: 1,
+  ores: {
+    'basemetals:ore/coldiron': ore('coldiron', {
+      'minecraft:the_nether': rule(0, 127, 5, ['minecraft:netherrack'], ['forge:netherrack'])
+    }),
+    'basemetals:ore/adamantine': ore('adamantine', {
+      'minecraft:the_nether': rule(0, 127, 2, ['minecraft:netherrack'], ['forge:netherrack'])
+    }),
+    'basemetals:ore/starsteel': ore('starsteel', {
+      'minecraft:the_end': rule(0, 254, 5, ['minecraft:end_stone'], ['forge:end_stones'])
+    }),
+    'basemetals:ore/copper': ore('copper', null, ordinary(0, 95, 10)),
+    'basemetals:ore/silver': ore('silver', null, ordinary(0, 31, 4)),
+    'basemetals:ore/tin': ore('tin', null, ordinary(0, 127, 10)),
+    'basemetals:ore/lead': ore('lead', null, ordinary(0, 63, 5)),
+    'basemetals:ore/zinc': ore('zinc', null, ordinary(0, 95, 5)),
+    'basemetals:ore/mercury': ore('mercury', null, ordinary(0, 31, 3)),
+    'basemetals:ore/nickel': ore('nickel', null, ordinary(32, 95, 1)),
+    'basemetals:ore/platinum': ore('platinum', null, ordinary(1, 31, 0.125))
+  },
+  rocks: {},
+  geomes: {},
+  biome_rules: {},
+  terrain_dimensions: {},
+  fluid_deposits: {}
+});
+
+console.log('Generated Minecraft 1.13.2-compatible Base Metals resources.');

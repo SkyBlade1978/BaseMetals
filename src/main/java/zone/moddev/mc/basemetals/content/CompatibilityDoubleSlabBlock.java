@@ -1,12 +1,20 @@
 package zone.moddev.mc.basemetals.content;
 
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.state.properties.SlabType;
+import net.minecraftforge.common.ToolType;
 
-/** Kept solely so 1.12 double-slab states survive registry remapping. */
-public final class CompatibilityDoubleSlabBlock extends SlabBlock {
-    public CompatibilityDoubleSlabBlock(Properties properties) {
+/** Hidden compatibility target for flattened 1.10/1.12 double-slab states. */
+public final class CompatibilityDoubleSlabBlock extends BlockSlab {
+    private final int harvestLevel;
+
+    public CompatibilityDoubleSlabBlock(Properties properties, int harvestLevel) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, false));
+        this.harvestLevel = harvestLevel;
+        setDefaultState(getDefaultState().with(TYPE, SlabType.DOUBLE).with(WATERLOGGED, Boolean.FALSE));
     }
+
+    @Override public ToolType getHarvestTool(IBlockState state) { return ToolType.PICKAXE; }
+    @Override public int getHarvestLevel(IBlockState state) { return harvestLevel; }
 }

@@ -1,13 +1,25 @@
 package zone.moddev.mc.basemetals.content;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.block.BlockFlowingFluid;
+import net.minecraft.fluid.FlowingFluid;
+import net.minecraft.item.Item;
 
-public record FluidContent(
-        RegistryObject<ForgeFlowingFluid.Source> source,
-        RegistryObject<ForgeFlowingFluid.Flowing> flowing,
-        RegistryObject<LiquidBlock> block,
-        RegistryObject<Item> bucket) {
+public final class FluidContent {
+    private final RegistryHandle<FlowingFluid> source;
+    private final RegistryHandle<FlowingFluid> flowing;
+    private final RegistryHandle<BlockFlowingFluid> block;
+    private final RegistryHandle<Item> bucket;
+
+    public FluidContent(RegistryHandle<FlowingFluid> source, RegistryHandle<FlowingFluid> flowing,
+            RegistryHandle<BlockFlowingFluid> block, RegistryHandle<Item> bucket) {
+        this.source = source;
+        this.flowing = flowing;
+        this.block = block;
+        this.bucket = bucket;
+    }
+
+    public RegistryHandle<FlowingFluid> source() { return source; }
+    public RegistryHandle<FlowingFluid> flowing() { return flowing; }
+    public RegistryHandle<BlockFlowingFluid> block() { return block; }
+    public RegistryHandle<Item> bucket() { return bucket; }
 }

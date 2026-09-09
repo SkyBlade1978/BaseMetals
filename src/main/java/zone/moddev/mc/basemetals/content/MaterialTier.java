@@ -2,35 +2,28 @@ package zone.moddev.mc.basemetals.content;
 
 import java.util.function.Supplier;
 
-import zone.moddev.mc.basemetals.BaseMetals;
 import zone.moddev.mc.basemetals.material.MaterialDefinition;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.core.Registry;
+import net.minecraft.util.ResourceLocation;
 
-public final class MaterialTier implements Tier {
+public final class MaterialTier implements IItemTier {
     private final MaterialDefinition material;
     private final Supplier<Ingredient> repair;
 
     public MaterialTier(MaterialDefinition material) {
         this.material = material;
-        TagKey<Item> tag = ItemTags.create(new ResourceLocation(material.repairIngredientTag()));
-        this.repair = () -> Ingredient.of(tag);
+        final ItemTags.Wrapper tag = new ItemTags.Wrapper(new ResourceLocation(material.repairIngredientTag()));
+        this.repair = () -> Ingredient.fromTag(tag);
     }
 
-    public MaterialDefinition material() {
-        return material;
-    }
-
-    @Override public int getUses() { return material.toolDurability(); }
-    @Override public float getSpeed() { return material.toolEfficiency(); }
-    @Override public float getAttackDamageBonus() { return material.baseAttackDamage(); }
-    @Override public int getLevel() { return material.toolLevel(); }
-    @Override public int getEnchantmentValue() { return material.enchantability(); }
-    @Override public Ingredient getRepairIngredient() { return repair.get(); }
+    public MaterialDefinition material() { return material; }
+    @Override public int getMaxUses() { return material.toolDurability(); }
+    @Override public float getEfficiency() { return material.toolEfficiency(); }
+    @Override public float getAttackDamage() { return material.baseAttackDamage(); }
+    @Override public int getHarvestLevel() { return material.toolLevel(); }
+    @Override public int getEnchantability() { return material.enchantability(); }
+    @Override public Ingredient getRepairMaterial() { return repair.get(); }
 }

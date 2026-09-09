@@ -2,67 +2,55 @@ package zone.moddev.mc.basemetals.entity;
 
 import zone.moddev.mc.basemetals.content.ModContent;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.ItemSupplier;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public final class MaterialProjectile extends AbstractArrow implements IEntityAdditionalSpawnData, ItemSupplier {
+public final class MaterialProjectile extends EntityArrow implements IEntityAdditionalSpawnData {
     private ItemStack ammunition = ItemStack.EMPTY;
 
-    public MaterialProjectile(EntityType<? extends MaterialProjectile> type, Level level) {
-        super(type, level);
+    public MaterialProjectile(EntityType<?> type, World world) {
+        super(type, world);
     }
 
-    public MaterialProjectile(EntityType<? extends MaterialProjectile> type, Level level,
-            LivingEntity shooter, ItemStack ammunition) {
-        this(type, level);
-        setOwner(shooter);
-        setPos(shooter.getX(), shooter.getEyeY() - 0.1D, shooter.getZ());
-        this.ammunition = ammunition.copy();
-        this.ammunition.setCount(1);
+    public MaterialProjectile(EntityType<?> type, World world, EntityLivingBase shooter, ItemStack ammunition) {
+        super(type, shooter, world);
+        this.ammunition = single(ammunition);
     }
 
-    @Override
-    protected ItemStack getPickupItem() {
-        return ammunition.isEmpty() ? ModContent.item("copper_arrow").get().getDefaultInstance() : ammunition.copy();
-    }
-
-    /** Used by the renderer so arrows and bolts retain their actual ammunition appearance. */
-    @Override
-    public ItemStack getItem() {
-        return getPickupItem();
+    private static ItemStack single(ItemStack stack) {
+        ItemStack copy = stack.copy();
+        copy.setCount(1);
+        return copy;
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        if (!ammunition.isEmpty()) tag.put("Ammunition", ammunition.save(new CompoundTag()));
+    protected ItemStack getArrowStack() {
+        return ammunition.isEmpty() ? new ItemStack(ModContent.item("copper_arrow").get()) : ammunition.copy();
+    }
+
+    public ItemStack getAmmunition() {
+        return getArrowStack();
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        ammunition = tag.contains("Ammunition") ? ItemStack.of(tag.getCompound("Ammunition")) : ItemStack.EMPTY;
+    public void writeAdditional(NBTTagCompound tag) {
+        super.writeAdditional(tag);
+        if (!ammunition.isEmpty()) tag.setTag("Ammunition", ammunition.write(new NBTTagCompound()));
     }
 
-    @Override public void writeSpawnData(FriendlyByteBuf buffer) { buffer.writeItem(ammunition); }
-    @Override public void readSpawnData(FriendlyByteBuf additionalData) { ammunition = additionalData.readItem(); }
-
-    /**
-     * AbstractArrow's vanilla packet omits Forge additional spawn data. The
-     * Forge packet carries the retained ammunition to the client before the
-     * projectile's first render.
-     */
     @Override
-    public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public void readAdditional(NBTTagCompound tag) {
+        super.readAdditional(tag);
+        ammunition = tag.contains("Ammunition", 10)
+                ? ItemStack.read(tag.getCompound("Ammunition")) : ItemStack.EMPTY;
     }
+
+    @Override public void writeSpawnData(PacketBuffer buffer) { buffer.writeItemStack(ammunition); }
+    @Override public void readSpawnData(PacketBuffer buffer) { ammunition = buffer.readItemStack(); }
 }

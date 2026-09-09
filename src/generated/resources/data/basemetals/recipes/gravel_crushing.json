@@ -1,7 +1,7 @@
 {
   "type": "basemetals:crushing",
   "ingredient": {
-    "tag": "forge:gravel"
+    "item": "minecraft:gravel"
   },
   "result": {
     "item": "minecraft:sand"

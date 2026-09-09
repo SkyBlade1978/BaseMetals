@@ -1,67 +1,62 @@
 package zone.moddev.mc.basemetals.content;
 
-import zone.moddev.mc.basemetals.material.MaterialDefinition;
-import zone.moddev.mc.basemetals.ModTags;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.DiggerItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import java.util.Collections;
 import java.util.List;
+
 import javax.annotation.Nullable;
 
-public final class ScytheItem extends DiggerItem implements MaterialBacked {
-    /**
-     * The nested calls use the ordinary server break path so every affected
-     * block still fires Forge's protection event and receives vanilla drops.
-     * The guard lets those nested calls complete without recursively starting
-     * another 3x3 harvest.
-     */
-    private static final ThreadLocal<Boolean> HARVESTING = ThreadLocal.withInitial(() -> false);
+import zone.moddev.mc.basemetals.ModTags;
+import zone.moddev.mc.basemetals.material.MaterialDefinition;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
+
+public final class ScytheItem extends ItemTool implements MaterialBacked {
+    private static final ThreadLocal<Boolean> HARVESTING = new ThreadLocal<Boolean>() {
+        @Override protected Boolean initialValue() { return Boolean.FALSE; }
+    };
     private final MaterialDefinition material;
 
-    public ScytheItem(MaterialDefinition material, Properties properties) {
-        super(0.0F, 0.0F, new MaterialTier(material), ModTags.SCYTHE_HARVESTABLE, properties);
+    public ScytheItem(MaterialDefinition material, Item.Properties properties) {
+        super(0.0F, 0.0F, new MaterialTier(material), Collections.<Block>emptySet(), properties);
         this.material = material;
     }
 
     @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+    @Override public float getDestroySpeed(ItemStack stack, IBlockState state) {
+        return state.isIn(ModTags.SCYTHE_HARVESTABLE) ? material.toolEfficiency() : 1.0F;
+    }
 
     @Override
-    public boolean onBlockStartBreak(ItemStack stack, BlockPos position, Player player) {
-        if (player.level.isClientSide || !(player instanceof ServerPlayer serverPlayer)
-                || HARVESTING.get()) {
-            return false;
-        }
-        if (!player.level.getBlockState(position).is(ModTags.SCYTHE_HARVESTABLE)) {
-            return false;
-        }
-
-        HARVESTING.set(true);
+    public boolean onBlockStartBreak(ItemStack stack, BlockPos position, EntityPlayer player) {
+        if (player.world.isRemote || !(player instanceof EntityPlayerMP) || HARVESTING.get()) return false;
+        if (!player.world.getBlockState(position).isIn(ModTags.SCYTHE_HARVESTABLE)) return false;
+        HARVESTING.set(Boolean.TRUE);
         try {
+            EntityPlayerMP serverPlayer = (EntityPlayerMP) player;
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    BlockPos target = position.offset(dx, 0, dz);
-                    if (player.level.getBlockState(target).is(ModTags.SCYTHE_HARVESTABLE)) {
-                        serverPlayer.gameMode.destroyBlock(target);
+                    BlockPos target = position.add(dx, 0, dz);
+                    if (player.world.getBlockState(target).isIn(ModTags.SCYTHE_HARVESTABLE)) {
+                        serverPlayer.interactionManager.tryHarvestBlock(target);
                     }
                 }
             }
         } finally {
-            HARVESTING.set(false);
+            HARVESTING.set(Boolean.FALSE);
         }
-        // The centre was included above; prevent the outer break from paying
-        // drops and durability a second time.
         return true;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-            List<Component> tooltip, TooltipFlag flag) {
-        MaterialItems.addToolTooltip(material, tooltip);
-    }
+    @Override public void addInformation(ItemStack stack, @Nullable World world,
+            List<ITextComponent> tooltip, ITooltipFlag flag) { MaterialItems.addToolTooltip(material, tooltip); }
 }

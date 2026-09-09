@@ -1,26 +1,40 @@
 package zone.moddev.mc.basemetals.entity;
 
 import zone.moddev.mc.basemetals.BaseMetals;
+import zone.moddev.mc.basemetals.content.RegistryHandle;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.entity.EntityType;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = BaseMetals.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ModEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(
-            ForgeRegistries.ENTITIES, BaseMetals.MOD_ID);
-    public static final RegistryObject<EntityType<MaterialProjectile>> CUSTOM_ARROW = ENTITIES.register(
-            "custom_arrow", () -> EntityType.Builder.<MaterialProjectile>of(MaterialProjectile::new, MobCategory.MISC)
-                    .sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20)
-                    .build(BaseMetals.MOD_ID + ":custom_arrow"));
-    public static final RegistryObject<EntityType<MaterialProjectile>> CUSTOM_BOLT = ENTITIES.register(
-            "custom_bolt", () -> EntityType.Builder.<MaterialProjectile>of(MaterialProjectile::new, MobCategory.MISC)
-                    .sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20)
-                    .build(BaseMetals.MOD_ID + ":custom_bolt"));
+    public static final RegistryHandle<EntityType<MaterialProjectile>> CUSTOM_ARROW =
+            new RegistryHandle<EntityType<MaterialProjectile>>("custom_arrow");
+    public static final RegistryHandle<EntityType<MaterialProjectile>> CUSTOM_BOLT =
+            new RegistryHandle<EntityType<MaterialProjectile>>("custom_bolt");
 
     private ModEntities() {}
-    public static void register(IEventBus bus) { ENTITIES.register(bus); }
+
+    public static void initialize() {
+        // Forces this event subscriber to initialize before item factories capture the handles.
+    }
+
+    @SubscribeEvent
+    public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
+        CUSTOM_ARROW.bind(register(event, "custom_arrow", CUSTOM_ARROW));
+        CUSTOM_BOLT.bind(register(event, "custom_bolt", CUSTOM_BOLT));
+    }
+
+    private static EntityType<MaterialProjectile> register(RegistryEvent.Register<EntityType<?>> event,
+            String name, final RegistryHandle<EntityType<MaterialProjectile>> self) {
+        EntityType<MaterialProjectile> type = EntityType.Builder
+                .create(MaterialProjectile.class, world -> new MaterialProjectile(self.get(), world))
+                .tracker(64, 20, true)
+                .build(BaseMetals.MOD_ID + ":" + name);
+        type.setRegistryName(BaseMetals.MOD_ID, name);
+        event.getRegistry().register(type);
+        return type;
+    }
 }

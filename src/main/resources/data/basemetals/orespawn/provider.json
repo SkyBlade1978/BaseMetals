@@ -10,122 +10,368 @@
       "retrogen": false,
       "dimensions": {
         "minecraft:the_nether": {
-          "enabled": true, "min_y": 0, "max_y": 127, "frequency": 5,
-          "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
-          "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
-          "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-          "host_blocks": ["minecraft:netherrack"],
-          "host_tags": ["forge:netherrack"]
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 127,
+          "frequency": 5,
+          "host_blocks": [
+            "minecraft:netherrack"
+          ],
+          "host_tags": [
+            "forge:netherrack"
+          ],
+          "host_families": []
         }
       }
     },
     "basemetals:ore/adamantine": {
       "block": "basemetals:adamantine_ore",
-      "enabled": true, "source_mod": "basemetals", "retrogen": false,
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
       "dimensions": {
         "minecraft:the_nether": {
-          "enabled": true, "min_y": 0, "max_y": 127, "frequency": 2,
-          "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
-          "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
-          "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-          "host_blocks": ["minecraft:netherrack"],
-          "host_tags": ["forge:netherrack"]
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 127,
+          "frequency": 2,
+          "host_blocks": [
+            "minecraft:netherrack"
+          ],
+          "host_tags": [
+            "forge:netherrack"
+          ],
+          "host_families": []
         }
       }
     },
     "basemetals:ore/starsteel": {
       "block": "basemetals:starsteel_ore",
-      "enabled": true, "source_mod": "basemetals", "retrogen": false,
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
       "dimensions": {
         "minecraft:the_end": {
-          "enabled": true, "min_y": 0, "max_y": 254, "frequency": 5,
-          "min_quantity": 4, "max_quantity": 11, "pattern": "vein",
-          "height_distribution": "uniform", "discard_chance_on_air_exposure": 0,
-          "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-          "host_blocks": ["minecraft:end_stone"],
-          "host_tags": ["forge:end_stones"]
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 254,
+          "frequency": 5,
+          "host_blocks": [
+            "minecraft:end_stone"
+          ],
+          "host_tags": [
+            "forge:end_stones"
+          ],
+          "host_families": []
+        }
+      }
+    },
+    "basemetals:ore/copper": {
+      "block": "basemetals:copper_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 95,
+          "frequency": 10,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
+    },
+    "basemetals:ore/silver": {
+      "block": "basemetals:silver_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 31,
+          "frequency": 4,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
         }
       }
     },
     "basemetals:ore/tin": {
-      "block": "basemetals:tin_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 128, "frequency": 10,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:tin_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 127,
+          "frequency": 10,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     },
     "basemetals:ore/lead": {
-      "block": "basemetals:lead_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 64, "frequency": 5,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:lead_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 63,
+          "frequency": 5,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     },
     "basemetals:ore/zinc": {
-      "block": "basemetals:zinc_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 96, "frequency": 5,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
-    },
-    "basemetals:ore/silver": {
-      "block": "basemetals:silver_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 32, "frequency": 4,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "bottom_triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:zinc_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 95,
+          "frequency": 5,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     },
     "basemetals:ore/mercury": {
-      "block": "basemetals:mercury_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 32, "frequency": 3,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "bottom_triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:mercury_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 0,
+          "max_y": 31,
+          "frequency": 3,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     },
     "basemetals:ore/nickel": {
-      "block": "basemetals:nickel_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -32, "max_y": 96, "frequency": 1,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:nickel_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 32,
+          "max_y": 95,
+          "frequency": 1,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     },
     "basemetals:ore/platinum": {
-      "block": "basemetals:platinum_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": true, "min_y": -64, "max_y": 16, "frequency": 0.125,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "bottom_triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
-    },
-    "basemetals:ore/copper": {
-      "block": "basemetals:copper_ore", "enabled": true, "source_mod": "basemetals", "retrogen": false,
-      "dimension_selectors": {"orespawn:all_except_nether_end": {
-        "enabled": false, "min_y": -16, "max_y": 112, "frequency": 10,
-        "min_quantity": 4, "max_quantity": 11, "pattern": "vein", "height_distribution": "triangle",
-        "discard_chance_on_air_exposure": 0, "spread": 8, "vertical_spread": 4, "node_size": 4, "length": 16,
-        "host_families": ["sedimentary", "metamorphic", "igneous_intrusive", "igneous_volcanic"],
-        "host_tags": ["minecraft:stone_ore_replaceables", "minecraft:deepslate_ore_replaceables"]
-      }}
+      "block": "basemetals:platinum_ore",
+      "enabled": true,
+      "source_mod": "basemetals",
+      "retrogen": false,
+      "dimension_selectors": {
+        "orespawn:all_except_nether_end": {
+          "enabled": true,
+          "min_quantity": 4,
+          "max_quantity": 11,
+          "pattern": "vein",
+          "height_distribution": "uniform",
+          "discard_chance_on_air_exposure": 0,
+          "spread": 8,
+          "vertical_spread": 4,
+          "node_size": 4,
+          "length": 16,
+          "min_y": 1,
+          "max_y": 31,
+          "frequency": 0.125,
+          "host_blocks": [
+            "minecraft:stone"
+          ],
+          "host_tags": [
+            "forge:stone"
+          ],
+          "host_families": [
+            "sedimentary",
+            "metamorphic",
+            "igneous_intrusive",
+            "igneous_volcanic"
+          ]
+        }
+      }
     }
   },
   "rocks": {},

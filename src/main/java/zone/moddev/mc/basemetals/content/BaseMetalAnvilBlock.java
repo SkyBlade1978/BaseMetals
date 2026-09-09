@@ -1,85 +1,80 @@
 package zone.moddev.mc.basemetals.content;
 
-import javax.annotation.Nullable;
+import net.minecraft.block.BlockAnvil;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ContainerRepair;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.IInteractionObject;
+import net.minecraft.world.World;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AnvilBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
-
-/** A single registry ID retaining the 1.12 anvil damage states. */
-public final class BaseMetalAnvilBlock extends AnvilBlock {
+/** Base Metals anvil with the vanilla repair UI and a stable custom block ID. */
+public final class BaseMetalAnvilBlock extends BlockAnvil {
     public static final IntegerProperty DAMAGE = IntegerProperty.create("damage", 0, 2);
 
     public BaseMetalAnvilBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(DAMAGE, 0));
+        setDefaultState(stateContainer.getBaseState().with(FACING, EnumFacing.NORTH)
+                .with(DAMAGE, Integer.valueOf(0)));
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(DAMAGE);
+    public IBlockState getStateForPlacement(BlockItemUseContext context) {
+        return getDefaultState().with(FACING, context.getPlacementHorizontalFacing().rotateY());
     }
 
-    @Nullable
     @Override
-    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-        return new SimpleMenuProvider((containerId, inventory, player) ->
-                new DurableAnvilMenu(containerId, inventory, level, pos),
-                new TranslatableComponent(getDescriptionId()));
+    protected void fillStateContainer(StateContainer.Builder<net.minecraft.block.Block, IBlockState> builder) {
+        builder.add(FACING, DAMAGE);
     }
 
-    private static final class DurableAnvilMenu extends AnvilMenu {
-        private final Level level;
+    /** Entry points used by the Forge 25 compatibility transformer in BlockAnvil.damage. */
+    public static boolean isBaseMetalAnvil(IBlockState state) {
+        return state != null && state.getBlock() instanceof BaseMetalAnvilBlock;
+    }
+
+    public static IBlockState damageBaseMetalAnvil(IBlockState state) {
+        int damage = state.get(DAMAGE).intValue();
+        return damage >= 2 ? null : state.with(DAMAGE, Integer.valueOf(damage + 1));
+    }
+
+    @Override
+    public boolean onBlockActivated(IBlockState state, World world, BlockPos pos, EntityPlayer player,
+            EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) player.displayGui(new Interaction(world, pos, this));
+        return true;
+    }
+
+    private static final class Interaction implements IInteractionObject {
+        private final World world;
         private final BlockPos pos;
-
-        private DurableAnvilMenu(int containerId, Inventory inventory, Level level, BlockPos pos) {
-            super(containerId, inventory, ContainerLevelAccess.create(level, pos));
-            this.level = level;
-            this.pos = pos.immutable();
+        private final BaseMetalAnvilBlock block;
+        private Interaction(World world, BlockPos pos, BaseMetalAnvilBlock block) {
+            this.world = world;
+            this.pos = pos;
+            this.block = block;
         }
-
-        @Override
-        protected boolean isValidBlock(BlockState state) {
-            return state.getBlock() instanceof BaseMetalAnvilBlock;
-        }
-
-        @Override
-        protected void onTake(Player player, ItemStack output) {
-            BlockState original = level.getBlockState(pos);
-            if (!(original.getBlock() instanceof BaseMetalAnvilBlock)) {
-                super.onTake(player, output);
-                return;
-            }
-
-            int damage = original.getValue(DAMAGE);
-            Block placeholder = switch (damage) {
-                case 0 -> Blocks.ANVIL;
-                case 1 -> Blocks.CHIPPED_ANVIL;
-                default -> Blocks.DAMAGED_ANVIL;
+        @Override public ITextComponent getName() { return new TextComponentTranslation(block.getTranslationKey()); }
+        @Override public boolean hasCustomName() { return false; }
+        @Override public ITextComponent getCustomName() { return null; }
+        @Override public String getGuiID() { return "minecraft:anvil"; }
+        @Override public Container createContainer(InventoryPlayer inventory, EntityPlayer player) {
+            return new ContainerRepair(inventory, world, pos, player) {
+                @Override public boolean canInteractWith(EntityPlayer candidate) {
+                    return world.getBlockState(pos).getBlock() == block
+                            && candidate.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D,
+                                    pos.getZ() + 0.5D) <= 64.0D;
+                }
             };
-            level.setBlock(pos, placeholder.defaultBlockState().setValue(FACING, original.getValue(FACING)), 2);
-            super.onTake(player, output);
-
-            BlockState after = level.getBlockState(pos);
-            if (after.is(placeholder)) {
-                level.setBlock(pos, original, 2);
-            } else if (damage < 2 && (after.is(Blocks.CHIPPED_ANVIL) || after.is(Blocks.DAMAGED_ANVIL))) {
-                level.setBlock(pos, original.setValue(DAMAGE, damage + 1), 2);
-            }
         }
     }
 }

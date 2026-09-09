@@ -1,9 +1,8 @@
-Base Metals 3.0.1.118021
+Base Metals 3.0.1.113021
 
-- Modernize the Minecraft 1.18.2 build to ForgeGradle 7.0.34 and Gradle 9.6.1.
-- Qualify against the exact OreSpawn 4.0.16.118021 CurseForge release while retaining the supported OreSpawn 4.x runtime range.
-- Add deterministic main, sources, and Javadocs artifacts with release checksums and guarded publication validation.
-- Isolate GameTests and smoke fixtures from production artifacts and Eclipse production launches.
-- Add pinned GitHub Actions for build, GameTests, generated-data drift, CodeQL, wrapper validation, and target-qualified releases.
-
-Gameplay, registry IDs, recipes, save migration, and the OreSpawn provider rules are unchanged from Base Metals 3.0.0.
+- Backport the complete native Base Metals implementation to Minecraft 1.13.2 and Forge 25.0.223.
+- Preserve the established registry catalogue, mechanics, recipes, fluids, loot, trades, advancements, and Forge-tag contracts without MMDLib.
+- Use OreSpawn 4.0.16.113021 as the sole ore-placement engine, with all eleven historical rules and Base Metals copper enabled.
+- Add direct pre-flattening migration support for Cyano and MMD Base Metals worlds from Minecraft 1.10.2 and 1.12.2.
+- Render all 36 molten-fluid buckets through target-native layered models and catalogue-driven item colours, avoiding Forge 25's unfinished dynamic bucket loader.
+- Retain ForgeGradle 7.0.34, Gradle 9.6.1, exact Java toolchains, deterministic release artifacts, checksums, CI audits, and isolated Eclipse launches.

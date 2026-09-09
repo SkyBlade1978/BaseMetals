@@ -1,45 +1,42 @@
 package zone.moddev.mc.basemetals.content;
 
-import zone.moddev.mc.basemetals.material.MaterialDefinition;
-import zone.moddev.mc.basemetals.BaseMetals;
-
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.FishingRodItem;
-import net.minecraft.world.item.HoeItem;
-import net.minecraft.world.item.HorseArmorItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Predicate;
-import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nullable;
+
+import zone.moddev.mc.basemetals.BaseMetals;
+import zone.moddev.mc.basemetals.material.MaterialDefinition;
+
+import net.minecraft.entity.passive.HorseArmorType;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.init.Enchantments;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemArrow;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemShears;
+import net.minecraft.item.ItemShield;
+import net.minecraft.item.ItemSpade;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
 
 public final class MaterialItems {
     private MaterialItems() {}
@@ -53,23 +50,21 @@ public final class MaterialItems {
             this.burnTime = burnTime;
         }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public int getBurnTime(ItemStack stack,
-                @Nullable net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-            return burnTime;
-        }
+        @Override public int getBurnTime(ItemStack stack) { return burnTime; }
     }
 
-    public static final class Pickaxe extends PickaxeItem implements MaterialBacked {
+    public static final class Pickaxe extends ItemPickaxe implements MaterialBacked {
         private final MaterialDefinition material;
         public Pickaxe(MaterialDefinition material, Properties properties) {
-            super(new MaterialTier(material), 1, -2.8F, properties); this.material = material;
+            super(new MaterialTier(material), 1, -2.8F, properties);
+            this.material = material;
         }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) { addToolTooltip(material, tooltip); }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static final class Axe extends AxeItem implements MaterialBacked {
+    public static final class Axe extends ItemAxe implements MaterialBacked {
         private final MaterialDefinition material;
         public Axe(MaterialDefinition material, Properties properties) {
             super(new MaterialTier(material), 4.0F + material.baseAttackDamage(),
@@ -77,247 +72,224 @@ public final class MaterialItems {
             this.material = material;
         }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) { addToolTooltip(material, tooltip); }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static final class Shovel extends ShovelItem implements MaterialBacked {
+    public static final class Shovel extends ItemSpade implements MaterialBacked {
         private final MaterialDefinition material;
         public Shovel(MaterialDefinition material, Properties properties) {
-            super(new MaterialTier(material), 1.5F, -3.0F, properties); this.material = material;
-        }
-        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) { addToolTooltip(material, tooltip); }
-    }
-
-    public static final class Hoe extends HoeItem implements MaterialBacked {
-        private final MaterialDefinition material;
-        private final Multimap<Attribute, AttributeModifier> modifiers;
-        public Hoe(MaterialDefinition material, Properties properties) {
-            super(new MaterialTier(material), 0, material.baseAttackDamage() - 3.0F, properties);
+            super(new MaterialTier(material), 1.5F, -3.0F, properties);
             this.material = material;
-            this.modifiers = ImmutableMultimap.<Attribute, AttributeModifier>builder()
-                    // ItemHoe in 1.12 contributed no attack-damage modifier;
-                    // the player's normal one point of unarmed damage remains.
-                    .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID,
-                            "Tool modifier", 0.0D, AttributeModifier.Operation.ADDITION))
-                    .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID,
-                            "Tool modifier", material.baseAttackDamage() - 3.0D,
-                            AttributeModifier.Operation.ADDITION))
-                    .build();
         }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public float getAttackDamage() { return 0.0F; }
-        @Override public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
-            return slot == EquipmentSlot.MAINHAND ? modifiers : super.getDefaultAttributeModifiers(slot);
-        }
-        @Override public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) { addToolTooltip(material, tooltip); }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static class Sword extends SwordItem implements MaterialBacked {
+    public static final class Hoe extends ItemHoe implements MaterialBacked {
+        private final MaterialDefinition material;
+        public Hoe(MaterialDefinition material, Properties properties) {
+            super(new MaterialTier(material), material.baseAttackDamage() - 3.0F, properties);
+            this.material = material;
+        }
+        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
+    }
+
+    public static class Sword extends ItemSword implements MaterialBacked {
         private final MaterialDefinition material;
         public Sword(MaterialDefinition material, Properties properties) {
-            super(new MaterialTier(material), 3, -2.4F, properties); this.material = material;
-        }
-        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) { addToolTooltip(material, tooltip); }
-    }
-
-    public static final class Armor extends ArmorItem implements MaterialBacked {
-        private final MaterialDefinition material;
-        public Armor(MaterialDefinition material, EquipmentSlot slot, Properties properties) {
-            super(new MaterialArmor(material), slot, properties); this.material = material;
-        }
-        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addArmorTooltip(material, tooltip);
-        }
-    }
-
-    public static final class HorseArmor extends HorseArmorItem implements MaterialBacked {
-        private final MaterialDefinition material;
-        public HorseArmor(MaterialDefinition material, Properties properties) {
-            super(material.horseArmorProtection(), new ResourceLocation(BaseMetals.MOD_ID,
-                    "textures/entity/horse/armor/horse_armor_" + material.name() + ".png"), properties);
+            super(new MaterialTier(material), 3, -2.4F, properties);
             this.material = material;
         }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static final class BurnableBlock extends BlockItem {
+    public static final class Armor extends ItemArmor implements MaterialBacked {
+        private final MaterialDefinition material;
+        public Armor(MaterialDefinition material, EntityEquipmentSlot slot, Properties properties) {
+            super(new MaterialArmor(material), slot, properties);
+            this.material = material;
+        }
+        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addArmorTooltip(material, tooltip); }
+    }
+
+    public static final class HorseArmor extends Item implements MaterialBacked {
+        private final MaterialDefinition material;
+        private final HorseArmorType armorType;
+        public HorseArmor(MaterialDefinition material, Properties properties) {
+            super(properties.maxStackSize(1));
+            this.material = material;
+            String texture = BaseMetals.MOD_ID + ":textures/entity/horse/armor/horse_armor_"
+                    + material.name() + ".png";
+            String hash = Integer.toHexString(material.name().hashCode());
+            this.armorType = HorseArmorType.create("BASEMETALS_" + material.name().toUpperCase(),
+                    material.horseArmorProtection(), texture, hash, this);
+        }
+        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+        @Override public HorseArmorType getHorseArmorType(ItemStack stack) { return armorType; }
+    }
+
+    public static final class BurnableBlock extends ItemBlock {
         private final int burnTime;
-        public BurnableBlock(net.minecraft.world.level.block.Block block, int burnTime, Properties properties) {
+        public BurnableBlock(net.minecraft.block.Block block, int burnTime, Properties properties) {
             super(block, properties);
             this.burnTime = burnTime;
         }
-        @Override public int getBurnTime(ItemStack stack,
-                @Nullable net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-            return burnTime;
-        }
+        @Override public int getBurnTime(ItemStack stack) { return burnTime; }
     }
 
-    public static final class Shears extends ShearsItem implements MaterialBacked {
+    public static final class Shears extends ItemShears implements MaterialBacked {
         private final MaterialDefinition material;
-        public Shears(MaterialDefinition material, Properties properties) { super(properties); this.material = material; }
+        public Shears(MaterialDefinition material, Properties properties) {
+            super(properties.defaultMaxDamage(material.toolDurability()));
+            this.material = material;
+        }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-            return isMaterialRepairIngredient(repair) || super.isValidRepairItem(toRepair, repair);
+        @Override public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+            return new MaterialTier(material).getRepairMaterial().test(repair) || super.getIsRepairable(toRepair, repair);
         }
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addToolTooltip(material, tooltip);
-        }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static class Shield extends ShieldItem implements MaterialBacked {
+    public static class Shield extends ItemShield implements MaterialBacked {
         private final MaterialDefinition material;
-        public Shield(MaterialDefinition material, Properties properties) { super(properties); this.material = material; }
+        public Shield(MaterialDefinition material, Properties properties) {
+            super(properties.defaultMaxDamage(material.shieldDurability()));
+            this.material = material;
+        }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-            return isMaterialRepairIngredient(repair) || super.isValidRepairItem(toRepair, repair);
+        @Override public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+            return new MaterialTier(material).getRepairMaterial().test(repair) || super.getIsRepairable(toRepair, repair);
         }
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addToolTooltip(material, tooltip);
-        }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static class Bow extends BowItem implements MaterialBacked {
+    public static class Bow extends ItemBow implements MaterialBacked {
         private final MaterialDefinition material;
-        public Bow(MaterialDefinition material, Properties properties) { super(properties); this.material = material; }
+        public Bow(MaterialDefinition material, Properties properties) {
+            super(properties.defaultMaxDamage(material.toolDurability()));
+            this.material = material;
+        }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public Predicate<ItemStack> getAllSupportedProjectiles() {
-            return ARROW_ONLY;
+        @Override protected boolean isArrow(ItemStack stack) {
+            if (stack.getItem() instanceof BaseMetalAmmoItem) {
+                return ((BaseMetalAmmoItem) stack.getItem()).kind() == BaseMetalAmmoItem.Kind.ARROW;
+            }
+            return stack.getItem() instanceof ItemArrow;
         }
-        @Override public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-            return isMaterialRepairIngredient(repair) || super.isValidRepairItem(toRepair, repair);
+        @Override public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+            return new MaterialTier(material).getRepairMaterial().test(repair) || super.getIsRepairable(toRepair, repair);
         }
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addToolTooltip(material, tooltip);
-        }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static final class Crossbow extends BowItem implements MaterialBacked {
+    public static final class Crossbow extends ItemBow implements MaterialBacked {
         private final MaterialDefinition material;
-        public Crossbow(MaterialDefinition material, Properties properties) { super(properties); this.material = material; }
-        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public Predicate<ItemStack> getAllSupportedProjectiles() {
-            return stack -> stack.getItem() instanceof BaseMetalAmmoItem ammo
-                    && ammo.kind() == BaseMetalAmmoItem.Kind.BOLT;
+        public Crossbow(MaterialDefinition material, Properties properties) {
+            super(properties.defaultMaxDamage(material.toolDurability()));
+            this.material = material;
         }
-        @Override public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-            return isMaterialRepairIngredient(repair) || super.isValidRepairItem(toRepair, repair);
+        @Override public MaterialDefinition baseMetalsMaterial() { return material; }
+        @Override protected boolean isArrow(ItemStack stack) {
+            return stack.getItem() instanceof BaseMetalAmmoItem
+                    && ((BaseMetalAmmoItem) stack.getItem()).kind() == BaseMetalAmmoItem.Kind.BOLT;
         }
         @Override
-        public void releaseUsing(ItemStack bow, Level level, LivingEntity user, int timeLeft) {
-            if (!(user instanceof Player player)) return;
-            boolean hasInfiniteAmmo = player.getAbilities().instabuild
-                    || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, bow) > 0;
-            ItemStack ammunition = findBolt(player);
+        public void onPlayerStoppedUsing(ItemStack bow, World world, EntityLivingBase user, int timeLeft) {
+            if (!(user instanceof EntityPlayer)) return;
+            EntityPlayer player = (EntityPlayer) user;
+            boolean hasInfiniteAmmo = player.abilities.isCreativeMode
+                    || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, bow) > 0;
+            ItemStack ammunition = findAmmo(player);
             int charge = getUseDuration(bow) - timeLeft;
-            charge = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(
-                    bow, level, player, charge, !ammunition.isEmpty() || hasInfiniteAmmo);
+            charge = ForgeEventFactory.onArrowLoose(bow, world, player, charge,
+                    !ammunition.isEmpty() || hasInfiniteAmmo);
             if (charge < 0 || ammunition.isEmpty() && !hasInfiniteAmmo) return;
 
-            if (ammunition.isEmpty()) {
-                ammunition = ModContent.item("iron_bolt").get().getDefaultInstance();
-            }
-            float power = getPowerForTime(charge);
+            if (ammunition.isEmpty()) ammunition = new ItemStack(ModContent.item("iron_bolt").get());
+            float power = getArrowVelocity(charge);
             if (power < 0.1F) return;
 
-            BaseMetalAmmoItem boltItem = ammunition.getItem() instanceof BaseMetalAmmoItem ammo
-                    && ammo.kind() == BaseMetalAmmoItem.Kind.BOLT
-                    ? ammo
-                    : (BaseMetalAmmoItem) ModContent.item("iron_bolt").get();
-            boolean infiniteShot = player.getAbilities().instabuild
-                    || boltItem.isInfinite(ammunition, bow, player);
-            if (!level.isClientSide) {
-                AbstractArrow bolt = boltItem.createArrow(level, ammunition, player);
-                bolt.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F,
+            BaseMetalAmmoItem bolt = (BaseMetalAmmoItem) ammunition.getItem();
+            boolean infiniteShot = player.abilities.isCreativeMode
+                    || bolt.isInfinite(ammunition, bow, player);
+            if (!world.isRemote) {
+                EntityArrow projectile = bolt.createArrow(world, ammunition, player);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F,
                         power * 3.0F, 1.0F);
-                if (power == 1.0F) bolt.setCritArrow(true);
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, bow);
+                if (power == 1.0F) projectile.setIsCritical(true);
+                int powerLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, bow);
                 if (powerLevel > 0) {
-                    bolt.setBaseDamage(bolt.getBaseDamage() + powerLevel * 0.5D + 0.5D);
+                    projectile.setDamage(projectile.getDamage() + powerLevel * 0.5D + 0.5D);
                 }
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, bow);
-                if (punchLevel > 0) bolt.setKnockback(punchLevel);
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, bow) > 0) {
-                    bolt.setSecondsOnFire(100);
+                int punchLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, bow);
+                if (punchLevel > 0) projectile.setKnockbackStrength(punchLevel);
+                if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, bow) > 0) {
+                    projectile.setFire(100);
                 }
-                bow.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(player.getUsedItemHand()));
-                if (infiniteShot) bolt.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
-                level.addFreshEntity(bolt);
+                bow.damageItem(1, player);
+                if (infiniteShot) projectile.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
+                world.spawnEntity(projectile);
             }
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT,
-                    SoundSource.PLAYERS, 1.0F,
-                    1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
-            if (!infiniteShot && !player.getAbilities().instabuild) {
+            world.playSound(null, player.posX, player.posY, player.posZ,
+                    SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.0F,
+                    1.0F / (random.nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+            if (!infiniteShot && !player.abilities.isCreativeMode) {
                 ammunition.shrink(1);
-                if (ammunition.isEmpty()) player.getInventory().removeItem(ammunition);
+                if (ammunition.isEmpty()) player.inventory.deleteStack(ammunition);
             }
-            player.awardStat(Stats.ITEM_USED.get(this));
+            player.addStat(StatList.ITEM_USED.get(this));
         }
-
-        private ItemStack findBolt(Player player) {
-            ItemStack offhand = player.getOffhandItem();
-            if (getAllSupportedProjectiles().test(offhand)) return offhand;
-            ItemStack mainhand = player.getMainHandItem();
-            if (getAllSupportedProjectiles().test(mainhand)) return mainhand;
-            for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
-                ItemStack candidate = player.getInventory().getItem(slot);
-                if (getAllSupportedProjectiles().test(candidate)) return candidate;
-            }
-            return ItemStack.EMPTY;
+        @Override public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+            return new MaterialTier(material).getRepairMaterial().test(repair) || super.getIsRepairable(toRepair, repair);
         }
-
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addToolTooltip(material, tooltip);
-        }
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
     }
 
-    public static final class FishingRod extends FishingRodItem implements MaterialBacked {
+    public static final class FishingRod extends ItemFishingRod implements MaterialBacked {
         private final MaterialDefinition material;
-        public FishingRod(MaterialDefinition material, Properties properties) { super(properties); this.material = material; }
+        public FishingRod(MaterialDefinition material, Properties properties) {
+            super(properties.defaultMaxDamage(material.toolDurability()));
+            this.material = material;
+        }
         @Override public MaterialDefinition baseMetalsMaterial() { return material; }
-        @Override public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-            return isMaterialRepairIngredient(repair) || super.isValidRepairItem(toRepair, repair);
+        @Override public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+            return new MaterialTier(material).getRepairMaterial().test(repair) || super.getIsRepairable(toRepair, repair);
         }
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                List<Component> tooltip, TooltipFlag flag) {
-            addToolTooltip(material, tooltip);
+        @Override public void addInformation(ItemStack stack, @Nullable World world,
+                List<ITextComponent> tooltip, ITooltipFlag flag) { addToolTooltip(material, tooltip); }
+    }
+
+    static void addToolTooltip(MaterialDefinition material, List<ITextComponent> tooltip) {
+        if ("adamantine".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip.adamantine.tool", 4));
+        } else if ("aquarium".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip.aquarium.tool", 4));
+        } else if ("coldiron".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip.coldiron.tool", 3));
+        } else if ("mithril".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip.mithril.tool"));
+        } else if ("starsteel".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip.starsteel.tool", 10));
         }
     }
 
-    static void addToolTooltip(MaterialDefinition material, List<Component> tooltip) {
-        Component component = switch (material.name()) {
-            case "adamantine" -> new TranslatableComponent("tooltip.adamantine.tool", 4);
-            case "aquarium" -> new TranslatableComponent("tooltip.aquarium.tool", 4);
-            case "coldiron" -> new TranslatableComponent("tooltip.coldiron.tool", 3);
-            case "mithril" -> new TranslatableComponent("tooltip.mithril.tool");
-            case "starsteel" -> new TranslatableComponent("tooltip.starsteel.tool", 10);
-            default -> null;
-        };
-        if (component != null) tooltip.add(component);
-    }
-
-    private static void addArmorTooltip(MaterialDefinition material, List<Component> tooltip) {
-        if (material.name().equals("adamantine") || material.name().equals("aquarium")
-                || material.name().equals("coldiron") || material.name().equals("mithril")
-                || material.name().equals("starsteel")) {
-            tooltip.add(new TranslatableComponent("tooltip." + material.name() + ".armor"));
+    private static void addArmorTooltip(MaterialDefinition material, List<ITextComponent> tooltip) {
+        if ("adamantine".equals(material.name()) || "aquarium".equals(material.name())
+                || "coldiron".equals(material.name()) || "mithril".equals(material.name())
+                || "starsteel".equals(material.name())) {
+            tooltip.add(new TextComponentTranslation("tooltip." + material.name() + ".armor"));
         }
     }
 }

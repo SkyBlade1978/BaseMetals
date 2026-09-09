@@ -4,34 +4,33 @@ import java.util.function.Supplier;
 
 import zone.moddev.mc.basemetals.material.MaterialDefinition;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.IArmorMaterial;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 
-public final class MaterialArmor implements ArmorMaterial {
+public final class MaterialArmor implements IArmorMaterial {
     private static final int[] DURABILITY = {13, 15, 16, 11};
     private final MaterialDefinition material;
     private final Supplier<Ingredient> repair;
 
     public MaterialArmor(MaterialDefinition material) {
         this.material = material;
-        this.repair = () -> Ingredient.of(ItemTags.create(
-                new ResourceLocation(material.repairIngredientTag())));
+        final ItemTags.Wrapper tag = new ItemTags.Wrapper(new ResourceLocation(material.repairIngredientTag()));
+        this.repair = () -> Ingredient.fromTag(tag);
     }
 
     public MaterialDefinition material() { return material; }
-    @Override public int getDurabilityForSlot(EquipmentSlot slot) {
+    @Override public int getDurability(EntityEquipmentSlot slot) {
         return DURABILITY[slot.getIndex()] * material.armorDurabilityFactor();
     }
-    @Override public int getDefenseForSlot(EquipmentSlot slot) { return material.armorProtection(slot); }
-    @Override public int getEnchantmentValue() { return material.enchantability(); }
-    @Override public SoundEvent getEquipSound() { return SoundEvents.ARMOR_EQUIP_IRON; }
-    @Override public Ingredient getRepairIngredient() { return repair.get(); }
+    @Override public int getDamageReductionAmount(EntityEquipmentSlot slot) { return material.armorProtection(slot); }
+    @Override public int getEnchantability() { return material.enchantability(); }
+    @Override public SoundEvent getSoundEvent() { return SoundEvents.ITEM_ARMOR_EQUIP_IRON; }
+    @Override public Ingredient getRepairMaterial() { return repair.get(); }
     @Override public String getName() { return "basemetals:" + material.name(); }
     @Override public float getToughness() { return material.armorToughness(); }
-    @Override public float getKnockbackResistance() { return 0.0F; }
 }

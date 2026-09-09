@@ -1,31 +1,30 @@
 package zone.moddev.mc.basemetals;
 
-import java.util.function.Supplier;
-
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class ModTabs {
-    public static final CreativeModeTab BLOCKS = tab("blocks", "starsteel_block", Items.IRON_BLOCK);
-    public static final CreativeModeTab ITEMS = tab("items", "starsteel_gear", Items.IRON_INGOT);
-    public static final CreativeModeTab TOOLS = tab("tools", "starsteel_pickaxe", Items.IRON_PICKAXE);
-    public static final CreativeModeTab COMBAT = tab("combat", "starsteel_sword", Items.IRON_SWORD);
+    public static final ItemGroup BLOCKS = tab("blocks", "starsteel_block", Item.getItemFromBlock(Blocks.IRON_BLOCK));
+    public static final ItemGroup ITEMS = tab("items", "starsteel_gear", Items.IRON_INGOT);
+    public static final ItemGroup TOOLS = tab("tools", "starsteel_pickaxe", Items.IRON_PICKAXE);
+    public static final ItemGroup COMBAT = tab("combat", "starsteel_sword", Items.IRON_SWORD);
 
     private ModTabs() {}
 
-    private static CreativeModeTab tab(String suffix, String iconId, Item fallback) {
-        Supplier<ItemStack> icon = () -> {
-            Item registered = ForgeRegistries.ITEMS.getValue(new ResourceLocation(BaseMetals.MOD_ID, iconId));
-            return new ItemStack(registered == null ? fallback : registered);
-        };
-        return new CreativeModeTab(BaseMetals.MOD_ID + "." + suffix) {
+    private static ItemGroup tab(String suffix, final String iconId, final Item fallback) {
+        return new ItemGroup(BaseMetals.MOD_ID + "." + suffix) {
             @Override
-            public ItemStack makeIcon() {
-                return icon.get();
+            @OnlyIn(Dist.CLIENT)
+            public ItemStack createIcon() {
+                Item registered = ForgeRegistries.ITEMS.getValue(new ResourceLocation(BaseMetals.MOD_ID, iconId));
+                return new ItemStack(registered == null ? fallback : registered);
             }
         };
     }

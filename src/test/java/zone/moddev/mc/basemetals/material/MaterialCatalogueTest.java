@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.inventory.EntityEquipmentSlot;
 
 class MaterialCatalogueTest {
     @Test
@@ -29,10 +29,10 @@ class MaterialCatalogueTest {
         assertEquals(3200, adamantine.toolDurability());
         assertEquals(200, adamantine.armorDurabilityFactor());
         assertEquals(0, adamantine.enchantability());
-        assertEquals(2, adamantine.armorProtection(EquipmentSlot.HEAD));
-        assertEquals(8, adamantine.armorProtection(EquipmentSlot.CHEST));
-        assertEquals(7, adamantine.armorProtection(EquipmentSlot.LEGS));
-        assertEquals(3, adamantine.armorProtection(EquipmentSlot.FEET));
+        assertEquals(2, adamantine.armorProtection(EntityEquipmentSlot.HEAD));
+        assertEquals(8, adamantine.armorProtection(EntityEquipmentSlot.CHEST));
+        assertEquals(7, adamantine.armorProtection(EntityEquipmentSlot.LEGS));
+        assertEquals(3, adamantine.armorProtection(EntityEquipmentSlot.FEET));
     }
 
     @Test
@@ -75,8 +75,8 @@ class MaterialCatalogueTest {
                     material.name());
             assertEquals(material.hardness() > 10.0D ? (float) (int) (material.hardness() / 5.0D) : 0.0F,
                     material.armorToughness(), material.name());
-            for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST,
-                    EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
+            for (EntityEquipmentSlot slot : Arrays.asList(EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST,
+                    EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET)) {
                 assertTrue(material.armorProtection(slot) >= 0 && material.armorProtection(slot) <= 30,
                         material.name() + " " + slot);
             }

@@ -117,8 +117,8 @@ class OreSpawnSchemaValidationTest {
 		}
 		if (schema.has("additionalProperties") && schema.get("additionalProperties").isJsonPrimitive()
 				&& !schema.get("additionalProperties").getAsBoolean()) {
-			for (String property : value.keySet()) {
-				require(properties.has(property), path + " has unsupported property " + property);
+			for (Map.Entry<String, JsonElement> property : value.entrySet()) {
+				require(properties.has(property.getKey()), path + " has unsupported property " + property.getKey());
 			}
 		}
 	}

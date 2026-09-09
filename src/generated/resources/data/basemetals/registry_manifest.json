@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "source": "Base Metals 1.18 catalogue",
+  "source": "Base Metals 1.13.2 catalogue",
   "blocks": [
     "basemetals:adamantine_block",
     "basemetals:adamantine_plate",
@@ -1563,9 +1563,7 @@
     "basemetals:legacy_smelting",
     "basemetals:plate_repair"
   ],
-  "loot_modifier_serializers": [
-    "basemetals:add_table"
-  ],
+  "loot_modifier_serializers": [],
   "restored_blocks": [
     "basemetals:stone_anvil",
     "basemetals:steel_anvil",
@@ -1707,7 +1705,5 @@
     "basemetals:legacy_smelting",
     "basemetals:plate_repair"
   ],
-  "new_loot_modifier_serializers": [
-    "basemetals:add_table"
-  ]
+  "new_loot_modifier_serializers": []
 }
